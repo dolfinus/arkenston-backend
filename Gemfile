@@ -5,8 +5,8 @@ ruby '2.5.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.1'
-# Use sqlite3 as the database for Active Record
-gem 'sqlite3'
+# Use pg as the database for Active Record
+gem 'pg', '~> 0.21'
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -28,6 +28,30 @@ gem 'bootsnap', '>= 1.1.0', require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
 
+# Use Clearance for user auth
+gem "clearance"
+
+# Use ActiveStorage for attaching files support
+gem 'activestorage'
+
+# Use GraphQL as API endpoint
+gem 'graphql'
+
+# Use validates_type for validating type of fields while assign value
+gem 'validates_type'
+
+# Use PaperTrail for versioning
+gem 'paper_trail', '~> 10'
+gem 'paper_trail-association_tracking'
+
+# Use ActiveRecord Diff for returning diff between versions
+gem 'activerecord-diff'
+
+# Use Globalize for translatable content
+gem 'globalize', github: 'globalize/globalize', branch: 'master'
+# With versioning support also
+gem 'globalize-versioning', github: 'dolfinus/globalize-versioning', branch: 'rails_5x'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -43,3 +67,4 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem 'graphiql-rails', group: :development
