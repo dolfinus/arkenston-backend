@@ -1,2 +1,2 @@
-# diamantum-backend
-A Ruby on Rails based backend for Diamantum project
+# Arkenston backend
+A Ruby on Rails based backend for Arkenston project
