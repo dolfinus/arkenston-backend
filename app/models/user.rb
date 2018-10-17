@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   include Clearance::User
+  include HasRole
   has_paper_trail
 
   validates_format_of :name, with: /^[a-zA-Z0-9_\.]*$/, multiline: true
