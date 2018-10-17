@@ -1,6 +1,7 @@
 require 'active_record/diff'
 
 class ApplicationRecord < ActiveRecord::Base
+  include ActiveModel::Validations
   include ActiveRecord::Diff
   self.abstract_class = true
 
