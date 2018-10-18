@@ -10,6 +10,13 @@ GIT
       paper_trail (>= 3.0.0)
 
 GIT
+  remote: https://github.com/dolfinus/graphql-sugar.git
+  revision: d1becc979e16f7b5a0f6dc78a01a95f07ff774e0
+  branch: support-1.8
+  specs:
+    graphql-sugar (0.1.6)
+
+GIT
   remote: https://github.com/globalize/globalize.git
   revision: ff22b92bfa283bb9f378899031dbfad38de6280d
   branch: master
@@ -185,6 +192,7 @@ DEPENDENCIES
   globalize-versioning!
   graphiql-rails
   graphql
+  graphql-sugar!
   listen (>= 3.0.5, < 3.2)
   paper_trail (~> 10)
   paper_trail-association_tracking
