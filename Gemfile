@@ -37,6 +37,9 @@ gem 'activestorage'
 # Use GraphQL as API endpoint
 gem 'graphql'
 
+# Use GraphQL Sugar for DRYing default GraphQL types
+gem 'graphql-sugar', github: 'dolfinus/graphql-sugar', branch: 'support-1.8'
+
 # Use validates_type for validating type of fields while assign value
 gem 'validates_type'
 

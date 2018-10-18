@@ -19,6 +19,9 @@ Bundler.require(*Rails.groups)
 
 module Backend
   class Application < Rails::Application
+    config.eager_load_paths += Dir["#{config.root}/app/graphql/resolvers/**/"]
+    config.eager_load_paths += Dir["#{config.root}/app/graphql/mutators/**/"]
+    config.eager_load_paths += Dir["#{config.root}/app/graphql/functions/**/"]
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.2
 
