@@ -3,5 +3,6 @@ module Types
     graphql_name "Query"
 
     resolver :user
+    resolver :users
   end
 end
