@@ -28,8 +28,15 @@ gem 'bootsnap', '>= 1.1.0', require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
 
-# Use Clearance for user auth
+# Use Clearance for user registration
 gem "clearance"
+
+# Use Pundit for auth policy
+gem 'pundit'
+gem 'graphql-pundit', github: 'ontohub/graphql-pundit', branch: 'dependabot/bundler/pundit-gte-1.1-and-lt-2.1'
+
+# Use JWT Bearer auth
+gem 'jwt'
 
 # Use ActiveStorage for attaching files support
 gem 'activestorage'
@@ -70,4 +77,3 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
-gem 'graphiql-rails', group: :development

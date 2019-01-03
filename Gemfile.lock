@@ -26,6 +26,15 @@ GIT
       activerecord (>= 4.2, < 5.3)
       request_store (~> 1.0)
 
+GIT
+  remote: https://github.com/ontohub/graphql-pundit.git
+  revision: 5c14ccd887d6cce070073b4c5129024356f75d77
+  branch: dependabot/bundler/pundit-gte-1.1-and-lt-2.1
+  specs:
+    graphql-pundit (0.7.1)
+      graphql (>= 1.6.4, < 1.10.0)
+      pundit (>= 1.1, < 2.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -89,12 +98,10 @@ GEM
     ffi (1.9.25)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
-    graphiql-rails (1.4.11)
-      railties
-      sprockets-rails
     graphql (1.8.11)
     i18n (1.1.1)
       concurrent-ruby (~> 1.0)
+    jwt (2.1.0)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -121,6 +128,8 @@ GEM
     paper_trail-association_tracking (1.0.0)
     pg (0.21.0)
     puma (3.12.0)
+    pundit (2.0.0)
+      activesupport (>= 3.0.0)
     rack (2.0.5)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -190,14 +199,16 @@ DEPENDENCIES
   clearance
   globalize!
   globalize-versioning!
-  graphiql-rails
   graphql
+  graphql-pundit!
   graphql-sugar!
+  jwt
   listen (>= 3.0.5, < 3.2)
   paper_trail (~> 10)
   paper_trail-association_tracking
   pg (~> 0.21)
   puma (~> 3.11)
+  pundit
   rails (~> 5.2.1)
   spring
   spring-watcher-listen (~> 2.0.0)
@@ -208,4 +219,4 @@ RUBY VERSION
    ruby 2.5.3p105
 
 BUNDLED WITH
-   1.16.4
+   1.16.6
