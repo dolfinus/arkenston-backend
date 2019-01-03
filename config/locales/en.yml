@@ -30,4 +30,8 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  error:
+    not_found: '%{class} not found!'
+    not_allowed:
+      one: 'Insufficiend privileges to change %{field} of %{class}'
+      other: 'Insufficiend privileges to %{action} %{class}'
