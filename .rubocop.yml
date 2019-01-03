@@ -1,0 +1,44 @@
+require: rubocop-rspec
+
+AllCops:
+  Exclude:
+    - config/**/*
+    - db/schema.rb
+    - db/seeds.rb
+    - db/migrate/*.rb
+    - bin/**/*
+    - vendor/bundle/**/*
+    - spec/rails_helper.rb
+    - spec/spec_helper.rb
+Rails:
+  Enabled: true
+Rails/InverseOf:
+  Enabled: false
+Rails/ActiveRecordAliases:
+  Enabled: false
+Metrics/AbcSize:
+  Max: 30
+Metrics/LineLength:
+  Max: 150
+Metrics/BlockLength:
+  Max: 50
+Metrics/MethodLength:
+  Max: 50
+Style/RescueStandardError:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Style/UnlessElse:
+  Enabled: false
+Style/MultilineIfThen:
+  Enabled: false
+Style/Next:
+  Enabled: false
+Bundler/OrderedGems:
+  Enabled: false
+Layout/AlignHash:
+  Enabled: false
+Layout/ExtraSpacing:
+  Enabled: false
