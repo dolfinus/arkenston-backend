@@ -1,8 +1,7 @@
-module Types
-  class QueryType < GraphQL::Schema::Object
-    graphql_name "Query"
+Types::QueryType = GraphQL::ObjectType.define do
+  name "Query"
 
-    resolver :user
-    resolver :users
-  end
+  resolver :user
+  resolver :users
+  resolver :sign_in
 end

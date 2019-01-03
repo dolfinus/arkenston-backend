@@ -1,14 +1,14 @@
 class UserResolver < ApplicationResolver
-  parameter :id,   types.ID
-  parameter :name, types.String
+  parameter :id,    types.ID
+  parameter :name,  types.String
+  parameter :email, types.String
 
   def resolve
-    if params[:id]
-      User.find(params[:id])
-    elsif params[:name]
-      User.find_by_name(params[:name])
-    else
-      raise "You should set id or name arguments to find a user!"
+    [:id, :name, :email].each do |attr|
+      if params[attr]
+        return User.find_by!({"#{attr}": params[attr]})
+      end
     end
+    return current_user
   end
 end
