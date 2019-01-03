@@ -1,8 +1,6 @@
-module Types
-  class UserType < GraphQL::Schema::Object
-    model_class User
+Types::UserType = GraphQL::ObjectType.define do
+  model_class User
 
-    attributes
-    relationships
-  end
+  attributes :name, :email, :role
+  relationships :translations, :versions
 end

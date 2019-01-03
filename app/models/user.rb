@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   include Clearance::User
   include HasRole
+  include HasTranslations
   has_paper_trail skip: [:encrypted_password, :remember_token, :confirmation_token, :created_at, :updated_at]
 
   validates_format_of :name, with: /^[a-zA-Z0-9_\.]*$/, multiline: true
