@@ -11,6 +11,6 @@ class ApplicationController < ActionController::API
   end
 
   def user_for_paper_trail
-    current_user.name
+    current_user.id
   end
 end
