@@ -22,6 +22,7 @@ module Backend
     config.eager_load_paths += Dir["#{config.root}/app/graphql/resolvers/**/"]
     config.eager_load_paths += Dir["#{config.root}/app/graphql/mutations/**/"]
     config.eager_load_paths += Dir["#{config.root}/app/graphql/mutators/**/"]
+    config.eager_load_paths += Dir["#{config.root}/app/graphql/inputs/**/"]
     config.eager_load_paths += Dir["#{config.root}/app/graphql/functions/**/"]
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.2
