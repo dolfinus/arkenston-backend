@@ -12,14 +12,15 @@ class GraphqlController < ApplicationController
       }
       result = BackendSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
       render json: result
-    rescue ActiveRecord::RecordNotFound => e
-      not_found(e)
-    rescue Pundit::NotAuthorizedError => e
-      not_authorized(e)
+    rescue ActiveRecord::RecordNotFound => exception
+      not_found(exception)
+    rescue Pundit::NotAuthorizedError => exception
+      not_authorized(exception)
     end
-  rescue => e
-    raise e unless Rails.env.development?
-    handle_error_in_development e
+  rescue => exception
+    raise exception unless Rails.env.development?
+
+    handle_error_in_development(exception)
   end
 
   # Handle form data, JSON body, or a blank value

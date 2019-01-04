@@ -3,22 +3,22 @@ class ApplicationMutator < ApplicationFunction
   include Pundit
 
   def authorize_fields!(instance, fields, policy = nil)
-    if fields.kind_of?(Array)
+    if fields.is_a?(Array)
       fields.each do |item|
         authorize_action!(instance, item, policy)
       end
-    end
     else
-      fields.each do |key, value|
+      fields.each do |key, _|
         authorize_action!(instance, key, policy)
       end
+    end
   end
 
   def authorize_action!(instance, action, policy = nil)
     if instance.nil?
-      authorize instance, "#{action.to_s}?".to_sym, policy_class: policy
+      authorize instance, "#{action}?".to_sym, policy_class: policy
     else
-      authorize instance, "#{action.to_s}?".to_sym
+      authorize instance, "#{action}?".to_sym
     end
   end
 

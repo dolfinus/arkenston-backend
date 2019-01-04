@@ -1,8 +1,9 @@
 module Auth
   class Token
-
     def self.generate(user)
-      payload = {user_id: user.id}
+      payload = {
+        user_id: user.id
+      }
       JsonWebToken.encode(payload)
     end
 
@@ -17,6 +18,5 @@ module Auth
       end
       user
     end
-
   end
 end

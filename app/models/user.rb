@@ -1,6 +1,6 @@
 class User < ApplicationRecord
   def self.skipped_version_attrs
-    return [:encrypted_password, :remember_token, :confirmation_token, :created_at, :updated_at]
+    %i[encrypted_password remember_token confirmation_token created_at updated_at]
   end
 
   include Clearance::User
@@ -8,7 +8,8 @@ class User < ApplicationRecord
   include HasTranslations
   include HasVersions
 
-  validates_format_of :name, with: /^[a-zA-Z0-9_\.]*$/, multiline: true
+  validates :name, format: /[a-zA-Z0-9_\.]+/, uniqueness: true
+  validates :email, uniqueness: true
   translates :first_name, :middle_name, :last_name, **translation_versioning_options
 
   def to_param
@@ -24,7 +25,7 @@ class User < ApplicationRecord
   end
 
   def anonymous?
-    self.name == User.anonymous_name
+    name == User.anonymous_name
   end
 
   def self.anonymous_name
@@ -32,6 +33,6 @@ class User < ApplicationRecord
   end
 
   def self.anonymous
-    find_by_name(User.anonymous_name)
+    find_by(name: User.anonymous_name)
   end
 end

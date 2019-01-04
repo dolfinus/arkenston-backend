@@ -34,8 +34,8 @@ class ApplicationPolicy
     false
   end
 
-  def is_action?(attr)
-    attr.to_s.gsub('?', '').in? ['create', 'new', 'update', 'destroy', 'delete', 'translate']
+  def action?(attr)
+    attr.to_s.delete('?').to_sym.in?(%i[create new update destroy delete translate])
   end
 
   class Scope

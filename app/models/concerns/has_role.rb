@@ -2,7 +2,7 @@ module HasRole
   extend ActiveSupport::Concern
 
   included do
-    enum role: [:user, :moderator, :admin]
+    enum role: %i[user moderator admin]
 
     after_initialize :set_default_role, if: :new_record?
   end
@@ -16,7 +16,7 @@ module HasRole
   end
 
   module ClassMethods
-    def role_i18n_key role
+    def role_i18n_key(role)
       "user_role.#{role}"
     end
 
@@ -24,8 +24,8 @@ module HasRole
       roles.keys
     end
 
-    def roles_list_str separator = ', '
-      roles_list.map{ |r| %Q("#{r}")}.join separator
+    def roles_list_str(separator = ', ')
+      roles_list.map { |r| %("#{r}") }.join separator
     end
   end
 end

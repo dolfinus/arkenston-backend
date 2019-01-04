@@ -5,8 +5,10 @@ class ApplicationController < ActionController::API
 
   def current_user
     return User.anonymous if request.headers['Authorization'].blank?
+
     token = request.headers['Authorization'].split(' ').last
     return User.anonymous if token.blank?
+
     Auth::Token.verify(token)
   end
 

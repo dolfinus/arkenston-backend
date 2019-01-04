@@ -1,5 +1,4 @@
 class UserPolicy < ApplicationPolicy
-
   def create?
     @user.admin? || @user.anonymous?
   end
@@ -40,10 +39,9 @@ class UserPolicy < ApplicationPolicy
     update?
   end
 
-
   private
 
   def current?
-    @user == @record and not @user.anonymous?
+    @user == @record && !@user.anonymous?
   end
 end

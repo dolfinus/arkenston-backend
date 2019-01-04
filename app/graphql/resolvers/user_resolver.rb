@@ -4,11 +4,10 @@ class UserResolver < ApplicationResolver
   parameter :email, types.String
 
   def resolve
-    [:id, :name, :email].each do |attr|
-      if params[attr]
-        return User.find_by!({"#{attr}": params[attr]})
-      end
+    %i[id name email].each do |attr|
+      return User.find_by!("#{attr}": params[attr]) if params[attr]
     end
-    return current_user
+
+    current_user
   end
 end
