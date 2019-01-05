@@ -13,13 +13,11 @@ def add_anonymous
     new_anonymous = User.new(
       name:           'anonymous',
       role:           :user,
-      first_name:     '',
-      middle_name:    '',
-      last_name:      '',
       email:          '',
       password:       '',
       remember_token: ''
     )
+    fill_up_user_locales(new_anonymous)
     new_anonymous.save(validate: false)
   end
 end
@@ -34,15 +32,25 @@ def add_admin
     new_admin = User.new(
       name:           'admin',
       role:           :admin,
-      first_name:     'Simple',
-      middle_name:    'Admin',
-      last_name:      'User',
       email:          'admin@example.com',
       password:       '12345678',
       remember_token: '#{Clearance::Token.new}'
     )
-    new_admin.save!
+    fill_up_user_locales(new_admin)
+    new_admin.save
   end
+end
+
+def fill_up_user_locales(user)
+  i18n_prefix = "default.users.#{user.name}"
+
+  I18n.available_locales.each do |locale|
+    I18n.locale = locale
+    user.first_name  = I18n.t("#{i18n_prefix}.first_name")
+    user.middle_name = I18n.t("#{i18n_prefix}.middle_name")
+    user.last_name   = I18n.t("#{i18n_prefix}.last_name")
+  end
+  I18n.locale = I18n.default_locale
 end
 
 seed
