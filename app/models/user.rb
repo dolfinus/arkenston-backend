@@ -9,8 +9,8 @@ class User < ApplicationRecord
   include HasVersions
 
   validates :name, format: /[a-zA-Z0-9_\.]+/, uniqueness: true
-  validates :email, uniqueness: true
-  translates :first_name, :middle_name, :last_name, **translation_versioning_options
+  validates_with Validators::UserTranslationsValidator
+  translates :first_name, :middle_name, :last_name, fallbacks_for_empty_translations: true, **translation_versioning_options
 
   def to_param
     name
@@ -21,7 +21,7 @@ class User < ApplicationRecord
   end
 
   def jwt
-    Auth::Token.generate(self)
+    Auth::Token.generate(self) unless anonymous?
   end
 
   def anonymous?

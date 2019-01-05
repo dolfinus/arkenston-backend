@@ -35,3 +35,4 @@ en:
     not_allowed:
       one: 'Insufficiend privileges to change %{field} of %{class}'
       other: 'Insufficiend privileges to %{action} %{class}'
+    no_translations: You should specify as least one translation

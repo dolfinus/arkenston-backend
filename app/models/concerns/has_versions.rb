@@ -18,7 +18,6 @@ module HasVersions
 
       def self.translation_versioning_options
         {
-          fallbacks_for_empty_translations: true,
           versioning: {
             gem: :paper_trail,
             options: {

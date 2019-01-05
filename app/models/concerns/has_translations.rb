@@ -1,7 +1,7 @@
 module HasTranslations
   def self.included(base)
     base.class_eval do
-      after_commit :save_translations
+      after_create :save_translations
 
       def initialize(params = {})
         unless params.nil?
@@ -12,27 +12,37 @@ module HasTranslations
         end
       end
 
-      def update_attributes(params)
-        params.except(:translations).each do |key, value|
-          send("#{key}=", value)
-        end
-
-        return if params[:translations].nil?
-
-        params[:translations].each do |item|
-          translation = translations.find_or_initialize_by_locale(item[:locale])
-          item.each do |key, value|
-            translation.send("#{key}=".to_sym, value)
+      def translation=(input)
+        Globalize.with_locale(input[:locale]) do
+          input.except(:locale).each do |key, value|
+            send("#{key}=", value)
           end
         end
+      end
+
+      def translations=(input)
+        input.each do |item|
+          self.translation = item
+        end
+      end
+
+      def update_attributes(params)
+        self.attributes = params.except(:translations)
+        self.translations = params[:translations] unless params[:translations].nil?
       end
 
       def save_translations
         translations.each do |item|
           item.user_id = id if item.new_record?
-
           item.save!
         end
+      end
+
+      def remove_translation(locale)
+        translation = translation_for(locale)
+        raise ActiveRecord::RecordNotFound.new('', User::Translation.to_s, locale, locale) if translation.new_record?
+
+        translation_for(locale).destroy!
       end
     end
   end
