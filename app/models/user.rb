@@ -16,10 +16,6 @@ class User < ApplicationRecord
     name
   end
 
-  def full_name
-    [first_name, middle_name, last_name].join ' '
-  end
-
   def jwt
     Auth::Token.generate(self) unless anonymous?
   end
