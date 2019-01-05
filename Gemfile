@@ -62,6 +62,9 @@ gem 'globalize', github: 'globalize/globalize', branch: 'master'
 # With versioning support also
 gem 'globalize-versioning', github: 'dolfinus/globalize-versioning', branch: 'rails_5x'
 
+# Use Paranoia for destroying models without deleting them
+gem 'paranoia'
+
 group :development, :test do
   gem 'factory_bot_rails'
   gem 'faker'

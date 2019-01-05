@@ -44,6 +44,7 @@ ActiveRecord::Schema.define(version: 2018_10_17_210951) do
     t.string "first_name", null: false
     t.string "middle_name", null: false
     t.string "last_name", null: false
+    t.datetime "deleted_at"
     t.index ["locale"], name: "index_user_translations_on_locale"
     t.index ["user_id"], name: "index_user_translations_on_user_id"
   end
@@ -57,7 +58,9 @@ ActiveRecord::Schema.define(version: 2018_10_17_210951) do
     t.integer "role"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
+    t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["id", "name", "role"], name: "index_users_on_id_and_name_and_role"
     t.index ["name"], name: "index_users_on_name", unique: true

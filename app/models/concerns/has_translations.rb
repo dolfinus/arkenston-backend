@@ -52,9 +52,10 @@ module HasTranslations
       has_versions = respond_to?(:translation_versioning_options)
 
       if has_versions
-        translates(*fields, **options)
-      else
         translates(*fields, **options, **translation_versioning_options)
+        "#{self}::Translation".constantize.class_eval { acts_as_paranoid }
+      else
+        translates(*fields, **options)
       end
     end
   end

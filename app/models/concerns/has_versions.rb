@@ -6,6 +6,7 @@ module HasVersions
       skip: skipped_versioning_attrs,
       class_name: versioning_class
     )
+    acts_as_paranoid
   end
 
   module ClassMethods

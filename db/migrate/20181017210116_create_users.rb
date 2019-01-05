@@ -8,6 +8,7 @@ class CreateUsers < ActiveRecord::Migration[5.2]
       t.string   :confirmation_token
       t.integer  :role
       t.timestamps
+      t.datetime :deleted_at,         index: true
     end
 
     reversible do |dir|
@@ -16,6 +17,7 @@ class CreateUsers < ActiveRecord::Migration[5.2]
         change_column_null :user_translations, :first_name,  false, ''
         change_column_null :user_translations, :middle_name, false, ''
         change_column_null :user_translations, :last_name,   false, ''
+        add_column         :user_translations, :deleted_at,  :datetime, index: true
       end
 
       dir.down do
