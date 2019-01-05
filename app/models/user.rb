@@ -10,7 +10,7 @@ class User < ApplicationRecord
 
   validates :name, format: /[a-zA-Z0-9_\.]+/, uniqueness: true
   validates_with Validators::UserTranslationsValidator
-  translates :first_name, :middle_name, :last_name, fallbacks_for_empty_translations: true, **translation_versioning_options
+  translate_attrs :first_name, :middle_name, :last_name, fallbacks_for_empty_translations: true
 
   def to_param
     name

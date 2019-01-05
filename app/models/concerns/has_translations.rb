@@ -1,48 +1,60 @@
 module HasTranslations
-  def self.included(base)
-    base.class_eval do
-      after_create :save_translations
+  extend ActiveSupport::Concern
 
-      def initialize(params = {})
-        unless params.nil?
-          super(params.except(:translations))
-          update_attributes(params)
-        else
-          super
-        end
+  included do
+    after_commit :save_translations
+  end
+
+  def initialize(params = {})
+    unless params.nil?
+      super(params.except(:translations))
+      update_attributes(params)
+    else
+      super
+    end
+  end
+
+  def translation=(input)
+    Globalize.with_locale(input[:locale]) do
+      input.except(:locale).each do |key, value|
+        send("#{key}=", value)
       end
+    end
+  end
 
-      def translation=(input)
-        Globalize.with_locale(input[:locale]) do
-          input.except(:locale).each do |key, value|
-            send("#{key}=", value)
-          end
-        end
-      end
+  def translations=(input)
+    input.each do |item|
+      self.translation = item
+    end
+  end
 
-      def translations=(input)
-        input.each do |item|
-          self.translation = item
-        end
-      end
+  def update_attributes(params)
+    self.attributes = params.except(:translations)
+    self.translations = params[:translations] unless params[:translations].nil?
+  end
 
-      def update_attributes(params)
-        self.attributes = params.except(:translations)
-        self.translations = params[:translations] unless params[:translations].nil?
-      end
+  def save_translations
+    translations.each do |item|
+      item.user_id = id if item.new_record?
+      item.save!
+    end
+  end
 
-      def save_translations
-        translations.each do |item|
-          item.user_id = id if item.new_record?
-          item.save!
-        end
-      end
+  def remove_translation(locale)
+    translation = translation_for(locale)
+    raise ActiveRecord::RecordNotFound.new('', User::Translation.to_s, locale, locale) if translation.new_record?
 
-      def remove_translation(locale)
-        translation = translation_for(locale)
-        raise ActiveRecord::RecordNotFound.new('', User::Translation.to_s, locale, locale) if translation.new_record?
+    translation_for(locale).destroy!
+  end
 
-        translation_for(locale).destroy!
+  module ClassMethods
+    def translate_attrs(*fields, **options)
+      has_versions = respond_to?(:translation_versioning_options)
+
+      if has_versions
+        translates(*fields, **options)
+      else
+        translates(*fields, **options, **translation_versioning_options)
       end
     end
   end

@@ -41,9 +41,9 @@ ActiveRecord::Schema.define(version: 2018_10_17_210951) do
     t.string "locale", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "first_name"
-    t.string "middle_name"
-    t.string "last_name"
+    t.string "first_name", null: false
+    t.string "middle_name", null: false
+    t.string "last_name", null: false
     t.index ["locale"], name: "index_user_translations_on_locale"
     t.index ["user_id"], name: "index_user_translations_on_user_id"
   end
