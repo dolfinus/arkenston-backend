@@ -1,57 +1,52 @@
 module ErrorHandler
-  def self.included(base)
-    base.class_eval do
-      def handle_error_in_development(exception)
-        logger.error(exception.message)
-        logger.error(exception.backtrace.join("\n"))
+  extend ActiveSupport::Concern
 
-        render json: {
-          error: {
-            message: exception.message
-          },
-          data: {}
-        },
-        status: 500
-      end
+  included do
+    rescue_from ActiveRecord::RecordNotFound, with: :record_missing
+    rescue_from ActiveRecord::RecordInvalid, with: :record_invalid
+    rescue_from Pundit::NotAuthorizedError, with: :policy_prohibited
+    rescue_from JWT::VerificationError, JWT::DecodeError, with: :token_invalid
+    rescue_from JWT::ExpiredSignature, with: :token_expired
+    rescue_from Auth::Error::NotAuthorized, with: :auth_method_prohibited
+  end
 
-      def not_authorized(exception)
-        @class  = exception.policy.class.to_s.delete('Policy')
-        @model  = @class.downcase
-        @field  = exception.query.to_s.sub('?', '')
+  def token_invalid(exception) # rubocop:disable Lint/UnusedMethodArgument
+    render_error 401, 'error.auth.token.invalid'
+  end
 
-        @is_action = exception.policy.action?(exception.query) ? 2 : 1
+  def token_expired(exception) # rubocop:disable Lint/UnusedMethodArgument
+    render_error 401, 'error.auth.token.expired'
+  end
 
-        render json: {
-          error: {
-            message: I18n.t(
-              'error.not_allowed',
-              class:  @class,
-              action: @field,
-              field:  @field,
-              count:  @is_action
-            ),
-            code: "#{@model}.#{@field}.not_allowed"
-          },
-          data: {}
-        },
-        status: 403
-      end
+  def auth_method_prohibited(exception) # rubocop:disable Lint/UnusedMethodArgument
+    render_error 401, 'error.auth.method.prohibited'
+  end
 
-      def not_found(exception)
-        @class = exception.model
-        @model = @class.downcase
-        render json: {
-          error: {
-            message: I18n.t(
-              'error.not_found',
-              class: @class
-            ),
-            code: "#{@model}.not_found"
-          },
-          data: {}
-        },
-        status: 404
-      end
-    end
+  def policy_prohibited(exception)
+    @class  = exception.policy.class.to_s.delete('Policy')
+    @query  = exception.query.to_s.delete('?')
+
+    render_error 403, 'error.policy.prohibited', class: @class, query: @query
+  end
+
+  def record_missing(exception)
+    render_error 404, 'error.record.missing', record: exception.model
+  end
+
+  def record_invalid(exception)
+    @record = exception.record
+    @fields = @record.errors
+    @class = @record.class.name
+
+    render_error 404, 'error.record.invalid', @fields, record: @class
+  end
+
+  def render_error(status, message, fields = nil, **kwargs)
+    error = {
+      message: I18n.t(message, **kwargs)
+    }
+    error[:fields] = fields unless fields.nil?
+
+    render json: { errors: [error], data: {} }, status: status
   end
 end
