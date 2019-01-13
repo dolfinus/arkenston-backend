@@ -28,7 +28,7 @@ RSpec.describe User, type: :model do
         expect(build(:user, email: Faker::Lorem.word)).not_to be_valid
       end
       it 'with unknown role' do
-        expect { build(:user, role: Faker::Lorem.word.to_sym) }.to raise_error.with_message(/is not a valid role/)
+        expect(build(:user, role: Faker::Lorem.word)).not_to be_valid
       end
       it 'without any translation' do
         expect(build(:user, first_name: '', last_name: '', middle_name: '')).not_to be_valid

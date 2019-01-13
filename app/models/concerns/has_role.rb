@@ -10,10 +10,6 @@ module HasRole
       %w[user moderator admin]
     end
 
-    def roles_list
-      assignable_roles
-    end
-
     def default_role
       all_roles.first
     end

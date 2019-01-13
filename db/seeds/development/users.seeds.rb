@@ -16,5 +16,5 @@ after 'common' do
     remember_token: nil
   )
   fill_up_user_locales(new_admin)
-  new_admin.save(validate: false)
+  new_admin.save
 end

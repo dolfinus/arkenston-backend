@@ -12,6 +12,7 @@ users:
     format: '[a-zA-Z0-9_\.]+'
   admin:
     name: admin
+    role: admin
     email: admin@example.com
     password: 12345678
   anonymous:
