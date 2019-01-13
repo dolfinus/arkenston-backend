@@ -1,0 +1,19 @@
+token:
+  default: &default
+    algorithm: HS256
+  refresh:
+    <<: *default
+    expire: <%= 1.month %>
+  access:
+    <<: *default
+    expire: <%= 1.hour %>
+users:
+  name:
+    format: '[a-zA-Z0-9_\.]+'
+  admin:
+    name: admin
+    email: admin@example.com
+    password: 12345678
+  anonymous:
+    name: anonymous
+    id: -1
