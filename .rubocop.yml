@@ -36,6 +36,10 @@ Style/MultilineIfThen:
   Enabled: false
 Style/Next:
   Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/MixinUsage:
+  Enabled: false
 Bundler/OrderedGems:
   Enabled: false
 Layout/AlignHash:

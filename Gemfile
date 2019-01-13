@@ -45,7 +45,7 @@ gem 'activestorage'
 gem 'graphql'
 
 # Use GraphQL Sugar for DRYing default GraphQL types
-gem 'graphql-sugar', github: 'dolfinus/graphql-sugar', branch: 'support-1.8'
+gem 'graphql-sugar', github: 'dolfinus/graphql-sugar', branch: 'support-1.8-pundit'
 
 # Use validates_type for validating type of fields while assign value
 gem 'validates_type'
@@ -64,6 +64,15 @@ gem 'globalize-versioning', github: 'dolfinus/globalize-versioning', branch: 'ra
 
 # Use Paranoia for destroying models without deleting them
 gem 'paranoia'
+
+# Use RailsConfig for beautiful configs
+gem 'config'
+
+# Use Seedbank for environmental db seed
+gem 'seedbank'
+
+# Use Assignable Values for limiting values assignator depend on roles
+gem 'assignable_values'
 
 group :development, :test do
   gem 'factory_bot_rails'
