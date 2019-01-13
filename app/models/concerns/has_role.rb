@@ -2,30 +2,24 @@ module HasRole
   extend ActiveSupport::Concern
 
   included do
-    enum role: %i[user moderator admin]
-
-    after_initialize :set_default_role, if: :new_record?
-  end
-
-  def set_default_role
-    self.role ||= :user
-  end
-
-  def role_i18n_key
-    self.class.role_i18n_key(self.role)
+    assignable_values_for :role, through: proc { find_policy(self) }, default: default_role
   end
 
   module ClassMethods
-    def role_i18n_key(role)
-      "user_role.#{role}"
+    def all_roles
+      %w[user moderator admin]
     end
 
     def roles_list
-      roles.keys
+      assignable_roles
     end
 
-    def roles_list_str(separator = ', ')
-      roles_list.map { |r| %("#{r}") }.join separator
+    def default_role
+      all_roles.first
+    end
+
+    def anonymous_role
+      default_role
     end
   end
 end

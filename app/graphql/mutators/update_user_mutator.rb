@@ -1,12 +1,12 @@
 class UpdateUserMutator < ApplicationMutator
-  parameter :name,  !types.String
+  include UserSeeker
   parameter :input, !Inputs::UpdateUserInputType
   type Types::UserType
 
   def mutate
-    user = User.find_by!(name: params[:name])
+    user = find_user_or_current(params)
     authorize_action! user, :update
-    authorize_fields! user, params[:input]
+    authorize_params! user, params[:input], :update
 
     user.update_attributes(params[:input])
     user.save!

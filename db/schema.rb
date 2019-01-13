@@ -55,7 +55,7 @@ ActiveRecord::Schema.define(version: 2018_10_17_210951) do
     t.string "encrypted_password", default: "", null: false
     t.string "remember_token", default: "", null: false
     t.string "confirmation_token"
-    t.integer "role"
+    t.string "role"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"

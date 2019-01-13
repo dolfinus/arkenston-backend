@@ -1,13 +1,7 @@
 class UserResolver < ApplicationResolver
-  parameter :id,    types.ID
-  parameter :name,  types.String
-  parameter :email, types.String
+  include UserSeeker
 
   def resolve
-    %i[id name email].each do |attr|
-      return User.find_by!("#{attr}": params[attr]) if params[attr]
-    end
-
-    current_user
+    find_user_or_current(params)
   end
 end

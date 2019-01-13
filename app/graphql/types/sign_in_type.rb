@@ -1,4 +1,5 @@
 Types::SignInType = GraphQL::ObjectType.define do
   name 'SignIn'
-  field :jwt, types.String
+
+  field :refresh_token, types.String
 end

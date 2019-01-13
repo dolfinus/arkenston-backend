@@ -6,7 +6,7 @@ class CreateUsers < ActiveRecord::Migration[5.2]
       t.string   :encrypted_password, null: false, default: ''
       t.string   :remember_token,     null: false, default: ''
       t.string   :confirmation_token
-      t.integer  :role
+      t.string   :role
       t.timestamps
       t.datetime :deleted_at,         index: true
     end

@@ -16,8 +16,9 @@ module HasTranslations
 
   def translation=(input)
     Globalize.with_locale(input[:locale]) do
-      input.except(:locale).each do |key, value|
-        send("#{key}=", value)
+      translated_attribute_names.each do |attr|
+        value = input[attr].nil? ? '' : input[attr]
+        send("#{attr}=", value)
       end
     end
   end

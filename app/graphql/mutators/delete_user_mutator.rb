@@ -1,9 +1,9 @@
 class DeleteUserMutator < ApplicationMutator
-  parameter :name, types.String
+  include UserSeeker
   type types.Boolean
 
   def mutate
-    user = User.find_by!(name: params[:name])
+    user = find_user!(params)
     authorize_action! user, :destroy
     user.destroy!
   end

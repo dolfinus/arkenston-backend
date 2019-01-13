@@ -7,8 +7,9 @@ class User < ApplicationRecord
   include HasRole
   include HasTranslations
   include HasVersions
+  include ChecksPolicy
 
-  validates :name, format: /[a-zA-Z0-9_\.]+/, uniqueness: true
+  validates :name, format: Regexp.new(Settings.users.name.format), uniqueness: true
   validates_with Validators::UserTranslationsValidator
   translate_attrs :first_name, :middle_name, :last_name, fallbacks_for_empty_translations: true
 
@@ -16,19 +17,34 @@ class User < ApplicationRecord
     name
   end
 
-  def jwt
-    Auth::Token.generate(self) unless anonymous?
-  end
-
   def anonymous?
-    name == User.anonymous_name
-  end
-
-  def self.anonymous_name
-    'anonymous'
+    id == User.anonymous_id
   end
 
   def self.anonymous
-    find_by(name: User.anonymous_name)
+    find(User.anonymous_id)
+  end
+
+  def self.anonymous_name
+    Settings.users.anonymous.name
+  end
+
+  def self.anonymous_id
+    Settings.users.anonymous.id
+  end
+
+  def self.uniq_fields
+    %i[id name email]
+  end
+
+  def self.filtrate_uniq_fields(input)
+    input.select { |item| item.in?(User.uniq_fields) }
+  end
+
+  def self.find_uniq(input)
+    uniq_fields.each do |attr|
+      return find_by!("#{attr}": input[attr]) if input[attr]
+    end
+    nil
   end
 end
