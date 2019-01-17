@@ -57,3 +57,5 @@ RSpec/ContextWording:
   - when
   - if
   - is
+Layout/SpaceBeforeBlockBraces:
+  Enabled: false
