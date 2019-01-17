@@ -6,5 +6,5 @@ Inputs::CreateUserInputType = Inputs::BaseInputObject.define do
   parameter :email,        !types.String
   parameter :password,     !types.String
   parameter :translations, !types[Inputs::UserTranslationInputType]
-  parameter :role,          types.ID
+  parameter :role,          Types::UserRoleType
 end
