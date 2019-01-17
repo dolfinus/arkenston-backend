@@ -23,7 +23,7 @@ class Auth::Token
   end
 
   def self.verify(token, type = :access)
-    return Auth::Visitor.anonymous unless token
+    return Auth::Visitor.anonymous if token.blank?
 
     result = JsonWebToken.decode(token, config(type))
     Auth::Visitor.new(id: result[:sub], role: result[:aud])
