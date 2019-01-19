@@ -57,5 +57,7 @@ RSpec/ContextWording:
   - when
   - if
   - is
+RSpec/NestedGroups:
+  Enabled: false
 Layout/SpaceBeforeBlockBraces:
   Enabled: false
