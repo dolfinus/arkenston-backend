@@ -5,9 +5,7 @@ class UpdateUserMutator < ApplicationMutator
 
   def mutate
     user = find_user_or_current(params)
-    authorize_action! user, :update
     authorize_params! user, params[:input], :update
-
     user.update_attributes(params[:input])
     user.save!
     user

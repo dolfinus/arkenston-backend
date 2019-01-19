@@ -20,6 +20,7 @@ module ChecksPolicy
 
   def authorize_params!(record, params, action = :access, policy_class = nil)
     policy = find_policy(record, policy_class)
+    authorize_action! record, action, policy
 
     real_params = authorized_attrs_list(policy, action)
     params = params.keys unless params.is_a?(Array)
