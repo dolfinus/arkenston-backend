@@ -2,6 +2,7 @@ class ApplicationPolicy
   include BasePolicy
   attr_reader :user, :record
 
+  allowed :access
   restricted :create, :update, :destroy
   alias_method(:new?, :create?) # rubocop:disable Style/Alias
   alias_method(:delete?, :destroy?) # rubocop:disable Style/Alias

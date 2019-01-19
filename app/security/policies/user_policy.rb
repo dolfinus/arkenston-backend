@@ -1,4 +1,18 @@
 class UserPolicy < ApplicationPolicy
+  allowed :access
+
+  def create?
+    admin? || moderator? || anonymous?
+  end
+
+  def update?
+    (admin? || moderator? || current?) && not_anonymous?
+  end
+
+  def destroy?
+    (admin? || current?) && not_anonymous?
+  end
+
   def permitted_attributes_for_access
     attrs = %i[name email role translations versions]
     attrs += [:remember_token] if current?
@@ -6,16 +20,8 @@ class UserPolicy < ApplicationPolicy
     attrs
   end
 
-  def create?
-    admin? || moderator? || anonymous?
-  end
-
   def permitted_attributes_for_create
     %i[name email role translations password]
-  end
-
-  def update?
-    (admin? || moderator? || current?) && not_anonymous?
   end
 
   def permitted_attributes_for_update
@@ -25,13 +31,16 @@ class UserPolicy < ApplicationPolicy
     attrs
   end
 
-  def destroy?
-    (admin? || current?) && not_anonymous?
-  end
-
   def permitted_values_for_role
     roles = User.all_roles
-    roles = User.all_roles[0..@user.role_id] if @user
+    if @user
+      roles = User.all_roles[0..@user.role_id]
+
+      if @record
+        # Don't allow do downgrade admin role by moderator
+        roles = [] if @record.role_id > @user.role_id
+      end
+    end
 
     roles
   end
@@ -49,6 +58,8 @@ class UserPolicy < ApplicationPolicy
   end
 
   def not_anonymous?
-    !@record.anonymous?
+    !@record.anonymous? if @record
+
+    true
   end
 end
