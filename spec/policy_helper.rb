@@ -1,26 +1,35 @@
 RSpec.shared_context 'policy' do # rubocop:disable RSpec/ContextWording
-  let(:admin) { build(:visitor, :admin) }
-  let(:moderator) { build(:visitor, :moderator) }
+  include ChecksPolicy
   let(:anonymous) { build(:visitor, :anonymous) }
-  let(:user) { build(:visitor) }
+
+  let(:existing_user) { create(:user) }
+  let(:existing_moderator) { create(:user, :moderator) }
+  let(:existing_admin) { create(:user, :admin) }
+
+  let(:admin) { build(:visitor, :admin, id: existing_admin.id) }
+  let(:moderator) { build(:visitor, :moderator, id: existing_moderator.id) }
+  let(:user) { build(:visitor, id: existing_user.id) }
   let(:record) { nil }
-  let(:policy) { described_class.new(current_user, record) }
+  let(:context) { { current_user: current_user } }
 end
 
 RSpec.shared_examples 'is allowed for' do |method, attrs|
   context 'is allowed to' do
+    action = method.to_s.delete('#').delete('.').delete('?')
+
     unless attrs
       it method do
-        expect(policy.send("#{method.to_s.delete('#').delete('.')}?")).to be_truthy
+        expect { authorize_action!(record, action, described_class) }.not_to raise_error(Pundit::NotAuthorizedError)
       end
     end
     attrs = [] if attrs.blank?
     attrs = [attrs] unless attrs.is_a?(Array)
+    attributes = attrs.each { |attr| attr.to_s.delete('#').delete('=') }
 
     context method do
-      attrs.each do |attr|
-        it attr.to_s.delete('#') do
-          expect(attributes).to include(attr.to_s.delete('#').delete('=').to_sym)
+      attributes.each do |attr|
+        it attr do
+          expect { authorize_param_with_context!(record, attr, context, action, described_class) }.not_to raise_error(Pundit::NotAuthorizedError)
         end
       end
     end
@@ -29,18 +38,21 @@ end
 
 RSpec.shared_examples 'is not allowed for' do |method, attrs|
   context 'is not allowed to' do
+    action = method.to_s.delete('#').delete('.').delete('?')
+
     unless attrs
       it method do
-        expect(policy.send("#{method.to_s.delete('#').delete('.')}?")).to be_falsey
+        expect { authorize_action!(record, action, described_class) }.to raise_error(Pundit::NotAuthorizedError)
       end
     end
     attrs = [] if attrs.blank?
     attrs = [attrs] unless attrs.is_a?(Array)
+    attributes = attrs.each { |attr| attr.to_s.delete('#').delete('=') }
 
     context method do
-      attrs.each do |attr|
-        it attr.to_s.delete('#') do
-          expect(attributes).not_to include(attr.to_s.delete('#').delete('=').to_sym)
+      attributes.each do |attr|
+        it attr do
+          expect { authorize_param_with_context!(record, attr, context, action, described_class) }.to raise_error(Pundit::NotAuthorizedError)
         end
       end
     end

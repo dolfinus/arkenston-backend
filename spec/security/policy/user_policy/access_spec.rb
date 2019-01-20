@@ -3,7 +3,6 @@ require 'policy_helper'
 
 RSpec.describe UserPolicy do
   include_context 'policy'
-  let(:attributes) { policy.permitted_attributes_for_access }
 
   public_attrs = %i[name email role translations versions]
   private_attrs = %i[remember_token]

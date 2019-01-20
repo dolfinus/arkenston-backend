@@ -6,10 +6,6 @@ module BasePolicy
     delegate :nobody,  to: :class
   end
 
-  def action?(attr)
-    attr.to_s.delete('?').to_sym.in?(%i[create new update destroy delete])
-  end
-
   module ClassMethods
     def anybody
       true

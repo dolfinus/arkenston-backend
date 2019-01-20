@@ -20,7 +20,7 @@ module ChecksPolicy
 
   def authorize_params!(record, params, action = :access, policy_class = nil)
     policy = find_policy(record, policy_class)
-    authorize_action! record, action, policy
+    authorize_action! record, action, policy.class
 
     real_params = authorized_attrs_list(policy, action)
     params = params.keys unless params.is_a?(Array)
@@ -35,7 +35,10 @@ module ChecksPolicy
   end
 
   def authorize_param_with_context!(record, param, context = {}, action = :access, policy_class = nil)
-    record.current_user = context[:current_user] unless current_user
+    if record.present?
+      record.current_user = context[:current_user] if current_user.blank?
+      record.current_user = current_user if current_user.present?
+    end
     authorize_param!(record, param, action, policy_class)
   end
 
