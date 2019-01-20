@@ -83,3 +83,16 @@ RSpec.configure do |config|
 
   config.include FactoryBot::Syntax::Methods
 end
+
+require 'simplecov'
+SimpleCov.start 'rails' do
+  add_filter '/test/'
+  add_filter '/config/'
+  add_filter '/vendor/'
+  add_filter '/spec/rails_helper'
+  add_filter '/spec/spec_helper'
+
+  add_group 'Security', 'app/security'
+  add_group 'GraphQL', 'app/graphql'
+  add_group 'Channels', 'app/channels'
+end
