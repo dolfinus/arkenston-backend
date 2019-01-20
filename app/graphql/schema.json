@@ -58,7 +58,7 @@
               "deprecationReason": null
             },
             {
-              "name": "sign_in",
+              "name": "signIn",
               "description": null,
               "args": [
                 {

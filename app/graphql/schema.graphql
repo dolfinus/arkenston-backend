@@ -23,7 +23,7 @@ type Mutation {
 
 type Query {
   refresh_token(token: String): RefreshToken
-  sign_in(email: String, id: ID, name: String, password: String): SignIn
+  signIn(email: String, id: ID, name: String, password: String): SignIn
   user(email: String, id: ID, name: String): User
   users(email: String, id: ID, name: String): [User]!
 }

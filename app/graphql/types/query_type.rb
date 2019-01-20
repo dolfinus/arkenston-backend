@@ -3,6 +3,6 @@ Types::QueryType = GraphQL::ObjectType.define do
 
   resolver :user
   resolver :users
-  resolver :sign_in
+  resolver :signIn
   resolver :refresh_token
 end
