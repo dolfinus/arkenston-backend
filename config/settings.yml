@@ -7,6 +7,12 @@ token:
   access:
     <<: *default
     expire: <%= 1.hour %>
+graphql:
+  schema:
+    json: app/graphql/schema.json
+    dsl: app/graphql/schema.graphql
+  docs:
+    output: public/docs
 users:
   name:
     format: '[a-zA-Z0-9_\.]+'

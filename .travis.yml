@@ -5,6 +5,7 @@ gemfile:
   - Gemfile
 sudo: false
 cache: bundler
+bundler_args: --without development
 before_script:
   - cp config/database.travis.yml config/database.yml
   - cp config/settings.travis.yml config/settings.local.yml

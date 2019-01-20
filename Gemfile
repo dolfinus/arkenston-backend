@@ -74,18 +74,22 @@ gem 'seedbank'
 # Use Assignable Values for limiting values assignator depend on roles
 gem 'assignable_values'
 
+group :development do
+  gem 'graphql-docs'
+  gem 'rubocop'
+  gem 'rubocop-rspec'
+  gem 'listen', '>= 3.0.5', '< 3.2'
+  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'spring'
+  gem 'spring-watcher-listen', '~> 2.0.0'
+end
+
 group :development, :test do
   gem 'factory_bot_rails'
   gem 'faker'
   gem 'rspec-rails'
   gem 'rspec-mocks'
-  gem 'rubocop'
-  gem 'rubocop-rspec'
   gem 'coveralls'
   gem 'simplecov'
   gem 'rspec_junit_formatter'
-  gem 'listen', '>= 3.0.5', '< 3.2'
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
-  gem 'spring-watcher-listen', '~> 2.0.0'
 end
