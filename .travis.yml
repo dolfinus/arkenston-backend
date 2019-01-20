@@ -1,0 +1,13 @@
+language: ruby
+rvm:
+  - 2.5.3
+gemfile:
+  - Gemfile
+sudo: false
+cache: bundler
+before_script:
+  - cp config/database.travis.yml config/database.yml
+  - cp config/settings.travis.yml config/settings.local.yml
+  - psql -c 'create database travis_ci_test;' -U postgres
+script:
+  - bundle exec rake spec

@@ -81,6 +81,7 @@ group :development, :test do
   gem 'rspec-mocks'
   gem 'rubocop'
   gem 'rubocop-rspec'
+  gem 'coveralls'
   gem 'simplecov'
   gem 'rspec_junit_formatter'
   gem 'listen', '>= 3.0.5', '< 3.2'

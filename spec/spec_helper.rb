@@ -84,6 +84,9 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
 end
 
+require 'coveralls'
+Coveralls.wear!
+
 require 'simplecov'
 SimpleCov.start 'rails' do
   add_filter '/test/'
