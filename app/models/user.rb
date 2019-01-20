@@ -10,12 +10,7 @@ class User < ApplicationRecord
   include ChecksPolicy
 
   validates :name, format: Regexp.new(Settings.users.name.format), uniqueness: true
-  validates_with Validators::UserTranslationsValidator
   translate_attrs :first_name, :middle_name, :last_name, fallbacks_for_empty_translations: true
-
-  def to_param
-    name
-  end
 
   def anonymous?
     id == User.anonymous_id

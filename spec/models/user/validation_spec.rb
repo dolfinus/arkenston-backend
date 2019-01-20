@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  let(:new_user) { create(:user) }
-  let(:new_translation) { build(:user_translation) }
+  let(:existing_user) { create(:user) }
+  let(:unknown_locale) { build(:user_translation, :unknown_locale) }
 
   context '.new' do # rubocop:disable RSpec/ContextWording
     context 'is valid' do
@@ -34,12 +34,10 @@ RSpec.describe User, type: :model do
         expect(build(:user, first_name: '', last_name: '', middle_name: '')).not_to be_valid
       end
       it 'with name already used' do
-        existing_user = create(:user)
         double_user = build(:user, name: existing_user.name)
         expect(double_user).not_to be_valid
       end
       it 'with email already used' do
-        existing_user = create(:user)
         double_user = build(:user, email: existing_user.email)
         expect(double_user).not_to be_valid
       end

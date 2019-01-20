@@ -7,9 +7,11 @@ en:
       method:
         prohibited: Auth method is not allowed
     record:
-      missing: '%{record} not found!'
-      invalid: '%{record} not valid!'
-      no_translations: You should specify as least one translation
+      missing: '%{record} not found'
+      invalid: '%{record} not valid'
+      translations:
+        missing: You should specify as least one translation
+        invalid: Invalid translation
     policy:
       prohibited: 'Insufficiend privileges to %{query} %{class}'
   default:
