@@ -1,8 +1,9 @@
 class ApplicationController < ActionController::API
-  include Clearance::Controller
   include ErrorHandler
   include Pundit
 
+  attr_reader :visitor
+  before_action :set_visitor
   before_action :set_paper_trail_whodunnit
 
   def http_auth_header
@@ -15,18 +16,18 @@ class ApplicationController < ActionController::API
     [type.downcase.inquiry, token]
   end
 
-  def current_user
+  def set_visitor
     result = http_auth_header
-    return Auth::Visitor.anonymous unless result
+    return @visitor = Auth::Visitor.anonymous unless result
 
     type, token = result
-    if type.bearer?
-      Auth::Token.verify(token, :access)
-    elsif type.basic?
-      raise Auth::Error.not_allowed
-    else
-      Auth::Visitor.anonymous
-    end
+    raise Auth::Error.not_allowed unless type.bearer?
+
+    @visitor = Auth::Token.verify(token, :access)
+  end
+
+  def current_user
+    @visitor
   end
 
   def user_for_paper_trail

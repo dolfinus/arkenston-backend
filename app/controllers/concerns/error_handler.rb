@@ -35,8 +35,8 @@ module ErrorHandler
 
   def record_invalid(exception)
     @record = exception.record
-    @fields = @record.errors
-    @class = @record.class.name
+    @fields = @record.errors if @record
+    @class = @record.class.name if @record
 
     render_error 404, 'error.record.invalid', @fields, record: @class
   end
