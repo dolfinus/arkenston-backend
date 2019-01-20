@@ -11,7 +11,7 @@ GIT
 
 GIT
   remote: https://github.com/dolfinus/graphql-sugar.git
-  revision: 047ab78d36dc6725b0f204dddd981aeedd033d5d
+  revision: 0111b6c89866462946ad2198cfc305891e50a4d9
   branch: support-1.8-pundit
   specs:
     graphql-sugar (0.1.6)

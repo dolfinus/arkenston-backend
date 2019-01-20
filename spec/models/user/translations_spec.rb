@@ -56,8 +56,6 @@ RSpec.describe User, type: :model do
     it 'when new translation does not update existing with another locale' do
       prev_translation = new_translation
       next_translation = build(:user_translation, :known_locale)
-      puts new_translation[:locale]
-      puts next_translation[:locale]
       existing_user.translations = [prev_translation, next_translation]
       existing_user.save!
 
