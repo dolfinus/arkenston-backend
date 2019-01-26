@@ -1,0 +1,10 @@
+FROM dolfinus/arkenston-backend:base
+RUN apk add --update --no-cache --virtual .build-deps \
+  git \
+  postgresql-dev \
+  ruby-dev \
+  build-base \
+  libxml2-dev \
+  libxslt-dev
+RUN gem install bundler && bundle config --global frozen 1
+RUN bundle --without development test

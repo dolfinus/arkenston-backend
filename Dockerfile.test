@@ -1,0 +1,5 @@
+FROM dolfinus/arkenston-backend:build
+RUN bundle --with test
+
+USER arkenston
+ENTRYPOINT ["./entrypoint_test.sh"]

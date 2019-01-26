@@ -1,27 +1,28 @@
 version: '3.6'
 services:
-  db:
+  db_dev:
     image: postgres:alpine
-    container_name: db
-    env_file: .env
+    container_name: db_dev
+    env_file: .env.dev
     networks:
       - db
     volumes:
       - /var/lib/postgresql/data:/var/lib/postgresql/data
-  arkenston:
-    image: dolfinus/arkenston-backend:latest
-    container_name: backend
+  backend_dev:
+    image: dolfinus/arkenston-backend:dev
+    container_name: backend_dev
     build:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       context: .
+    volumes:
+     - ./:/opt/arkenston
     ports:
-      - 3000:3000
-    env_file: .env
+      - 3001:3000
+    env_file: .env.dev
     networks:
       - db
       - public
 networks:
   db:
     internal: true
-    name: db
   public:
