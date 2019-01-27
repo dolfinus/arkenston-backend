@@ -1,5 +1,14 @@
 FROM dolfinus/arkenston-backend:build
 RUN bundle --with test
 
+COPY --chown=arkenston:arkenston app/ ./app/
+COPY --chown=arkenston:arkenston bin/ ./bin/
+COPY --chown=arkenston:arkenston config/ ./config/
+COPY --chown=arkenston:arkenston db/ ./db/
+COPY --chown=arkenston:arkenston lib/ ./lib/
+COPY --chown=arkenston:arkenston public/ ./public/
+COPY --chown=arkenston:arkenston spec/ ./spec/
+COPY --chown=arkenston:arkenston vendor/ ./vendor/
+
 USER arkenston
 ENTRYPOINT ["./entrypoint_test.sh"]

@@ -8,6 +8,6 @@ RUN apk add --update --no-cache \
 RUN mkdir -p /opt/arkenston && adduser -u 2000 -h /opt/arkenston -s /bin/bash -D arkenston
 WORKDIR /opt/arkenston
 
-COPY --chown=arkenston:arkenston Gemfile Rakefile config.ru .gemrc entrypoint* wait_for_postgres.sh ./
+COPY --chown=arkenston:arkenston Gemfile Gemfile.lock Rakefile config.ru .gemrc entrypoint* wait_for_postgres.sh ./
 RUN chmod +x ./entrypoint* ./wait_for_postgres.sh
 ENV NOKOGIRI_USE_SYSTEM_LIBRARIES=1

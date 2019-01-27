@@ -28,6 +28,7 @@
 
 .env*
 !.env.sample
+!.env.travis
 .bash*
 
 config/settings.local.yml
@@ -37,3 +38,5 @@ coverage
 
 /public/docs/*
 /.sass-cache/*
+
+build.sh

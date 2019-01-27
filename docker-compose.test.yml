@@ -6,16 +6,12 @@ services:
     env_file: .env.test
     networks:
       - db
-    volumes:
-      - /var/lib/postgresql/data:/var/lib/postgresql/data
   backend_test:
     image: dolfinus/arkenston-backend:test
     container_name: backend_test
     build:
       dockerfile: Dockerfile.test
       context: .
-    volumes:
-     - ./:/opt/arkenston
     env_file: .env.test
     networks:
       - db
