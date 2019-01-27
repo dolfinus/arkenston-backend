@@ -4,7 +4,9 @@ module HasVersions
   included do
     has_paper_trail(
       skip: skipped_versioning_attrs,
-      class_name: versioning_class
+      versions: {
+        class_name: versioning_class
+      }
     )
     acts_as_paranoid
   end
