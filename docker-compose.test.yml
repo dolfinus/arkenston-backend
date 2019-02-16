@@ -12,6 +12,8 @@ services:
     build:
       dockerfile: Dockerfile.test
       context: .
+    volumes:
+      - ./:/opt/arkenston
     env_file: .env.test
     networks:
       - db
