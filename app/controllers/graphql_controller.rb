@@ -10,7 +10,7 @@ class GraphqlController < ApplicationController
     result = Schema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
   end
-
+  
   # Handle form data, JSON body, or a blank value
   def ensure_hash(ambiguous_param)
     case ambiguous_param
