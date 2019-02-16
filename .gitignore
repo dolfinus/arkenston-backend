@@ -26,5 +26,17 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
-.env
-.env.leave
+.env*
+!.env.sample
+!.env.travis
+.bash*
+
+config/settings.local.yml
+config/settings/*.local.yml
+config/environments/*.local.yml
+coverage
+
+/public/docs/*
+/.sass-cache/*
+
+build.sh

@@ -19,9 +19,8 @@ Bundler.require(*Rails.groups)
 
 module Backend
   class Application < Rails::Application
-    config.eager_load_paths += Dir["#{config.root}/app/graphql/resolvers/**/"]
-    config.eager_load_paths += Dir["#{config.root}/app/graphql/mutators/**/"]
-    config.eager_load_paths += Dir["#{config.root}/app/graphql/functions/**/"]
+    config.eager_load_paths += Dir["#{config.root}/app/graphql/**/**/"]
+    config.eager_load_paths += Dir["#{config.root}/app/security/**/**/"]
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.2
 
@@ -34,5 +33,7 @@ module Backend
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    config.i18n.fallbacks = [I18n.default_locale]
   end
 end

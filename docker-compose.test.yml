@@ -1,0 +1,22 @@
+version: '3.6'
+services:
+  db_test:
+    image: postgres:alpine
+    container_name: db_test
+    env_file: .env.test
+    networks:
+      - db
+  backend_test:
+    image: dolfinus/arkenston-backend:test
+    container_name: backend_test
+    build:
+      dockerfile: Dockerfile.test
+      context: .
+    volumes:
+      - ./:/opt/arkenston
+    env_file: .env.test
+    networks:
+      - db
+networks:
+  db:
+    internal: true

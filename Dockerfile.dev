@@ -1,0 +1,6 @@
+FROM dolfinus/arkenston-backend:build
+RUN bundle --with development
+
+USER arkenston
+EXPOSE 3000
+ENTRYPOINT ["./entrypoint_dev.sh"]

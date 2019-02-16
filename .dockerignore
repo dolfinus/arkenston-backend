@@ -1,0 +1,14 @@
+Docker*
+docker*
+*ignore
+tmp*
+log*
+storage*
+public/docs*
+coverage*
+build.sh*
+.git*
+.sass-cache*
+.env*
+*.md
+*.gz

@@ -41,26 +41,26 @@ ActiveRecord::Schema.define(version: 2018_10_17_210951) do
     t.string "locale", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "first_name"
-    t.string "middle_name"
-    t.string "last_name"
+    t.string "first_name", null: false
+    t.string "middle_name", null: false
+    t.string "last_name", null: false
+    t.datetime "deleted_at"
     t.index ["locale"], name: "index_user_translations_on_locale"
     t.index ["user_id"], name: "index_user_translations_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "name"
-    t.string "first_name"
-    t.string "middle_name"
-    t.string "last_name"
+    t.string "name", default: "", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "remember_token", default: "", null: false
     t.string "confirmation_token"
-    t.integer "role"
+    t.string "role"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
+    t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["id", "name", "role"], name: "index_users_on_id_and_name_and_role"
     t.index ["name"], name: "index_users_on_name", unique: true
@@ -71,11 +71,13 @@ ActiveRecord::Schema.define(version: 2018_10_17_210951) do
     t.string "item_type", null: false
     t.integer "item_id", null: false
     t.string "event", null: false
-    t.string "whodunnit"
     t.text "object"
+    t.integer "whodunnit"
     t.string "locale"
     t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "versions", "users", column: "whodunnit", on_update: :cascade, on_delete: :nullify
 end

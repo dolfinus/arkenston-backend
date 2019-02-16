@@ -1,8 +1,10 @@
 require 'active_record/diff'
 
 class ApplicationRecord < ActiveRecord::Base
-  include ActiveModel::Validations
   include ActiveRecord::Diff
+  include ActiveModel::Validations
+  
+  attr_accessor :current_user
   self.abstract_class = true
 
   def initialize(params = {})
