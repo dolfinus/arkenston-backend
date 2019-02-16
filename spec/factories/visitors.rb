@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :visitor, class: Auth::Visitor do
-    id { Faker::Number.number(5) }
+    id { Faker::Number.unique.number(5) }
     role { 'user' }
 
     trait :admin do
