@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'role_helper'
 
-RSpec.describe UserPolicy do
+describe UserPolicy do
   include_context 'policy'
   all_roles = User.all_roles
 

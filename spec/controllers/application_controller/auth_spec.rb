@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ApplicationController do
+describe ApplicationController do
   let(:user) { create(:user) }
   let(:visitor) { build(:visitor, id: user.id, role: user.role) }
 

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Auth::Token do
+describe Auth::Token do
   let(:new_user) { create(:user) }
   let(:new_visitor) { build(:visitor, id: new_user.id, role: new_user.role) }
   let(:anonymous_visitor) { build(:visitor, :anonymous) }

@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'policy_helper'
 
-RSpec.describe UserPolicy do
+describe UserPolicy do
   include_context 'policy'
   let(:policy) { described_class.new(current_user, record) }
 

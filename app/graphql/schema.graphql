@@ -15,17 +15,89 @@ type EntityVersion {
   whodunnit: ID
 }
 
+"""
+The connection type for EntityVersion.
+"""
+type EntityVersionConnection {
+  """
+  A list of edges.
+  """
+  edges: [EntityVersionEdge]
+  page_info: PageInfo
+  total_count: Int!
+}
+
+"""
+An edge in a connection.
+"""
+type EntityVersionEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: EntityVersion
+}
+
 type Mutation {
   createUser(input: CreateUserInput!): User
   deleteUser(email: String, id: ID, name: String): Boolean
   updateUser(email: String, id: ID, input: UpdateUserInput!, name: String): User
 }
 
+"""
+Information about pagination in a connection.
+"""
+type PageInfo {
+  """
+  When paginating forwards, the cursor to continue.
+  """
+  endCursor: String
+
+  """
+  When paginating forwards, the cursor to continue.
+  """
+  end_cursor: String
+
+  """
+  When paginating forwards, are there more items?
+  """
+  hasNextPage: Boolean!
+
+  """
+  When paginating backwards, are there more items?
+  """
+  hasPreviousPage: Boolean!
+
+  """
+  When paginating forwards, are there more items?
+  """
+  has_next_page: Boolean!
+
+  """
+  When paginating backwards, are there more items?
+  """
+  has_previous_page: Boolean!
+
+  """
+  When paginating backwards, the cursor to continue.
+  """
+  startCursor: String
+
+  """
+  When paginating backwards, the cursor to continue.
+  """
+  start_cursor: String
+}
+
 type Query {
-  refresh_token(token: String): RefreshToken
+  refreshToken(token: String): RefreshToken
   signIn(email: String, id: ID, name: String, password: String): SignIn
   user(email: String, id: ID, name: String): User
-  users(email: String, id: ID, name: String): [User]!
+  users(after: ID, before: ID, first: Int, last: Int): UserConnection
 }
 
 type RefreshToken {
@@ -54,6 +126,34 @@ type User {
   translations: [UserTranslation!]
   updated_at: String!
   versions: [EntityVersion!]
+  versions_paged(after: ID, before: ID, first: Int, last: Int): EntityVersionConnection
+}
+
+"""
+The connection type for User.
+"""
+type UserConnection {
+  """
+  A list of edges.
+  """
+  edges: [UserEdge]
+  page_info: PageInfo
+  total_count: Int!
+}
+
+"""
+An edge in a connection.
+"""
+type UserEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: User
 }
 
 enum UserRole {

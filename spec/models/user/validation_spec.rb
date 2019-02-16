@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe User, type: :model do
+describe User, type: :model do
   let(:existing_user) { create(:user) }
   let(:unknown_locale) { build(:user_translation, :unknown_locale) }
 

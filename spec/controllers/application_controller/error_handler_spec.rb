@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ApplicationController do
+describe ApplicationController do
   before do
     class ApplicationController
       def raise_record_missing

@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'policy_helper'
 
-RSpec.describe UserPolicy do
+describe UserPolicy do
   include_context 'policy'
 
   public_attrs = %i[name email role translations password]

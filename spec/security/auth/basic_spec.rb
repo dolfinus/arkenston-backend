@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'base64'
 
-RSpec.describe Auth::Basic do
+describe Auth::Basic do
   let(:new_user) { create(:user) }
 
   context '#verify' do # rubocop:disable RSpec/ContextWording

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Auth::Visitor do
+describe Auth::Visitor do
   let(:real_user) { create(:user) }
   let(:fake_visitor) { build(:visitor) }
   let(:real_visitor) { build(:visitor, id: real_user.id, role: real_user.role) }

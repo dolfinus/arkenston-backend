@@ -1,5 +1,4 @@
-class UsersResolver < UserResolver
-  def resolve
-    User.all
-  end
+class UsersResolver < ApplicationResolver
+  include ModelPagination
+  paginate User
 end
