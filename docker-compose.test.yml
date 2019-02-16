@@ -13,10 +13,17 @@ services:
       dockerfile: Dockerfile.test
       context: .
     volumes:
-      - ./:/opt/arkenston
+      - ./:/opt/arkenston/
     env_file: .env.test
+    environment:
+      - CI="$CI"
+      - TRAVIS="$TRAVIS"
+      - TRAVIS_JOB_ID="$TRAVIS_JOB_ID"
+      - TRAVIS_PULL_REQUEST="$TRAVIS_PULL_REQUEST"
     networks:
       - db
+      - public
 networks:
   db:
     internal: true
+  public:

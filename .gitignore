@@ -40,3 +40,5 @@ coverage
 /.sass-cache/*
 
 build.sh
+
+.fuse*
