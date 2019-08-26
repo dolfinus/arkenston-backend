@@ -1,0 +1,19 @@
+FROM dolfinus/arkenston-backend:build as build
+COPY --chown=arkenston:arkenston config/ ./config/
+COPY --chown=arkenston:arkenston lib/    ./lib/
+COPY --chown=arkenston:arkenston priv/   ./priv/
+COPY --chown=arkenston:arkenston rel/    ./rel/
+ENV MIX_ENV prod
+RUN mix distillery.release
+
+FROM dolfinus/arkenston-backend:base
+ENV MIX_ENV prod
+COPY --chown=root:root entrypoint.prod.sh wait_for_postgres.sh ./
+RUN chmod +x ./entrypoint* ./wait_for_postgres.sh
+
+COPY --from=build --chown=arkenston:arkenston /arkenston/_build ./_build
+COPY --from=build --chown=arkenston:arkenston /arkenston/deps   ./deps
+COPY --from=build --chown=arkenston:arkenston /arkenston/priv/  ./priv/
+COPY --from=build --chown=arkenston:arkenston /arkenston/mix.*  ./
+
+ENTRYPOINT ["./entrypoint.prod.sh"]

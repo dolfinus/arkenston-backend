@@ -15,7 +15,9 @@ services:
       dockerfile: Dockerfile.dev
       context: .
     volumes:
-      - ./:/opt/arkenston
+      - ./config:/arkenston/config
+      - ./lib:/arkenston/lib
+      - ./priv:/arkenston/priv
     ports:
       - 3001:3000
     env_file: .env.dev

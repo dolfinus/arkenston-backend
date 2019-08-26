@@ -1,9 +1,0 @@
-token:
-  default: &default
-    issuer: travis-ci.org
-  refresh:
-    <<: *default
-    secret: iwea9geisaiHoit5Id9ongoDaivoojoh3Niex9aeY3dohDeideem8fosiwiel9AiroozoPhuik5bee9wo4jaechai5aimo2Aita1ui3sie3iejoovieSeeJoushiejae
-  access:
-    <<: *default
-    secret: leix9veiQueeFeevie1eeweerei4ui4ahpeemahtaiwe0sooz5uang7the2Witha0eig7bohyul8gohseichaigheigahShij6vei3faeChaiK1Gahpeexoo8wiekohz

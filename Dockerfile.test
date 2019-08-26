@@ -1,13 +1,13 @@
 FROM dolfinus/arkenston-backend:build
-RUN bundle --with test
+ENV MIX_ENV test
+RUN mix do deps.get --only test, deps.compile
 
-COPY --chown=arkenston:arkenston app/ ./app/
-COPY --chown=arkenston:arkenston bin/ ./bin/
+COPY --chown=root:root entrypoint.test.sh wait_for_postgres.sh ./
+RUN chmod +x ./entrypoint* ./wait_for_postgres.sh
+
 COPY --chown=arkenston:arkenston config/ ./config/
-COPY --chown=arkenston:arkenston db/ ./db/
-COPY --chown=arkenston:arkenston lib/ ./lib/
-COPY --chown=arkenston:arkenston public/ ./public/
-COPY --chown=arkenston:arkenston vendor/ ./vendor/
+COPY --chown=arkenston:arkenston lib/    ./lib/
+COPY --chown=arkenston:arkenston priv/   ./priv/
+COPY --chown=arkenston:arkenston test/   ./test/
 
-USER arkenston
-ENTRYPOINT ["./entrypoint_test.sh"]
+ENTRYPOINT ["./entrypoint.test.sh"]

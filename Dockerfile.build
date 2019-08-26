@@ -1,10 +1,6 @@
 FROM dolfinus/arkenston-backend:base
-RUN apk add --update --no-cache --virtual .build-deps \
-  git \
-  postgresql-dev \
-  ruby-dev \
-  build-base \
-  libxml2-dev \
-  libxslt-dev
-RUN gem install bundler && bundle config --global frozen 1
-RUN bundle --without development test
+ENV MIX_ENV prod
+RUN \
+  apk add --update --virtual build-dependencies build-base && \
+  mix do deps.get --only prod, deps.compile --force && \
+  apk del build-dependencies
