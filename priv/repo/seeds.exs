@@ -1,11 +1,7 @@
-# Script for populating the database. You can run it as:
-#
-#     mix run priv/repo/seeds.exs
-#
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     Arkenston.Repo.insert!(%Arkenston.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
+import Path
+
+seeds = wildcard(join([__DIR__, "seeds", "*.{ex,exs}"])) ++ wildcard(join([__DIR__, "seeds", "#{Mix.env()}", "*.{ex,exs}"]))
+
+Enum.each(seeds, fn(seed) ->
+  Code.eval_file seed
+end)
