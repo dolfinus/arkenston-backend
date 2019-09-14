@@ -12,7 +12,8 @@ config :arkenston,
 
 # Configure your database
 config :arkenston, Arkenston.Repo,
-  pool_size: 10
+  pool_size: 10,
+  migration_timestamps: [type: :utc_datetime]
 
 # Configures the endpoint
 config :arkenston, ArkenstonWeb.Endpoint,

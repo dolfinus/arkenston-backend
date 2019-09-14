@@ -29,8 +29,8 @@ defmodule Arkenston.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "priv/i18n.ex", "test/support"]
-  defp elixirc_paths(_), do: ["lib", "priv/i18n.ex"]
+  defp elixirc_paths(:test), do: ["lib", "priv/repo/migration.ex", "priv/i18n.ex", "test/support"]
+  defp elixirc_paths(_), do: ["lib", "priv/repo/migration.ex", "priv/i18n.ex"]
 
   # Specifies your project dependencies.
   #
@@ -49,6 +49,8 @@ defmodule Arkenston.MixProject do
       {:absinthe_ecto, "~> 0.1"},
       {:distillery, "~> 2.0"},
       {:fast_yaml, "~> 1.0"},
+      {:p1_utils, "~> 1.0"},
+      {:inflex, "~> 2.0.0" },
       {:linguist, github: "yogodoshi/linguist", branch: "cm/fix-elixir-1.7-compatibility"}
     ]
   end
