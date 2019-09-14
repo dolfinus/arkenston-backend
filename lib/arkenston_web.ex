@@ -22,7 +22,6 @@ defmodule ArkenstonWeb do
       use Phoenix.Controller, namespace: ArkenstonWeb
 
       import Plug.Conn
-      import ArkenstonWeb.Gettext
       alias ArkenstonWeb.Router.Helpers, as: Routes
     end
   end
@@ -37,7 +36,6 @@ defmodule ArkenstonWeb do
       import Phoenix.Controller, only: [get_flash: 1, get_flash: 2, view_module: 1]
 
       import ArkenstonWeb.ErrorHelpers
-      import ArkenstonWeb.Gettext
       alias ArkenstonWeb.Router.Helpers, as: Routes
     end
   end
@@ -53,7 +51,6 @@ defmodule ArkenstonWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import ArkenstonWeb.Gettext
     end
   end
 

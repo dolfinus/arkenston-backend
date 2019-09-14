@@ -7,7 +7,7 @@ defmodule Arkenston.MixProject do
       version: "0.1.0",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -20,13 +20,17 @@ defmodule Arkenston.MixProject do
   def application do
     [
       mod: {Arkenston.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [
+        :logger,
+        :runtime_tools,
+        :absinthe_plug
+      ]
     ]
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
+  defp elixirc_paths(:test), do: ["lib", "priv/i18n.ex", "test/support"]
+  defp elixirc_paths(_), do: ["lib", "priv/i18n.ex"]
 
   # Specifies your project dependencies.
   #
@@ -38,7 +42,6 @@ defmodule Arkenston.MixProject do
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.1"},
       {:postgrex, "~> 0.15"},
-      {:gettext, "~> 0.11"},
       {:jason, "~> 1.1"},
       {:plug_cowboy, "~> 2.0"},
       {:absinthe, "~> 1.4"},
@@ -46,7 +49,7 @@ defmodule Arkenston.MixProject do
       {:absinthe_ecto, "~> 0.1"},
       {:distillery, "~> 2.0"},
       {:fast_yaml, "~> 1.0"},
-      {:p1_utils, "~> 1.0"}
+      {:linguist, github: "yogodoshi/linguist", branch: "cm/fix-elixir-1.7-compatibility"}
     ]
   end
 
