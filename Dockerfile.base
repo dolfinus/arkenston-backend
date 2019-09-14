@@ -5,6 +5,7 @@ RUN apk add --update --no-cache \
   postgresql-client \
   yaml-dev \
   tzdata \
+  make \
   sudo
 
 RUN mkdir -p /arkenston && adduser -u 2000 -h /arkenston -s /bin/bash -D arkenston

@@ -1,6 +1,9 @@
 FROM dolfinus/arkenston-backend:base
 ENV MIX_ENV prod
+
+COPY --chown=arkenston:arkenston config/ ./config/
 RUN \
   apk add --update --virtual build-dependencies build-base && \
-  mix do deps.get --only prod, deps.compile --force && \
+  mix deps.get && \
+  mix deps.compile --force && \
   apk del build-dependencies

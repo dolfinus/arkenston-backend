@@ -6,5 +6,4 @@ deps
 .bash*
 coverage
 /public/docs/*
-build.sh
 .fuse*

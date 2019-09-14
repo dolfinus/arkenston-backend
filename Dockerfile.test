@@ -1,13 +1,6 @@
 FROM dolfinus/arkenston-backend:build
 ENV MIX_ENV test
-RUN mix do deps.get --only test, deps.compile
 
 COPY --chown=root:root entrypoint.test.sh wait_for_postgres.sh ./
 RUN chmod +x ./entrypoint* ./wait_for_postgres.sh
-
-COPY --chown=arkenston:arkenston config/ ./config/
-COPY --chown=arkenston:arkenston lib/    ./lib/
-COPY --chown=arkenston:arkenston priv/   ./priv/
-COPY --chown=arkenston:arkenston test/   ./test/
-
 ENTRYPOINT ["./entrypoint.test.sh"]

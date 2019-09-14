@@ -13,6 +13,10 @@ services:
       dockerfile: Dockerfile.test
       context: .
     volumes:
+      - ./mix.exs:/arkenston/mix.exs
+      - ./mix.lock:/arkenston/mix.lock
+      - ./_build:/arkenston/_build
+      - ./deps:/arkenston/deps
       - ./config:/arkenston/config
       - ./lib:/arkenston/lib
       - ./priv:/arkenston/priv
