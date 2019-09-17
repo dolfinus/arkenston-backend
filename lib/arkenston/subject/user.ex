@@ -15,7 +15,6 @@ defmodule Arkenston.Subject.User do
     field :remember_token,     :string
   end
 
-
   @config Application.get_env(:arkenston, :users)
   @name_format  @config[:format][:name]
   @email_format @config[:format][:email]
@@ -42,6 +41,12 @@ defmodule Arkenston.Subject.User do
     |> validate_format(:email, @email_format)
     |> unique_constraint(:name)
     |> unique_constraint(:email)
+  end
+
+  @doc false
+  def delete_changeset(user) do
+    user
+    |> change([deleted: true])
   end
 
   defp put_pass_hash(%Ecto.Changeset{valid?: true, changes:

@@ -36,7 +36,20 @@ defmodule Arkenston.Subject do
 
   """
   def get_user!(id), do: Repo.get!(User, id)
-  def get_user(id),  do: Repo.get(User,  id)
+
+  @doc """
+  Gets a single user.
+
+  ## Examples
+
+      iex> get_user(123)
+      {:ok, %User{}}
+
+      iex> get_user(456)
+      {:error, error}
+
+  """
+  def get_user(id), do: Repo.get(User, id)
 
   @doc """
   Creates a user.
@@ -87,7 +100,9 @@ defmodule Arkenston.Subject do
 
   """
   def delete_user(%User{} = user) do
-    Repo.delete(user)
+    user
+    |> User.delete_changeset()
+    |> Repo.audited_update()
   end
 
   @doc """
@@ -101,5 +116,23 @@ defmodule Arkenston.Subject do
   """
   def change_user(%User{} = user) do
     User.update_changeset(user, %{})
+  end
+
+
+
+  @doc """
+  Returns only existing entities
+
+  ## Examples
+
+      iex> existing(User) |> Repo.all
+      [
+        %Ecto.Subject.User{}
+      ]
+
+  """
+  def existing(query) do
+    from i in query,
+    where: i.deleted == false
   end
 end
