@@ -15,13 +15,15 @@ services:
       dockerfile: Dockerfile.dev
       context: .
     volumes:
-      - ./mix.exs:/arkenston/mix.exs
-      - ./mix.lock:/arkenston/mix.lock
-      - ./_build:/arkenston/_build
-      - ./deps:/arkenston/deps
-      - ./config:/arkenston/config
-      - ./lib:/arkenston/lib
-      - ./priv:/arkenston/priv
+      - ./config:/opt/app/config
+      - ./lib:/opt/app/lib
+      - ./priv:/opt/app/priv
+      - ./deps:/opt/app/deps
+      - ./mix.exs:/opt/app/mix.exs
+      - ./mix.lock:/opt/app/mix.lock
+      - ./_build:/opt/app/_build
+      - ./.iex.exs:/opt/app/.iex.exs
+      - ./erlang-history:/opt/app/.cache/erlang-history
     ports:
       - 3001:3000
     env_file: .env.dev

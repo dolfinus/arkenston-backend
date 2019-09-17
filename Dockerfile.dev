@@ -1,5 +1,6 @@
 FROM dolfinus/arkenston-backend:build
 ENV MIX_ENV dev
+ENV ERL_AFLAGS="-kernel shell_history enabled"
 
 COPY --chown=root:root entrypoint.dev.sh wait_for_postgres.sh ./
 RUN chmod +x ./entrypoint* ./wait_for_postgres.sh

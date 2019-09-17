@@ -11,9 +11,9 @@ ENV MIX_ENV prod
 COPY --chown=root:root entrypoint.prod.sh wait_for_postgres.sh ./
 RUN chmod +x ./entrypoint* ./wait_for_postgres.sh
 
-COPY --from=build --chown=arkenston:arkenston /arkenston/_build ./_build
-COPY --from=build --chown=arkenston:arkenston /arkenston/deps   ./deps
-COPY --from=build --chown=arkenston:arkenston /arkenston/priv/  ./priv/
-COPY --from=build --chown=arkenston:arkenston /arkenston/mix.*  ./
+COPY --from=build --chown=arkenston:arkenston /opt/app/_build ./_build
+COPY --from=build --chown=arkenston:arkenston /opt/app/deps   ./deps
+COPY --from=build --chown=arkenston:arkenston /opt/app/priv/  ./priv/
+COPY --from=build --chown=arkenston:arkenston /opt/app/mix.*  ./
 
 ENTRYPOINT ["./entrypoint.prod.sh"]

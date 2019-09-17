@@ -8,8 +8,8 @@ RUN apk add --update --no-cache \
   make \
   sudo
 
-RUN mkdir -p /arkenston && adduser -u 2000 -h /arkenston -s /bin/bash -D arkenston
-WORKDIR /arkenston
+RUN mkdir -p /opt/app && adduser -u 2000 -h /opt/app -s /bin/bash -D arkenston
+WORKDIR /opt/app
 
 COPY --chown=arkenston:arkenston mix.* ./
 

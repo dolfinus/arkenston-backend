@@ -7,3 +7,4 @@ deps
 coverage
 /public/docs/*
 .fuse*
+erlang-history
