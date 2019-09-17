@@ -52,7 +52,6 @@ defmodule Arkenston.MixProject do
       {:p1_utils, "~> 1.0"},
       {:trans, "~> 2.0"},
       {:ecto_enum, "~> 1.3"},
-      {:comeonin, "~> 5.1"},
       {:argon2_elixir, "~> 2.0"},
       {:inflex, "~> 2.0.0" },
       {:linguist, github: "yogodoshi/linguist", branch: "cm/fix-elixir-1.7-compatibility"}
