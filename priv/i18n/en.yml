@@ -1,0 +1,26 @@
+error:
+  auth:
+    token:
+      invalid: Auth token is invalid
+      expired: Auth token was expired
+    method:
+      prohibited: Auth method is not allowed
+  record:
+    missing: '%{record} not found'
+    invalid: '%{record} not valid'
+    translations:
+      missing: You should specify as least one translation
+      invalid: Invalid translation
+  policy:
+    prohibited: 'Insufficiend privileges to %{query} %{class}'
+default:
+  users:
+    admin:
+      role: admin
+      first_name: Super
+      middle_name: ''
+      last_name: Admin
+    anonymous:
+      first_name: Anonymous
+      middle_name: ''
+      last_name: User
