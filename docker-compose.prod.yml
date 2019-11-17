@@ -18,10 +18,9 @@ services:
       - 3000:3000
     env_file: .env.prod
     networks:
+      - default
       - db
-      - public
 networks:
   db:
     internal: true
     name: db
-  public:

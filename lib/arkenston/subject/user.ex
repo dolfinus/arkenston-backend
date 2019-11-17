@@ -23,20 +23,16 @@ defmodule Arkenston.Subject.User do
   def create_changeset(user, attrs) do
     user
     |> cast(attrs, [:name, :role, :email, :password, :confirmation_token, :remember_token])
-    |> put_pass_hash()
-    |> validate_required([:name, :role, :email, :password_hash])
-    |> validate_format(:name,  @name_format)
-    |> validate_format(:email, @email_format)
-    |> unique_constraint(:name)
-    |> unique_constraint(:email)
+    |> put_password_hash()
+    |> update_changeset()
   end
 
   @doc false
-  def update_changeset(user, attrs) do
+  def update_changeset(user, attrs \\ %{}) do
     user
     |> cast(attrs, [:name, :role, :email, :password, :password_hash, :confirmation_token, :remember_token])
-    |> put_pass_hash()
-    |> validate_required([:name, :role, :email])
+    |> put_password_hash()
+    |> validate_required([:name, :role, :email, :password_hash])
     |> validate_format(:name,  @name_format)
     |> validate_format(:email, @email_format)
     |> unique_constraint(:name)
@@ -46,13 +42,22 @@ defmodule Arkenston.Subject.User do
   @doc false
   def delete_changeset(user) do
     user
+    |> update_changeset()
     |> change([deleted: true])
   end
 
-  defp put_pass_hash(%Ecto.Changeset{valid?: true, changes:
-    %{password: password}} = changeset) do
-    change(changeset, Argon2.add_hash(password))
+  def check_password(user, password) do
+    Argon2.verify_pass(password, user.password_hash)
   end
 
-  defp put_pass_hash(changeset), do: changeset
+  def calc_password_hash(password) do
+    Argon2.hash_pwd_salt(password)
+  end
+
+  defp put_password_hash(%Ecto.Changeset{valid?: true, changes:
+    %{password: password}} = changeset) when password != nil do
+    change(changeset, %{password_hash: calc_password_hash(password)})
+  end
+
+  defp put_password_hash(changeset), do: changeset
 end

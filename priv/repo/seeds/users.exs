@@ -11,8 +11,8 @@ case Subject.get_user(config[:anonymous][:id]) do
           %User{},
           %{
             name: config[:anonymous][:name],
-            email: "",
-            password: "",
+            email: nil,
+            password: nil,
             role: :user
           }
         ) |> Ecto.Changeset.force_change(:id, config[:anonymous][:id])

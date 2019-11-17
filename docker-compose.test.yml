@@ -16,11 +16,10 @@ services:
       - ./config:/opt/app/config
       - ./lib:/opt/app/lib
       - ./priv:/opt/app/priv
-      - ./test:/opt/app/test
-      - ./deps:/opt/app/deps
+      - ./spec:/opt/app/spec
+      - ./coverage:/opt/app/cover
       - ./mix.exs:/opt/app/mix.exs
       - ./mix.lock:/opt/app/mix.lock
-      - ./_build:/opt/app/_build
       - ./.iex.exs:/opt/app/.iex.exs
       - ./erlang-history:/opt/app/.cache/erlang-history
     env_file: .env.test
@@ -30,9 +29,8 @@ services:
       - TRAVIS_JOB_ID="$TRAVIS_JOB_ID"
       - TRAVIS_PULL_REQUEST="$TRAVIS_PULL_REQUEST"
     networks:
+      - default
       - db
-      - public
 networks:
   db:
     internal: true
-  public:

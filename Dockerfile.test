@@ -1,5 +1,13 @@
-FROM dolfinus/arkenston-backend:build
+FROM dolfinus/arkenston-backend:base
 ENV MIX_ENV test
+
+COPY --chown=arkenston:arkenston config/ ./config/
+RUN \
+  apk add --update --virtual build-dependencies build-base gcc && \
+  mix deps.get && \
+  mix deps.compile --force && \
+  mix compile --force
+
 ENV ERL_AFLAGS="-kernel shell_history enabled"
 
 COPY --chown=root:root entrypoint.test.sh wait_for_postgres.sh ./

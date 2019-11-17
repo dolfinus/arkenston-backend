@@ -10,7 +10,11 @@ defmodule Arkenston.MixProject do
       compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      preferred_cli_env: [espec: :test],
+      spec_paths: ["spec"],
+      spec_pattern: "*_{factory,spec,helper}.{ex,exs}",
+      test_coverage: [tool: Coverex.Task, coveralls: true]
     ]
   end
 
@@ -46,14 +50,19 @@ defmodule Arkenston.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:absinthe, "~> 1.4"},
       {:absinthe_plug, "~> 1.4"},
-      {:distillery, "~> 2.0"},
+      {:distillery, "~> 2.0", only: :prod},
       {:fast_yaml, "~> 1.0"},
       {:p1_utils, "~> 1.0"},
       {:trans, "~> 2.0"},
       {:ecto_enum, "~> 1.3"},
       {:argon2_elixir, "~> 2.0"},
       {:inflex, "~> 2.0.0" },
-      {:linguist, github: "yogodoshi/linguist", branch: "cm/fix-elixir-1.7-compatibility"}
+      {:linguist, github: "yogodoshi/linguist", branch: "cm/fix-elixir-1.7-compatibility"},
+      {:faker, "~> 0.13", only: :test},
+      {:ex_machina, "~> 2.3", only: :test},
+      {:espec, "~> 1.7.0", only: :test},
+      {:propcheck, "~> 1.1", only: :test},
+      {:coverex, "~> 1.4.10", only: :test}
     ]
   end
 
@@ -67,7 +76,7 @@ defmodule Arkenston.MixProject do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["ecto.setup", "espec --cover"]
     ]
   end
 end

@@ -1,0 +1,45 @@
+language: minimal
+sudo: required
+services:
+  - docker
+cache:
+  directories:
+  - docker_images
+addons:
+  sonarcloud:
+    organization: "dolfinus"
+    token:
+      secure: "KtQDbrFbVJTF7YgxJJbyzCDjGsJWv7bRvLGDBPoWB81q+eJd5K1ELBgyk/LKxmxSZIH5ChENn9iscrqiaD8iDi+rzLcUGHucVEfgmmNjMZhBh7Z35IKwztrTZ/OFQ7RIWToESgmgvqJXBFx9XVAofZyu6x+/QayjTTrtR52j4xP6KA9by1D0k0EFnTDS5bRSnA1TNcj2cl92GXwcs7zldJaQqDJpcoVpBNNnMyuUM2dgFTvBp/jJ0FIjt0oF0B5AXHHFhjt/VO6ALzH4BJUPBHftU5JXfpIvODMjUTNKEsIKXN8NwUK0w53bCF/PkJ/TpQrdbQqvJUYUBdEa2Ef2nEEJg3JIm2T4I0LPv1XiI0Qu/gl7Q4Hy5Oy4Mu5pd/5qad/2bMwAAqWblLJjGdL7S23M5F/sgcC0T9BgOgjGfz1A0gyuOyKsXmVTSi2yI7j3BgLYbXwiJ0NWb4fslFgOVVLCGprY+BjUzhJNXXCcaOb8kQxaLdqGNXdE24CbMEXqLLiTGfs2F7W60geLwXbHmtn38xZC/gOa9WJiTXzYo38b2KNWp4s31h2tvAzze+SUNItr2AaqCh4g9sf4T2Lo1edTijnxoCjSLp8kYJRYbP7dLHb4EQuM/r4iiJNFEZOpdN/q6viJVuMWJiTHAg3xSRBuVnqVkFh/6sumnBb7N5k=" #SONARQUBE_TOKEN
+env:
+  global:
+    - secure: "JxUav1AwYDzH/Xb/uQ9NNA+JAxw0o04CmCUEJ2aA4/p853XnO38EqeF2+Cird55bGax/TQNFXa+6VHir+nx/mwh3wYY2SZzPOq8rH4y22jmGY8WwJCD12WTzr8yDDtph/GUE80LzhGMB8280SMB2AclegcM7PR6GRN4o6mhRI5d/EGAIfiraVB8sCt4TX56nFMSoKm+e3Qlhnh+Y+pwXgMVy0i7UQ1pQJT74wP+P5qqrysN6DW7OAc1Ip8UpVs6uFqzOm2WFTLTashKSk9FwsN7Fu1MkBJqKSGcYKTlozTEN2WGvtmmQ3Gci3LXFfxVd7SBj9ku8G905RE0GVRE3ONnX+dYhZ5G/egOtBe0uVae8iqW9Qbi6wECJFx6XpqNlCFFYLeySbK2XDw7lyllxcwxYIQJihmb/U6NdEfCF8127QQpTGVz4TETep1Yuc5PJybcgVRAoCQeVNJFVGzXFq1iueNgPSvPdTJDy7QBExCZo6PqfvLb+rJxBJHlbbujkVYXBd0BE7OJQcIjZKwgU4wlAbvUUiK4CcVN5SvbdDP0jzQY+U1zG08/dbpRE7YBqxp3UpqsHD8CojTMecpMZNxXKEZVlcbPtbhiKxWCjM3mDANHYsGd6FhMG/RbOG3AQWdHBQ1Ba+nE//cVCuvONUv0wKR+5kPHmCXv9HvPAn7Y=" # DOCKER_USER
+    - secure: "WSWuHqfxZ3/CcH0Pe5meOo6rk+Kb7ChsZVLspWQWZa/9N1oDkUFJZ+QSOdjLKj4m3oDvYfZimDXgl+AZSnoLLXpN1fugAV7FMgSdmXmDSx7DUj8wf+mc3NOx/IfLAVEVysTP3W2FS+W3ZOOyDuq9tdtxwXTI14KY0F9xCinfvcmatEepfdHT1dQiZLxAMMxTp2Z3WqoOyGeSbn7PV5fplrB7rIHXgvTCIvt+HPa2aCVa4CRfnyAl9ZLZjkwKUdjw0c13UeMsA7LdB3TnMApn26jEP9vpPdnicYfwSdS2bDI2ksQ/trY5/ZpsRn3jZJOSoUXlgMOloYDvDMvv6FQi9kC1j8xV6kHgYAetUmCUzV9bc4Dg+jUGd6MofAUafhPTgmUzjKNORoxKmXlSpg4Hxpyl/s3SJR6GjFJPKDmceUqhwLFfKOVaRHW2e2tVgK2YQ5xrcpD3OqJJiGToWDx9FreXVj5Lrx3t9l+bUKVBGjl5s0HTNaxeMm+ZWjTsomeIpQmanTrK/Y6AOAOkkjKRC9kl+tsY3806eQJ+4tdv8xa7/vMVrXSj4wWbd/jUjHNgx/XkDff6oeebYJ3wm2UCAQpvn0YS84mlBKO7ppqBfqpzJrt+quaoWaT8UUhAqO1GhKKCCgvrTU9HY1+iPoj4YDdghus3jvTsP43ziGmeHDU=" # DOCKER_PASS
+    - REPO=${TRAVIS_REPO_SLUG}
+    - COMMIT=${TRAVIS_COMMIT::8}
+    - DOCKER_COMPOSE_VERSION=1.24.1
+before_install:
+- docker load -i docker_images/images.tar || true
+install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+before_script:
+  - docker build -t dolfinus/arkenston-backend:base -f Dockerfile.base .
+  - cp .env.travis .env.test
+  - docker-compose -f docker-compose.test.yml build
+script:
+  - docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from backend_test
+  - sonar-scanner
+after_script:
+  - docker images
+before_deploy:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+  - docker build -t $REPO:latest -t $REPO:$COMMIT --compress -f Dockerfile.prod .
+before_cache:
+- docker save -o docker_images/images.tar $(docker images -a -q)
+deploy:
+  provider: script
+  script: docker push $REPO:latest && docker push $REPO:$COMMIT
+  on:
+    branch: master

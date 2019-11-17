@@ -8,10 +8,15 @@ defmodule Arkenston.Repo do
   alias Arkenston.Subject.User
 
   defp audited(op, %User{} = user, args) do
-    transaction(fn ->
+    if in_transaction?() do
       query("set local \"arkenston.current_user\" = '#{user.id}';")
       apply(__MODULE__, op, args)
-    end)
+    else
+      transaction(fn ->
+        query("set local \"arkenston.current_user\" = '#{user.id}';")
+        apply(__MODULE__, op, args)
+      end)
+    end
   end
 
   defp audited(op, _, args) do
@@ -19,7 +24,7 @@ defmodule Arkenston.Repo do
   end
 
   def audited_insert(changeset, user \\ %{}, opts \\ []) do
-    audited(:insert!, user, [changeset, opts])
+    audited(:insert, user, [changeset, opts])
   end
 
   def audited_insert!(changeset, user \\ %{}, opts \\ []) do
@@ -33,7 +38,7 @@ defmodule Arkenston.Repo do
   end
 
   def audited_update(changeset, user \\ %{}, opts \\ []) do
-    audited(:update!, user, [changeset, opts])
+    audited(:update, user, [changeset, opts])
   end
 
   def audited_update!(changeset, user \\ %{}, opts \\ []) do

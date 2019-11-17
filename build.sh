@@ -15,5 +15,4 @@ then
 fi
 
 docker build -t dolfinus/arkenston-backend:base  -f Dockerfile.base .
-docker build -t dolfinus/arkenston-backend:build -f Dockerfile.build .
 docker-compose -f "docker-compose.$ENV.yml" $COMMAND

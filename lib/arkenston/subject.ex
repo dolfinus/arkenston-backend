@@ -18,7 +18,7 @@ defmodule Arkenston.Subject do
 
   """
   def list_users do
-    Repo.all(User)
+    Repo.all(existing(User))
   end
 
   @doc """
@@ -65,8 +65,8 @@ defmodule Arkenston.Subject do
   """
   def create_user(attrs \\ %{}) do
     %User{}
-    |> User.create_changeset(attrs)
-    |> Repo.audited_insert()
+      |> User.create_changeset(attrs)
+      |> Repo.audited_insert()
   end
 
   @doc """
@@ -81,10 +81,10 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_user(%User{} = user, attrs) do
+  def update_user(%User{} = user, attrs \\ %{}) do
     user
-    |> User.update_changeset(attrs)
-    |> Repo.audited_update()
+      |> User.update_changeset(attrs)
+      |> Repo.audited_update()
   end
 
   @doc """
@@ -101,8 +101,8 @@ defmodule Arkenston.Subject do
   """
   def delete_user(%User{} = user) do
     user
-    |> User.delete_changeset()
-    |> Repo.audited_update()
+      |> User.delete_changeset()
+      |> Repo.audited_update()
   end
 
   @doc """
@@ -115,7 +115,7 @@ defmodule Arkenston.Subject do
 
   """
   def change_user(%User{} = user) do
-    User.update_changeset(user, %{})
+    User.update_changeset(user)
   end
 
 
@@ -133,6 +133,6 @@ defmodule Arkenston.Subject do
   """
   def existing(query) do
     from i in query,
-    where: i.deleted == false
+      where: i.deleted == false
   end
 end
