@@ -41,28 +41,28 @@ defmodule Arkenston.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.9"},
+      {:phoenix, "~> 1.4.16"},
       {:phoenix_pubsub, "~> 1.1"},
-      {:phoenix_ecto, "~> 4.0"},
-      {:ecto_sql, "~> 3.1"},
+      {:phoenix_ecto, "~> 4.1"},
+      {:ecto_sql, "~> 3.3"},
       {:postgrex, "~> 0.15"},
-      {:jason, "~> 1.1"},
-      {:plug_cowboy, "~> 2.0"},
+      {:jason, "~> 1.2"},
+      {:plug_cowboy, "~> 2.1"},
       {:absinthe, "~> 1.4"},
       {:absinthe_plug, "~> 1.4"},
-      {:distillery, "~> 2.0", only: :prod},
+      {:distillery, "~> 2.1", only: :prod},
       {:fast_yaml, "~> 1.0"},
       {:p1_utils, "~> 1.0"},
-      {:trans, "~> 2.0"},
-      {:ecto_enum, "~> 1.3"},
-      {:argon2_elixir, "~> 2.0"},
-      {:inflex, "~> 2.0.0" },
+      {:trans, "~> 2.2"},
+      {:ecto_enum, "~> 1.4"},
+      {:argon2_elixir, "~> 2.3"},
+      {:inflex, "~> 2.0" },
       {:linguist, github: "yogodoshi/linguist", branch: "cm/fix-elixir-1.7-compatibility"},
       {:faker, "~> 0.13", only: :test},
-      {:ex_machina, "~> 2.3", only: :test},
-      {:espec, "~> 1.7.0", only: :test},
-      {:propcheck, "~> 1.1", only: :test},
-      {:coverex, "~> 1.4.10", only: :test}
+      {:ex_machina, "~> 2.4", only: :test},
+      {:espec, "~> 1.8", only: :test},
+      {:propcheck, "~> 1.2", only: :test},
+      {:coverex, "~> 1.5", only: :test}
     ]
   end
 
