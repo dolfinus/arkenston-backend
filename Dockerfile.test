@@ -1,7 +1,7 @@
 FROM dolfinus/arkenston-backend:base
 ENV MIX_ENV test
 
-COPY --chown=arkenston:arkenston config/ ./config/
+COPY --chown=arkenston:arkenston config/config.exs config/test.exs config/runtime.exs ./config/
 RUN \
   apk add --update --virtual build-dependencies build-base gcc && \
   mix deps.get && \

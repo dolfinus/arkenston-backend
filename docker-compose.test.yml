@@ -1,12 +1,12 @@
 version: '3.6'
 services:
-  db_test:
+  db:
     image: postgres:alpine
     container_name: db_test
     env_file: .env.test
     networks:
       - db
-  backend_test:
+  backend:
     image: dolfinus/arkenston-backend:test
     container_name: backend_test
     build:
@@ -30,6 +30,8 @@ services:
       - TRAVIS_PULL_REQUEST="$TRAVIS_PULL_REQUEST"
     networks:
       - default
+      - db
+    depends_on:
       - db
 networks:
   db:
