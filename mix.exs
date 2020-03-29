@@ -58,6 +58,8 @@ defmodule Arkenston.MixProject do
       {:argon2_elixir, "~> 2.3"},
       {:inflex, "~> 2.0" },
       {:linguist, github: "yogodoshi/linguist", branch: "cm/fix-elixir-1.7-compatibility"},
+      {:guardian, "~> 2.1"},
+      {:guardian_phoenix, "~> 2.0"},
       {:faker, "~> 0.13", only: :test},
       {:ex_machina, "~> 2.4", only: :test},
       {:espec, "~> 1.8", only: :test},

@@ -37,4 +37,7 @@ if Mix.env() == "prod" do
 
   config :arkenston, ArkenstonWeb.Endpoint,
     secret_key_base: secret_key_base
+
+  config :arkenston, Arkenston.Guardian,
+    secret_key: %{"k" => secret_key_base, "kty" => "oct"}
 end

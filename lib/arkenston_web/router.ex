@@ -1,11 +1,19 @@
 defmodule ArkenstonWeb.Router do
   use ArkenstonWeb, :router
 
-  pipeline :api do
-    plug :accepts, ["json"]
+  pipeline :graphql do
+    plug Plug.Parsers,
+      parsers: [:urlencoded, :multipart, :json, Absinthe.Plug.Parser],
+      pass: ["*/*"],
+      json_decoder: Jason
+
+    plug Arkenston.Context
   end
 
-  scope "/api", ArkenstonWeb do
-    pipe_through :api
+  scope "/api" do
+    pipe_through :graphql
+
+    forward "/graphql",  Absinthe.Plug,          schema: ArkenstonWeb.Schema
+    forward "/graphiql", Absinthe.Plug.GraphiQL, schema: ArkenstonWeb.Schema
   end
 end
