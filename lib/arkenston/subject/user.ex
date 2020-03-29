@@ -5,6 +5,8 @@ defmodule Arkenston.Subject.User do
   import EctoEnum
   defenum RoleEnum, anonymous: -1, user: 0, moderator: 1, admin: 2
 
+  @type id :: integer
+
   audited_schema "users" do
     field :name,          :string
     field :role,          RoleEnum

@@ -19,7 +19,7 @@ defmodule Arkenston.Subject.UserResolver do
   def prepare_fields(%{fields: fields}), do: fields
   def prepare_fields(_fields), do: []
 
-  def all(%{} = where, %{context: context}) do
+  def all(where, %{context: context}) when is_map(where) do
     {:ok, Subject.list_users(where, prepare_fields(context))}
   end
 
@@ -34,7 +34,7 @@ defmodule Arkenston.Subject.UserResolver do
     end
   end
 
-  def find(%{} = where, %{context: context}) when where != %{} do
+  def find(where, %{context: context}) when is_map(where) and map_size(where) != 0 do
     case Subject.get_user_by(where, prepare_fields(context)) do
       nil -> {:error, "User not found!"}
       user -> {:ok, user}

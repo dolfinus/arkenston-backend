@@ -14,7 +14,11 @@ defmodule Arkenston.MixProject do
       preferred_cli_env: [espec: :test],
       spec_paths: ["spec"],
       spec_pattern: "*_{factory,spec,helper}.{ex,exs}",
-      test_coverage: [tool: Coverex.Task, coveralls: true]
+      test_coverage: [tool: Coverex.Task, coveralls: true],
+      dialyzer: [
+        plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+        ignore_warnings: ".dialyzer_ignore.exs"
+      ]
     ]
   end
 
@@ -60,6 +64,7 @@ defmodule Arkenston.MixProject do
       {:linguist, github: "yogodoshi/linguist", branch: "cm/fix-elixir-1.7-compatibility"},
       {:guardian, "~> 2.1"},
       {:guardian_phoenix, "~> 2.0"},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:faker, "~> 0.13", only: :test},
       {:ex_machina, "~> 2.4", only: :test},
       {:espec, "~> 1.8", only: :test},

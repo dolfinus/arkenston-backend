@@ -17,6 +17,8 @@ defmodule Arkenston.Subject do
       [%User{}, ...]
 
   """
+
+  @spec list_users(opts :: Repo.query_opts, fields :: Repo.fields) :: [%User{}]
   def list_users(opts \\ %{}, fields \\ []) do
     User
     |> generate_query(opts)
@@ -36,6 +38,7 @@ defmodule Arkenston.Subject do
       nil
 
   """
+  @spec get_user_by(opts :: Repo.query_opts, fields :: Repo.fields) :: %User{}|nil
   def get_user_by(opts \\ %{}, fields \\ []) do
     User
     |> generate_query(opts)
@@ -56,6 +59,7 @@ defmodule Arkenston.Subject do
       ** (Ecto.NoResultsError)
 
   """
+  @spec get_user_by!(opts :: Repo.query_opts, fields :: Repo.fields) :: %User{}|no_return
   def get_user_by!(opts \\ %{}, fields \\ []) do
     User
     |> generate_query(opts)
@@ -78,6 +82,7 @@ defmodule Arkenston.Subject do
       ** (Ecto.NoResultsError)
 
   """
+  @spec get_user!(id :: User.id, fields :: Repo.fields) :: %User{}|no_return
   def get_user!(id, fields \\ []), do: get_user_by!(%{id: id}, fields)
 
   @doc """
@@ -92,6 +97,7 @@ defmodule Arkenston.Subject do
       nil
 
   """
+  @spec get_user(id :: User.id, fields :: Repo.fields) :: %User{}|nil
   def get_user(id, fields \\ []), do: get_user_by(%{id: id}, fields)
 
   @doc """
@@ -106,6 +112,7 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec create_user(attrs :: map) :: {:ok, any}|{:error, any}
   def create_user(attrs \\ %{}) do
     %User{}
       |> User.create_changeset(attrs)
@@ -124,6 +131,7 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec update_user(user :: %User{}, attrs :: map) :: {:ok, any}|{:error, any}
   def update_user(%User{} = user, attrs \\ %{}) do
     user
       |> User.update_changeset(attrs)
@@ -142,6 +150,7 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec delete_user(user :: %User{}) :: {:ok, any}|{:error, any}
   def delete_user(%User{} = user) do
     user
       |> User.delete_changeset()
@@ -157,6 +166,7 @@ defmodule Arkenston.Subject do
       %Ecto.Changeset{source: %User{}}
 
   """
+  @spec change_user(user :: %User{}) :: Repo.changeset
   def change_user(%User{} = user) do
     User.update_changeset(user)
   end
@@ -183,6 +193,7 @@ defmodule Arkenston.Subject do
       {query, %{some: thing}}
 
   """
+  @spec filter_anonymous(query :: Repo.queryable, opts :: Repo.query_opts) :: {Repo.queryable, Repo.query_opts}
   def filter_anonymous(query, opts \\ %{}) do
     new_query = case opts |> Map.fetch(:role) do
       {:ok, role} when not is_nil(role) and (is_integer(role) or is_atom(role)) ->
@@ -218,13 +229,18 @@ end
       ]
 
   """
-  def generate_query(query, opts \\ %{})
+  @spec generate_query(query :: Repo.queryable) :: Repo.queryable
+  def generate_query(query) do
+    generate_query(query, %{})
+  end
 
+  @spec generate_query(query :: Repo.queryable, opts :: Repo.query_opts) :: Repo.queryable
   def generate_query(query, opts) when is_map(opts) do
     {query, opts} = filter_anonymous(query, opts)
     Repo.generate_query(query, opts)
   end
 
+  @spec generate_query(query :: Repo.queryable, opts :: [keyword]) :: Repo.queryable
   def generate_query(query, opts) when is_list(opts) do
     generate_query(query, opts |> Enum.into(%{}))
   end
