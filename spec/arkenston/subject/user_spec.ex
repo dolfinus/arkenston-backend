@@ -6,10 +6,10 @@ defmodule Arkenston.Subject.UserSpec do
 
   defmacro __using__(_opts) do
     quote do
-      @valid_attrs %{name: "text", password: "not_null", email: "it@example.com", confirmation_token: nil, remember_token: nil, role: :user}
-      @invalid_attrs %{name: nil, password: nil, email: nil, confirmation_token: nil, remember_token: nil, role: nil}
-      @check_attrs [:name, :email, :confirmation_token, :remember_token, :role]
-      @all_attrs [:name, :email, :confirmation_token, :password_hash, :remember_token, :role]
+      @valid_attrs %{name: "text", password: "not_null", email: "it@example.com", role: :user}
+      @invalid_attrs %{name: nil, password: nil, email: nil, role: nil}
+      @check_attrs [:name, :email, :role]
+      @all_attrs [:name, :email, :password_hash, :role]
 
       def get_user(user) do
         user

@@ -4,13 +4,11 @@ defmodule Arkenston.Repo.Migrations.CreateUsers do
 
   def up do
     create_audit table(:users) do
-      add :name,                :string
-      add :role,                :integer
-      add :email,               :string
-      add :password_hash,       :string
-      add :confirmation_token,  :string
-      add :remember_token,      :string
-      add :deleted,             :boolean, default: false
+      add :name,          :string
+      add :role,          :integer
+      add :email,         :string
+      add :password_hash, :string
+      add :deleted,       :boolean, default: false
     end
 
     create unique_index(:users, :name)

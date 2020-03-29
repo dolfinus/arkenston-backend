@@ -8,8 +8,6 @@ defmodule Arkenston.Factories.UserFactory do
       name: slug(),
       email: email(),
       password: base64(6),
-      confirmation_token: nil,
-      remember_token: nil,
       role: :user
     }
   end
