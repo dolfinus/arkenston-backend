@@ -15,8 +15,9 @@ defmodule Arkenston.Repo.Migrations.CreateUsers do
 
     create unique_index(:users, :name)
     create unique_index(:users, :email)
-    create index(:users, [:id, :name,  :role])
-    create index(:users, [:id, :email, :role])
+    create index(:users, [:id, :role,  :deleted])
+    create index(:users, [:id, :name,  :role, :deleted])
+    create index(:users, [:id, :email, :role, :deleted])
   end
 
   def down do

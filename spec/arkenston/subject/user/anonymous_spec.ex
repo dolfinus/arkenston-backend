@@ -10,20 +10,20 @@ defmodule Arkenston.Subject.User.AnonymousSpec do
                 name: @config[:anonymous][:name],
                 email: nil,
                 password_hash: nil,
-                role: :user
+                role: :anonymous
               }
       @anonymous_user struct(%User{}, @anonymous)
 
       describe "list_users/0" do
-        it "returns anonymous" do
+        it "does not return anonymous" do
           anonymous = get_user(@anonymous_user)
-          expect get_user_list() |> to(match_list [anonymous])
+          expect get_user_list() |> not_to(match_list [anonymous])
         end
       end
 
-      describe "get_user!/1" do
-        it "returns anonymous with with id #{@anonymous.id}" do
-          anonymous = Subject.get_user(@anonymous.id)
+      describe "get_user_by!/1" do
+        it "returns anonymous with role #{@anonymous.role}" do
+          anonymous = Subject.get_user_by!(role: @anonymous.role)
           expect get_user(anonymous) |> to(eq get_user(@anonymous_user))
         end
       end

@@ -12,14 +12,30 @@ defmodule Arkenston.Subject.User.BaseSpec do
           inserted = get_user(inserted_user)
           expect get_user_list() |> to(have inserted)
         end
+
+        it "does not return deleted user" do
+          user = build(:user)
+          {:ok, inserted_user} = user |> Subject.create_user()
+          inserted = get_user(inserted_user)
+          Subject.delete_user(inserted_user)
+          expect get_user_list() |> not_to(have inserted)
+        end
       end
 
       describe "get_user!/1" do
         it "returns the user with given id" do
           user = build(:user)
           {:ok, inserted_user} = user |> Subject.create_user()
-          fetched_user = Subject.get_user(inserted_user.id)
+          fetched_user = inserted_user.id |> Subject.get_user!()
           expect check_user(fetched_user, user)
+        end
+
+        it "does not return deleted user" do
+          user = build(:user)
+          {:ok, inserted_user} = user |> Subject.create_user()
+          {:ok, %User{}} = inserted_user |> Subject.delete_user()
+          fetched_user = inserted_user.id |> Subject.get_user()
+          expect fetched_user |> to(be_nil())
         end
       end
 
@@ -58,7 +74,7 @@ defmodule Arkenston.Subject.User.BaseSpec do
           user = build(:user)
           {:ok, inserted_user} = user |> Subject.create_user()
           {:ok, %User{}} = inserted_user |> Subject.delete_user()
-          deleted_user = inserted_user.id |> Subject.get_user()
+          deleted_user = Subject.get_user_by(id: inserted_user.id, deleted: nil)
           expect deleted_user.deleted |> to(be_true())
         end
       end

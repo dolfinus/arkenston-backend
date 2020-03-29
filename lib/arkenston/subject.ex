@@ -4,8 +4,8 @@ defmodule Arkenston.Subject do
   """
 
   import Ecto.Query, warn: false
-  alias Arkenston.Repo
 
+  alias Arkenston.Repo
   alias Arkenston.Subject.User
 
   @doc """
@@ -17,8 +17,51 @@ defmodule Arkenston.Subject do
       [%User{}, ...]
 
   """
-  def list_users do
-    Repo.all(existing(User))
+  def list_users(opts \\ %{}, fields \\ []) do
+    User
+    |> generate_query(opts)
+    |> Repo.return_fields(fields)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets a single user by search query.
+
+  ## Examples
+
+      iex> get_user_by(id: 123)
+      %User{}
+
+      iex> get_user_by(id: 456)
+      nil
+
+  """
+  def get_user_by(opts \\ %{}, fields \\ []) do
+    User
+    |> generate_query(opts)
+    |> Repo.return_fields(fields)
+    |> Repo.first()
+    |> Repo.one()
+  end
+
+  @doc """
+  Gets a single user by search query.
+
+  ## Examples
+
+      iex> get_user_by(id: 123)
+      %User{}
+
+      iex> get_user_by(id: 456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_user_by!(opts \\ %{}, fields \\ []) do
+    User
+    |> generate_query(opts)
+    |> Repo.return_fields(fields)
+    |> Repo.first()
+    |> Repo.one!()
   end
 
   @doc """
@@ -35,21 +78,21 @@ defmodule Arkenston.Subject do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id, fields \\ []), do: get_user_by!(%{id: id}, fields)
 
   @doc """
-  Gets a single user.
+  Gets a single user by id.
 
   ## Examples
 
       iex> get_user(123)
-      {:ok, %User{}}
+      %User{}
 
       iex> get_user(456)
-      {:error, error}
+      nil
 
   """
-  def get_user(id), do: Repo.get(User, id)
+  def get_user(id, fields \\ []), do: get_user_by(%{id: id}, fields)
 
   @doc """
   Creates a user.
@@ -119,20 +162,70 @@ defmodule Arkenston.Subject do
   end
 
 
-
   @doc """
-  Returns only existing entities
+  Apply filter for anonymous role
 
   ## Examples
 
-      iex> existing(User) |> Repo.all
+      iex> filter_anonymous(User)
+      {from i in query,
+        where: i.role != :anonymous}
+
+      iex> filter_anonymous(query, %{role: :anonymous})
+      {from i in query,
+        where: i.role == :anonymous, %{}}
+
+      iex> filter_anonymous(User, %{role: :user})
+      {from i in query,
+        where: i.role == user, %{}}
+
+      iex> filter_anonymous(User, %{some: thing})
+      {query, %{some: thing}}
+
+  """
+  def filter_anonymous(query, opts \\ %{}) do
+    new_query = case opts |> Map.fetch(:role) do
+      {:ok, role} when not is_nil(role) and (is_integer(role) or is_atom(role)) ->
+        from i in query,
+          where: i.role == ^role
+
+      {:ok, _} ->
+        query
+
+      :error ->
+        from i in query,
+          where: i.role != ^:anonymous
+    end
+
+    new_opts = cond do
+      new_query != query ->
+        opts |> Map.delete(:role)
+      true ->
+        opts
+    end
+
+    {new_query, new_opts}
+end
+
+  @doc """
+  Generate query
+
+  ## Examples
+
+      iex> generate_query(query, %{some: thing}) |> Repo.all
       [
         %Ecto.Subject.User{}
       ]
 
   """
-  def existing(query) do
-    from i in query,
-      where: i.deleted == false
+  def generate_query(query, opts \\ %{})
+
+  def generate_query(query, opts) when is_map(opts) do
+    {query, opts} = filter_anonymous(query, opts)
+    Repo.generate_query(query, opts)
+  end
+
+  def generate_query(query, opts) when is_list(opts) do
+    generate_query(query, opts |> Enum.into(%{}))
   end
 end

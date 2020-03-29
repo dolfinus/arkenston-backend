@@ -3,7 +3,7 @@ defmodule Arkenston.Subject.User do
   import Ecto.Changeset
   import Arkenston.Schema
   import EctoEnum
-  defenum RoleEnum, user: 0, moderator: 1, admin: 2
+  defenum RoleEnum, anonymous: -1, user: 0, moderator: 1, admin: 2
 
   audited_schema "users" do
     field :name,               :string

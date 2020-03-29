@@ -14,6 +14,10 @@ defmodule Arkenston.Factories.UserFactory do
     }
   end
 
+  def anonymous_factory do
+    %{user_factory() | role: :anonymous}
+  end
+
   def moderator_factory do
     %{user_factory() | role: :moderator}
   end
