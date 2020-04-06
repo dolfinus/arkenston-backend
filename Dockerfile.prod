@@ -1,20 +1,19 @@
 FROM dolfinus/arkenston-backend:base as build
-COPY --chown=arkenston:arkenston config/config.exs config/prod.exs config/runtime.exs ./config/
+ENV MIX_ENV prod
+
+COPY --chown=arkenston:arkenston config/config.exs config/$MIX_ENV.exs config/runtime.exs ./config/
 COPY --chown=arkenston:arkenston lib/  ./lib/
 COPY --chown=arkenston:arkenston priv/ ./priv/
 COPY --chown=arkenston:arkenston rel/  ./rel/
-ENV MIX_ENV prod
 RUN mix distillery.release
 
 FROM dolfinus/arkenston-backend:base
 ENV MIX_ENV prod
 
-COPY --chown=arkenston:arkenston config/config.exs config/prod.exs config/runtime.exs ./config/
+COPY --chown=arkenston:arkenston config/config.exs config/$MIX_ENV.exs config/runtime.exs ./config/
 RUN \
-  apk add --update --virtual build-dependencies build-base gcc && \
   mix deps.get && \
-  mix deps.compile --force && \
-  apk del build-dependencies
+  mix deps.compile --force
 
 COPY --chown=root:root entrypoint.prod.sh wait_for_postgres.sh ./
 RUN chmod +x ./entrypoint* ./wait_for_postgres.sh
