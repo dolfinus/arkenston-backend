@@ -11,7 +11,7 @@ case Subject.get_user_by(role: :anonymous) do
           %User{},
           %{
             name: config[:anonymous][:name],
-            email: nil,
+            email: config[:anonymous][:email],
             password: nil,
             role: :anonymous
           }

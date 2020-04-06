@@ -8,7 +8,7 @@ defmodule Arkenston.Subject.User.AnonymousSpec do
       @anonymous %{
                 id: @config[:anonymous][:id],
                 name: @config[:anonymous][:name],
-                email: nil,
+                email: @config[:anonymous][:email],
                 password_hash: nil,
                 role: :anonymous
               }

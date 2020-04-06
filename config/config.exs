@@ -12,7 +12,8 @@ config :arkenston,
   users: [
     anonymous: [
       id: "cb51f2d6-3289-4a2a-8212-4762ff0eea5b",
-      name: "anonymous"
+      name: "anonymous",
+      email: "anonymous@example.com"
     ],
     admin: [
       name: "admin",
