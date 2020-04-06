@@ -27,7 +27,7 @@ defmodule Arkenston.Subject.UserResolver do
     {:ok, Subject.list_users(%{}, prepare_fields(context))}
   end
 
-  def find(%{id: id}, %{context: context}) when is_integer(id) do
+  def find(%{id: id}, %{context: context}) when not is_nil(id) do
     case Subject.get_user(id, prepare_fields(context)) do
       nil -> {:error, "User id #{id} not found!"}
       user -> {:ok, user}

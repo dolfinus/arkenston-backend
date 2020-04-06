@@ -3,7 +3,7 @@ alias Arkenston.Subject
 alias Arkenston.Subject.User
 config = Application.get_env(:arkenston, :users)
 
-case Subject.get_user(config[:admin][:id]) do
+case Subject.get_user_by(name: config[:admin][:name], role: :admin) do
   nil ->
     Repo.insert!(
       %{
@@ -15,7 +15,7 @@ case Subject.get_user(config[:admin][:id]) do
             password: config[:admin][:password],
             role: :admin
           }
-        ) |> Ecto.Changeset.force_change(:id, config[:admin][:id])
+        )
       | valid?: true}
     )
 

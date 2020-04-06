@@ -11,11 +11,10 @@ config :arkenston,
   ecto_repos: [Arkenston.Repo],
   users: [
     anonymous: [
-      id: -1,
+      id: "cb51f2d6-3289-4a2a-8212-4762ff0eea5b",
       name: "anonymous"
     ],
     admin: [
-      id: 0,
       name: "admin",
       role: "admin",
       email: "admin@example.com",
@@ -30,7 +29,8 @@ config :arkenston,
 # Configure your database
 config :arkenston, Arkenston.Repo,
   pool_size: 10,
-  migration_timestamps: [type: :utc_datetime]
+  migration_timestamps: [type: :utc_datetime],
+  migration_primary_key: [name: :id, type: :binary_id, autogenerate: false, read_after_writes: true, default: {:fragment, "gen_random_uuid()"}]
 
 # Configures the endpoint
 config :arkenston, ArkenstonWeb.Endpoint,

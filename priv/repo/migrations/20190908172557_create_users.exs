@@ -3,7 +3,7 @@ defmodule Arkenston.Repo.Migrations.CreateUsers do
   import Arkenston.Repo.Migration
 
   def up do
-    create_audit table(:users) do
+    create_audit_table :users do
       add :name,          :string
       add :role,          :integer
       add :email,         :string
@@ -19,6 +19,6 @@ defmodule Arkenston.Repo.Migrations.CreateUsers do
   end
 
   def down do
-    drop_audit table(:users)
+    drop_audit_table :users
   end
 end

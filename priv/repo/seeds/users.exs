@@ -3,7 +3,7 @@ alias Arkenston.Subject
 alias Arkenston.Subject.User
 config = Application.get_env(:arkenston, :users)
 
-case Subject.get_user_by(id: config[:anonymous][:id], role: :anonymous) do
+case Subject.get_user_by(role: :anonymous) do
   nil ->
     Repo.insert!(
       %{

@@ -5,7 +5,7 @@ defmodule Arkenston.Subject.User do
   import EctoEnum
   defenum RoleEnum, anonymous: -1, user: 0, moderator: 1, admin: 2
 
-  @type id :: integer
+  @type id :: Ecto.UUID.t
 
   audited_schema "users" do
     field :name,          :string
@@ -13,6 +13,7 @@ defmodule Arkenston.Subject.User do
     field :email,         :string
     field :password,      :string, virtual: true
     field :password_hash, :string
+    field :deleted,       :boolean
   end
 
   @config Application.get_env(:arkenston, :users)
