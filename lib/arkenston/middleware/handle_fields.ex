@@ -4,10 +4,9 @@ defmodule Arkenston.Middleware.HandleFields do
   @behaviour Absinthe.Middleware
 
   alias Absinthe.Resolution
-  alias Absinthe.Blueprint.Document.Field
 
   @type resolution() :: Absinthe.Resolution.t()
-  @type field() :: Absinthe.Blueprint.Document.Field.t()
+  @type field() :: Absinthe.Blueprint.Document.Field.t() | Absinthe.Blueprint.Document.Fragment.Spread.t()
 
   @spec call(resolution(), any()) :: resolution()
   def call(resolution, config)
@@ -17,16 +16,24 @@ defmodule Arkenston.Middleware.HandleFields do
       resolution
       |> Resolution.project()
       |> Enum.map(&field/1)
-      |> Enum.map(&String.to_atom/1)
 
     %{resolution | context: Map.put(context, :fields, fields)}
   end
 
   @spec field(field()) :: binary() | map()
-  def field(%Field{name: name, selections: []}), do: name
+  def field(%{name: name, selections: selections}) when (is_list(selections) or is_map(selections)) and length(selections) == 0 do
+    name |> String.to_atom()
+  end
 
-  def field(%Field{name: name, selections: selections}),
-    do: %{name => Enum.map(selections, &field/1)}
+  def field(%{name: name, selections: selections}) when is_list(selections) or is_map(selections) do
+    {String.to_atom(name), Enum.map(selections, &field/1)}
+  end
 
-  def field(%Field{name: name}), do: name
+  def field(%{name: name}) when is_binary(name) do
+    name |> String.to_atom()
+  end
+
+  def field(%{name: name}) do
+    name
+  end
 end
