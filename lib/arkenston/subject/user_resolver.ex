@@ -48,4 +48,11 @@ defmodule Arkenston.Subject.UserResolver do
   def find(_args, _info) do
     {:error, "Search fields are not set or you've not authorized!"}
   end
+
+  def create(_parent, %{input: attrs}, %{context: context}) do
+    case Subject.create_user(attrs, context) do
+      {:ok, user} -> {:ok, user}
+      {:error, %Ecto.Changeset{} = changeset} -> {:ok, changeset}
+    end
+  end
 end
