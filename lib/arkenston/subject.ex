@@ -112,11 +112,11 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_user(attrs :: map) :: {:ok, any}|{:error, any}
-  def create_user(attrs \\ %{}) do
+  @spec create_user(attrs :: map, context :: map) :: {:ok, any}|{:error, any}
+  def create_user(attrs \\ %{}, context \\ %{}) do
     %User{}
       |> User.create_changeset(attrs)
-      |> Repo.audited_insert()
+      |> Repo.audited_insert(context)
   end
 
   @doc """
@@ -131,11 +131,11 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_user(user :: %User{}, attrs :: map) :: {:ok, any}|{:error, any}
-  def update_user(%User{} = user, attrs \\ %{}) do
+  @spec update_user(user :: %User{}, attrs :: map, context :: map) :: {:ok, any}|{:error, any}
+  def update_user(%User{} = user, attrs \\ %{}, context \\ %{}) do
     user
       |> User.update_changeset(attrs)
-      |> Repo.audited_update()
+      |> Repo.audited_update(context)
   end
 
   @doc """
@@ -150,11 +150,11 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_user(user :: %User{}) :: {:ok, any}|{:error, any}
-  def delete_user(%User{} = user) do
+  @spec delete_user(user :: %User{}, context :: map) :: {:ok, any}|{:error, any}
+  def delete_user(%User{} = user, context \\ %{}) do
     user
       |> User.delete_changeset()
-      |> Repo.audited_update()
+      |> Repo.audited_update(context)
   end
 
   @doc """

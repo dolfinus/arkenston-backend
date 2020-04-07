@@ -10,31 +10,48 @@ defmodule Arkenston.Repo do
   @type query :: Ecto.Query.t
   @type operation :: atom
 
+  @spec get_author(context :: map) :: %User{}|nil
+  defp get_author(%{current_user: %User{} = user}) do
+    user
+  end
+
+  defp get_author(_) do
+    nil
+  end
+
   @spec audited(op :: operation, user :: %User{}|nil, args :: [any]) :: {:ok, any} | {:error, any}
   defp audited(op, %User{} = user, args) do
     if in_transaction?() do
       query("set local \"arkenston.current_user\" = '#{user.id}';")
       apply(__MODULE__, op, args)
     else
-      transaction(fn ->
+      case transaction(fn ->
         query("set local \"arkenston.current_user\" = '#{user.id}';")
         apply(__MODULE__, op, args)
-      end)
+      end) do
+        {:ok, success} ->
+          success
+
+        {:error, error} ->
+          error
+      end
     end
   end
 
-  defp audited(op, _, args) do
+  defp audited(op, _user, args) do
     apply(__MODULE__, op, args)
   end
 
-  @spec audited_insert(changeset :: changeset, user :: %User{}|nil, opts :: [keyword]) :: {:ok, any} | {:error, any}
-  def audited_insert(changeset, user \\ nil, opts \\ []) do
-    audited(:insert, user, [changeset, opts])
+  @spec audited_insert(changeset :: changeset, context :: map, opts :: [keyword]) :: {:ok, any} | {:error, any}
+  def audited_insert(changeset, context \\ %{}, opts \\ []) do
+    author = get_author(context)
+
+    audited(:insert, author, [changeset, opts])
   end
 
-  @spec audited_insert!(changeset :: changeset, user :: %User{}|nil, opts :: [keyword]) :: any | no_return
-  def audited_insert!(changeset, user \\ nil, opts \\ []) do
-    case audited_insert(changeset, user, opts) do
+  @spec audited_insert!(changeset :: changeset, context :: map, opts :: [keyword]) :: any | no_return
+  def audited_insert!(changeset, context \\ %{}, opts \\ []) do
+    case audited_insert(changeset, context, opts) do
       {:ok, result} ->
         result
 
@@ -43,14 +60,16 @@ defmodule Arkenston.Repo do
     end
   end
 
-  @spec audited_update(changeset :: changeset, user :: %User{}|nil, opts :: [keyword]) :: {:ok, any} | {:error, any}
-  def audited_update(changeset, user \\ nil, opts \\ []) do
-    audited(:update, user, [changeset, opts])
+  @spec audited_update(changeset :: changeset, context :: map, opts :: [keyword]) :: {:ok, any} | {:error, any}
+  def audited_update(changeset, context \\ %{}, opts \\ []) do
+    author = get_author(context)
+
+    audited(:update, author, [changeset, opts])
   end
 
-  @spec audited_update!(changeset :: changeset, user :: %User{}|nil, opts :: [keyword]) :: any | no_return
-  def audited_update!(changeset, user \\ nil, opts \\ []) do
-    case audited_update(changeset, user, opts) do
+  @spec audited_update!(changeset :: changeset, context :: map, opts :: [keyword]) :: any | no_return
+  def audited_update!(changeset, context \\ %{}, opts \\ []) do
+    case audited_update(changeset, context, opts) do
       {:ok, result} ->
         result
 

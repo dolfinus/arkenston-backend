@@ -8,7 +8,7 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
       DECLARE
         audit_table_name   text   := TG_TABLE_NAME || '_audit';
         orig_table_key     text   := TG_ARGV[0];
-        current_user_#{@id_name} uuid   := current_setting('arkenston.current_user', 't');
+        current_user_#{@id_name} uuid := current_setting('arkenston.current_user', 't');
         orig_table_columns text[];
         new_table_columns  text[];
         new_version        int    := 1;
@@ -31,14 +31,20 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
                 %1$s AS rev,
                 %2$s AS orig
             WHERE
-                rev.id = orig.latest_revision_#{@id_name}',
+                rev.id = orig.latest_revision_#{@id_name}
+            AND rev.deleted is FALSE',
             audit_table_name,
             TG_TABLE_NAME
           );
+          --RAISE LOG 'version statement sql %', version_statement;
 
           EXECUTE version_statement
           INTO new_version;
+
+          --RAISE LOG 'version statement result %', new_version;
         END IF;
+
+        -- RAISE LOG 'current user #{@id_name} %', current_user_#{@id_name};
 
         IF current_user_#{@id_name} IS NOT NULL THEN
           audit_statement := FORMAT(
@@ -52,8 +58,8 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
             SELECT
               ($1).id AS %3$I,
               %4$s,
-              %2$I AS version,
-              ''%6$I''::uuid AS created_by_#{@id_name}
+              %2$s AS version,
+              ''%6$s''::uuid AS created_by_#{@id_name}
             RETURNING id
             ',
             audit_table_name,
@@ -85,9 +91,13 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
           );
         END IF;
 
+        --RAISE LOG 'audit statement sql %', audit_statement;
+
         EXECUTE  audit_statement
         INTO  latest_revision_#{@id_name}
         USING NEW;
+
+        --RAISE LOG 'audit statement result %', latest_revision_#{@id_name};
 
         NEW.latest_revision_#{@id_name} = latest_revision_#{@id_name};
         IF (TG_OP = 'INSERT') THEN

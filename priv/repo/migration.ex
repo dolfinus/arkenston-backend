@@ -39,7 +39,7 @@ defmodule Arkenston.Repo.Migration do
 
       create index(unquote(audit_table), unquote(created_by))
       create index(unquote(audit_table), :created_at)
-      create index(unquote(audit_table), [unquote(orig_primary_key), :version])
+      create unique_index(unquote(audit_table), [unquote(orig_primary_key), :version], where: "deleted IS FALSE")
 
       alter table(unquote(orig_table)) do
         add unquote(first_revision),  references(unquote(audit_table), type: unquote(@id_type)), null: false
