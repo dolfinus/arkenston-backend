@@ -23,7 +23,7 @@ defmodule Arkenston.Context do
   defp build_context(conn) do
     case get_req_header(conn, "authorization") do
       ["Bearer " <> token] ->
-        case Guardian.decode_and_verify(token) do
+        case Guardian.decode_and_verify(token, %{"typ" => "access"}) do
           {:ok, claims} ->
             case Guardian.resource_from_claims(claims) do
               {:ok, current_user} ->

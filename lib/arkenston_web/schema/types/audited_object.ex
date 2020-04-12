@@ -4,33 +4,6 @@ defmodule ArkenstonWeb.Schema.Types.AuditedObject do
 
     quote do
       import unquote(current)
-
-      interface :revision do
-        field :version,    non_null(:integer)
-        field :created_by, non_null(:user)
-        field :created_at, non_null(:datetime)
-
-        resolve_type fn
-          _, _ -> nil
-        end
-      end
-
-      interface :with_revision do
-        field :first_revision,  non_null(:revision)
-        field :latest_revision, non_null(:revision)
-        field :revisions,       non_null(list_of(:revision))
-
-        resolve_type fn
-          %{id: id}, %{context: context} ->
-            case Arkenston.Subject.UserResolver.find(%{id: id}, %{context: context}) do
-              {:ok, _} ->
-                :user
-              {:error, _} ->
-                nil
-            end
-          _, _ -> nil
-        end
-      end
     end
   end
 

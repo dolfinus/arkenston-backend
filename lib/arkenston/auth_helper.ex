@@ -1,12 +1,13 @@
 defmodule Arkenston.AuthHelper do
   @moduledoc false
 
-  alias Arkenston.Repo
+  alias Arkenston.Subject
   alias Arkenston.Subject.User
 
-  def login_with_pass(%User{} = user, given_pass) do
+  @spec login_with_pass(user :: User.t, password :: String.t) :: {:error, String.t} | {:ok, User.t()}
+  def login_with_pass(%User{} = user, password) do
     cond do
-      User.check_password(user, given_pass) ->
+      User.check_password(user, password) ->
         {:ok, user}
 
       true ->
@@ -14,19 +15,21 @@ defmodule Arkenston.AuthHelper do
     end
   end
 
-  def login_with_pass(_user, _given_pass) do
+  def login_with_pass(_user, _password) do
     {:error, "User not found"}
   end
 
-  def login_with_email_pass(email, given_pass) do
-    user = Repo.get_by(User, email: String.downcase(email))
+  @spec login_with_email_pass(email :: String.t, password :: String.t) :: {:error, String.t} | {:ok, User.t()}
+  def login_with_email_pass(email, password) do
+    user = Subject.get_user_by(%{email: String.downcase(email)})
 
-    login_with_pass(user, given_pass)
+    login_with_pass(user, password)
   end
 
-  def login_with_name_pass(name, given_pass) do
-    user = Repo.get_by(User, name: name)
+  @spec login_with_name_pass(name :: String.t, password :: String.t) :: {:error, String.t} | {:ok, User.t()}
+  def login_with_name_pass(name, password) do
+    user = Subject.get_user_by(%{name: name})
 
-    login_with_pass(user, given_pass)
+    login_with_pass(user, password)
   end
 end

@@ -166,7 +166,26 @@ defmodule Arkenston.Repo do
   def handle_filter(query, opts \\ %{}) do
     {query, opts} = filter_deleted(query, opts)
 
-    query |> where([], ^Enum.to_list(opts))
+    options = opts |> Enum.to_list()
+
+    {filter_options, new_query} = Enum.map_reduce(options, query, fn (option, query) ->
+      case option do
+        {key, value} when is_nil(value) ->
+          new_query = from i in query,
+                        where: is_nil(field(i, ^key))
+          {nil, new_query}
+
+        {key, value} ->
+          new_query = from i in query,
+                        where: field(i, ^key) == ^value
+          {option, new_query}
+
+        _ ->
+          {option, query}
+      end
+    end)
+
+    new_query
   end
 
   @doc """

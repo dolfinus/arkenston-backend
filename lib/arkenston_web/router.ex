@@ -4,9 +4,9 @@ defmodule ArkenstonWeb.Router do
 
   pipeline :graphql do
     plug Plug.Parsers,
-      parsers: [:urlencoded, :multipart, :json, Absinthe.Plug.Parser],
-      pass: ["*/*"],
-      json_decoder: Jason
+      parsers: [:json, Absinthe.Plug.Parser],
+      pass: ["application/json"],
+      json_decoder: Phoenix.json_library()
 
     plug Arkenston.Context
   end

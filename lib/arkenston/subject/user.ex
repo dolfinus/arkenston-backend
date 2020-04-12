@@ -6,6 +6,20 @@ defmodule Arkenston.Subject.User do
   defenum RoleEnum, anonymous: -1, user: 0, moderator: 1, admin: 2
 
   @type id :: Ecto.UUID.t
+  @type name :: String.t
+  @type role :: RoleEnum.t
+  @type email :: String
+  @type password :: String.t
+  @type deleted :: boolean
+
+  @type t :: %__MODULE__{
+    id: id,
+    name: name,
+    role: role,
+    email: email,
+    password: password,
+    deleted: deleted
+  }
 
   audited_schema "users" do
     field :name,          :string

@@ -17,29 +17,6 @@ defmodule ArkenstonWeb do
   and import those modules here.
   """
 
-  def controller do
-    quote do
-      use Phoenix.Controller, namespace: ArkenstonWeb
-
-      import Plug.Conn
-      alias ArkenstonWeb.Router.Helpers, as: Routes
-    end
-  end
-
-  def view do
-    quote do
-      use Phoenix.View,
-        root: "lib/arkenston_web/templates",
-        namespace: ArkenstonWeb
-
-      # Import convenience functions from controllers
-      import Phoenix.Controller, only: [get_flash: 1, get_flash: 2, view_module: 1]
-
-      import ArkenstonWeb.ErrorHelpers
-      alias ArkenstonWeb.Router.Helpers, as: Routes
-    end
-  end
-
   def router do
     quote do
       use Phoenix.Router

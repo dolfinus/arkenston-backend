@@ -7,7 +7,7 @@ defmodule ArkenstonWeb.Schema do
   end
 
   mutation do
-    import_fields :session_mutations
+    import_fields :token_mutations
     import_fields :user_mutations
   end
 

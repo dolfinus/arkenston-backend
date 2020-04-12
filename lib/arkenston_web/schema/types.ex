@@ -5,13 +5,14 @@ defmodule ArkenstonWeb.Schema.Types do
       import_types Absinthe.Plug.Types
 
       import_types ArkenstonWeb.Schema.Types.Enum
+      import_types ArkenstonWeb.Schema.Types.Interface
       import_types ArkenstonWeb.Schema.Types.Object
       import_types ArkenstonWeb.Schema.Types.Input
       import_types ArkenstonWeb.Schema.Types.Payload
 
       import_types ArkenstonWeb.Schema.Query.User
 
-      import_types ArkenstonWeb.Schema.Mutation.Session
+      import_types ArkenstonWeb.Schema.Mutation.Token
       import_types ArkenstonWeb.Schema.Mutation.User
     end
   end

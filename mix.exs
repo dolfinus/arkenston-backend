@@ -65,6 +65,7 @@ defmodule Arkenston.MixProject do
       {:linguist, github: "yogodoshi/linguist", branch: "cm/fix-elixir-1.7-compatibility"},
       {:guardian, "~> 2.1"},
       {:guardian_phoenix, "~> 2.0"},
+      {:guardian_db, "~> 2.0"},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:faker, "~> 0.13", only: :test},
       {:ex_machina, "~> 2.4", only: :test},

@@ -21,9 +21,9 @@ defmodule Arkenston.Subject.User.AnonymousSpec do
         end
       end
 
-      describe "get_user_by!/1" do
+      describe "get_anonymous/0" do
         it "returns anonymous with role #{@anonymous.role}" do
-          anonymous = Subject.get_user_by!(role: @anonymous.role)
+          anonymous = Subject.get_anonymous()
           expect get_user(anonymous) |> to(eq get_user(@anonymous_user))
         end
       end
@@ -41,7 +41,7 @@ defmodule Arkenston.Subject.User.AnonymousSpec do
       end
 
       describe "delete_user/1" do
-        it "returns error" do
+        it "returns error changeset" do
           expect Subject.delete_user(@anonymous_user) |> to(match_pattern {:error, %Ecto.Changeset{}})
         end
       end

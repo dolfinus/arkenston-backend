@@ -17,7 +17,7 @@ defmodule ArkenstonWeb.Schema.Query.User do
       arg :email, :string
       arg :role, :integer
       arg :deleted, :boolean
-      resolve &Arkenston.Subject.UserResolver.find/2
+      resolve &Arkenston.Subject.UserResolver.one/2
     end
   end
 end

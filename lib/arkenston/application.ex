@@ -11,9 +11,10 @@ defmodule Arkenston.Application do
       # Start the Ecto repository
       Arkenston.Repo,
       # Start the endpoint when the application starts
-      ArkenstonWeb.Endpoint
+      ArkenstonWeb.Endpoint,
       # Starts a worker by calling: Arkenston.Worker.start_link(arg)
       # {Arkenston.Worker, arg},
+      {Guardian.DB.Token.SweeperServer, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -55,12 +55,23 @@ config :arkenston, Arkenston.Guardian,
   # optional
   verify_module: Guardian.JWT,
   issuer: "Arkenston",
-  ttl: {30, :days},
+  ttl: {15, :minutes},
+  token_ttl: %{
+    refresh: {60, :days},
+    restore: {1, :days},
+    signin: {1, :days}
+  },
   allowed_drift: 2000,
   # optional
   verify_issuer: true,
   secret_key: %{"k" => Mix.env() |> Atom.to_string(), "kty" => "oct"},
   serializer: Arkenston.Guardian
+
+config :guardian, Guardian.DB,
+  repo: Arkenston.Repo, # Add your repository module
+  schema_name: "guardian_tokens", # default
+  token_types: ["refresh", "restore", "signin"], # store all token types if not set
+  sweep_interval: 60 # default: 60 minutes
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

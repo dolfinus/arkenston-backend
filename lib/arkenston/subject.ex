@@ -101,6 +101,18 @@ defmodule Arkenston.Subject do
   def get_user(id, fields \\ []), do: get_user_by(%{id: id}, fields)
 
   @doc """
+  Gets an anonymous user
+
+  ## Examples
+
+      iex> get_anonymous()
+      %User{}
+
+  """
+  @spec get_anonymous(fields :: Repo.fields) :: %User{}
+  def get_anonymous(fields \\ []), do: get_user_by(%{role: :anonymous}, fields)
+
+  @doc """
   Creates a user.
 
   ## Examples
@@ -216,7 +228,7 @@ defmodule Arkenston.Subject do
     end
 
     {new_query, new_opts}
-end
+  end
 
   @doc """
   Generate query
@@ -229,18 +241,16 @@ end
       ]
 
   """
-  @spec generate_query(query :: Repo.queryable) :: Repo.queryable
+  @spec generate_query(query :: Repo.queryable, opts :: Repo.query_opts | [keyword]) :: Repo.queryable
   def generate_query(query) do
     generate_query(query, %{})
   end
 
-  @spec generate_query(query :: Repo.queryable, opts :: Repo.query_opts) :: Repo.queryable
   def generate_query(query, opts) when is_map(opts) do
     {query, opts} = filter_anonymous(query, opts)
     Repo.generate_query(query, opts)
   end
 
-  @spec generate_query(query :: Repo.queryable, opts :: [keyword]) :: Repo.queryable
   def generate_query(query, opts) when is_list(opts) do
     generate_query(query, opts |> Enum.into(%{}))
   end
