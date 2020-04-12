@@ -1,5 +1,5 @@
 defmodule Arkenston.I18n do
-  use Linguist.Vocabulary
+  import Linguist.MemorizedVocabulary
 
   locale_files = Path.wildcard([__DIR__, "i18n", "*.{yml,yaml}"] |> Enum.join("/"))
 

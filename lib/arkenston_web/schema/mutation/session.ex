@@ -1,6 +1,5 @@
 defmodule ArkenstonWeb.Schema.Mutation.Session do
   use Absinthe.Schema.Notation
-  import AbsintheErrorPayload.Payload
 
   object :session_mutations do
     field :login, :session do
