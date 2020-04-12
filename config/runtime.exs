@@ -24,7 +24,13 @@ config :arkenston, ArkenstonWeb.Endpoint,
     path:   System.get_env("FRONTENT_PATH")   || "/",
   ],
   http: [
-    port: System.get_env("BACKEND_PORT") || "3000" |> String.to_integer()
+    port: 3000
+  ],
+  api: [
+    host:   System.get_env("BACKEND_HOST")   || "localhost",
+    port:   System.get_env("BACKEND_PORT")   || "3000" |> String.to_integer(),
+    scheme: System.get_env("BACKEND_SCHEME") || "http",
+    path:   System.get_env("BACKEND_PATH")   || "/api",
   ]
 
 if Mix.env() == "prod" do
