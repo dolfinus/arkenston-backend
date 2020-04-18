@@ -11,31 +11,23 @@ defmodule Arkenston.Context do
 
   @spec call(Plug.Conn.t, Plug.opts) :: Plug.Conn.t
   def call(conn, _) do
-    case build_context(conn) do
-      {:ok, %{} = context} ->
+    with {:ok, %{} = context} <- build_context(conn) do
         put_private(conn, :absinthe, %{context: context})
-      {:error, _} ->
-        conn
+    else
+        _ ->
+          conn
     end
   end
 
   @spec build_context(Plug.Conn.t) :: {:ok, context}|{:error, any}
   defp build_context(conn) do
-    case get_req_header(conn, "authorization") do
-      ["Bearer " <> token] ->
-        case Guardian.decode_and_verify(token, %{"typ" => "access"}) do
-          {:ok, claims} ->
-            case Guardian.resource_from_claims(claims) do
-              {:ok, current_user} ->
-                {:ok, %{current_user: current_user, token: token}}
-              {:error, error} ->
-                {:error, error}
-            end
-          {:error, error} ->
-            {:error, error}
-        end
+    with  ["Bearer " <> token] <- get_req_header(conn, "authorization"),
+          {:ok, claims} <- Guardian.decode_and_verify(token, %{"typ" => "access"}),
+          {:ok, current_user} <- Guardian.resource_from_claims(claims) do
+            {:ok, %{anonymous: false, current_user: current_user, token: token}}
+    else
       _ ->
-        {:error, :not_authorized}
+            {:ok, %{anonymous: true}}
     end
   end
 end

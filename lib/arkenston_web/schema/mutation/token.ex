@@ -3,7 +3,7 @@ defmodule ArkenstonWeb.Schema.Mutation.Token do
   import AbsintheErrorPayload.Payload
 
   object :token_mutations do
-    field :login, :token_payload do
+    field :login, :user_token_payload do
       arg :email, :string
       arg :name, :string
       arg :password, non_null(:string)
@@ -12,7 +12,7 @@ defmodule ArkenstonWeb.Schema.Mutation.Token do
       middleware &build_payload/2
     end
 
-    field :exchange, :access_token_payload do
+    field :exchange, :user_access_token_payload do
       arg :refresh_token, :string
       resolve &Arkenston.Subject.UserResolver.exchange/2
       middleware &build_payload/2

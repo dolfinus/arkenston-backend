@@ -4,7 +4,3 @@ default:
       first_name: Администратор
       middle_name: ''
       last_name: Системы
-    anonymous:
-      first_name: Анонимный
-      middle_name: ''
-      last_name: Пользователь

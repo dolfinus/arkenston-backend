@@ -6,11 +6,12 @@ defmodule Arkenston.Repo do
   import Ecto.Query, warn: false
   alias Arkenston.Subject.User
 
+  @type author :: User.t | nil
   @type changeset :: Ecto.Changeset.t
   @type query :: Ecto.Query.t
   @type operation :: atom
 
-  @spec get_author(context :: map) :: %User{}|nil
+  @spec get_author(context :: map) :: author
   defp get_author(%{current_user: %User{} = user}) do
     user
   end
@@ -19,14 +20,14 @@ defmodule Arkenston.Repo do
     nil
   end
 
-  @spec audited(op :: operation, user :: %User{}|nil, args :: [any]) :: {:ok, any} | {:error, any}
-  defp audited(op, %User{} = user, args) do
+  @spec audited(op :: operation, author :: author, args :: [any]) :: {:ok, any} | {:error, any}
+  defp audited(op, %User{} = author, args) do
     if in_transaction?() do
-      query("set local \"arkenston.current_user\" = '#{user.id}';")
+      query("set local \"arkenston.current_user\" = '#{author.id}';")
       apply(__MODULE__, op, args)
     else
       case transaction(fn ->
-        query("set local \"arkenston.current_user\" = '#{user.id}';")
+        query("set local \"arkenston.current_user\" = '#{author.id}';")
         apply(__MODULE__, op, args)
       end) do
         {:ok, success} ->
@@ -38,7 +39,7 @@ defmodule Arkenston.Repo do
     end
   end
 
-  defp audited(op, _user, args) do
+  defp audited(op, _author, args) do
     apply(__MODULE__, op, args)
   end
 
@@ -168,7 +169,7 @@ defmodule Arkenston.Repo do
 
     options = opts |> Enum.to_list()
 
-    {filter_options, new_query} = Enum.map_reduce(options, query, fn (option, query) ->
+    {_filter_options, new_query} = Enum.map_reduce(options, query, fn (option, query) ->
       case option do
         {key, value} when is_nil(value) ->
           new_query = from i in query,
@@ -315,8 +316,13 @@ defmodule Arkenston.Repo do
         order_by: [desc: column]
 
   """
-  @spec generate_query(query :: queryable, opts :: query_opts) :: queryable
-  def generate_query(query, opts \\ %{}) do
+  @spec generate_query(query :: queryable, opts :: query_opts | list) :: queryable
+  def generate_query(query, opts \\ %{})
+  def generate_query(query, opts) when is_list(opts) do
+    generate_query(query, opts |> Enum.into(%{}))
+  end
+
+  def generate_query(query, opts) when is_map(opts) do
     filter_opts = Map.drop(opts, [:limit, :order, :page, :size])
     query
     |> handle_pagination(opts)

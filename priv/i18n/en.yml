@@ -20,7 +20,3 @@ default:
       first_name: Super
       middle_name: ''
       last_name: Admin
-    anonymous:
-      first_name: Anonymous
-      middle_name: ''
-      last_name: User

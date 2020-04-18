@@ -3,7 +3,7 @@ defmodule ArkenstonWeb.Schema.Types.Interface.Revision do
 
   interface :revision do
     field :version,    non_null(:integer)
-    field :created_by, non_null(:user)
+    field :created_by, :user
     field :created_at, non_null(:datetime)
 
     resolve_type fn

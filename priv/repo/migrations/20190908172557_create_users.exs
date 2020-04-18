@@ -11,7 +11,6 @@ defmodule Arkenston.Repo.Migrations.CreateUsers do
       add :deleted,       :boolean, null: false, default: false
     end
 
-    create unique_index(:users, :role,  where: "role < 0")
     create unique_index(:users, :name,  where: "deleted IS FALSE")
     create unique_index(:users, :email, where: "deleted IS FALSE")
     create index(:users, [:id, :role],  where: "deleted IS FALSE")

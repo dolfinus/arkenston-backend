@@ -13,8 +13,8 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
         new_table_columns  text[];
         new_version        int    := 1;
         latest_revision_#{@id_name} uuid;
-        version_statement text := '';
-        audit_statement text := '';
+        version_statement  text := '';
+        audit_statement    text := '';
       BEGIN
         -- Get original table column names excluding 'id'
         FOR i IN 1..TG_NARGS-1

@@ -9,7 +9,7 @@ defmodule Arkenston.Subject.UserResolver do
   @type login_result :: %{refresh_token: String.t, access_token: String.t}
 
   @spec login(args :: login_args, info :: map) :: {:error, any} | {:ok, login_result}
-  def login(args), do: login(args, %{})
+  def login(args, info \\ %{})
   def login(%{password: password} = input, _info) do
     auth = case input do
       %{name: name} ->
@@ -21,23 +21,19 @@ defmodule Arkenston.Subject.UserResolver do
     with  {:ok, user} <- auth,
           {:ok, refresh_token, _} <- Guardian.encode_and_sign(user, %{}, token_type: "refresh"),
           {:ok, _old_stuff,  {access_token, _new_claims}} <- Guardian.exchange(refresh_token, "refresh", "access") do
-            {:ok, %{
-              refresh_token: refresh_token,
-              access_token: access_token
-            }}
+            {:ok, %{refresh_token: refresh_token, access_token: access_token, user: user}}
           else
             error -> error
     end
   end
 
   @spec exchange(args :: refresh_token, info :: map) :: {:error, any} | {:ok, access_token}
-  def exchange(args), do: exchange(args, %{})
+  def exchange(args, info \\ %{})
   def exchange(%{refresh_token: refresh_token}, _info) do
-    with  {:ok, _claims} <- Guardian.decode_and_verify(refresh_token, %{"typ" => "refresh"}),
+    with  {:ok, claims} <- Guardian.decode_and_verify(refresh_token, %{"typ" => "refresh"}),
+          {:ok, user} <- Guardian.resource_from_claims(claims),
           {:ok, _old_stuff, {access_token, _new_claims}} <- Guardian.exchange(refresh_token, "refresh", "access") do
-            {:ok, %{
-              access_token: access_token
-            }}
+            {:ok, %{access_token: access_token, user: user}}
           else
             error ->
               error
@@ -46,7 +42,7 @@ defmodule Arkenston.Subject.UserResolver do
 
   @type logout_result :: {:ok, any} | {:error, any}
   @spec logout(args :: refresh_token, info :: map) :: {:error, atom} | {:ok, nil}
-  def logout(args), do: logout(args, %{})
+  def logout(args, info \\ %{})
   def logout(%{refresh_token: token}, _info) do
     with  {:ok, _claims} <- Guardian.decode_and_verify(token, %{"typ" => "refresh"}),
           {:ok, _claims} <- Guardian.revoke(token) do

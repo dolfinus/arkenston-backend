@@ -4,7 +4,6 @@ defmodule Arkenston.Repo.Migration do
 
   @id_name Application.get_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:name]
   @id_type Application.get_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:type]
-  @anonymous_id Application.get_env(:arkenston, :users)[:anonymous][@id_name]
 
   defmacro create_audit_table(orig_table, do: block) do
 
@@ -32,7 +31,7 @@ defmodule Arkenston.Repo.Migration do
       create table(unquote(audit_table)) do
         unquote(block)
         add unquote(orig_primary_key), references(unquote(orig_table), type: unquote(@id_type)), null: false
-        add unquote(created_by), references("users", type: unquote(@id_type)), null: false, default: unquote(@anonymous_id)
+        add unquote(created_by), references("users", type: unquote(@id_type)), null: true
         add :version,    :integer, null: false, default: "1"
         add :created_at, :utc_datetime, null: false, default: {:fragment, "now()"}
       end

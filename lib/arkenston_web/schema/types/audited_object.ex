@@ -25,9 +25,7 @@ defmodule ArkenstonWeb.Schema.Types.AuditedObject do
         interface :revision
 
         unquote(block)
-        field :version,    non_null(:integer)
-        field :created_by, non_null(:user)
-        field :created_at, non_null(:datetime)
+        import_fields :revision
       end
     end
   end

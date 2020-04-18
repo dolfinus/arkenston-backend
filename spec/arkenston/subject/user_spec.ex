@@ -1,7 +1,7 @@
 defmodule Arkenston.Subject.UserSpec do
   alias Arkenston.Subject
   alias Arkenston.Subject.User
-  alias Arkenston.Subject.User.{AnonymousSpec,BaseSpec,ResolverSpec}
+  alias Arkenston.Subject.User.{BaseSpec,ResolverSpec}
   use ESpec
 
   defmacro __using__(_opts) do
@@ -27,11 +27,7 @@ defmodule Arkenston.Subject.UserSpec do
         result
       end
 
-      context "with anonymous user", user: true, anonymous: true do
-        use AnonymousSpec
-      end
-
-      context "with non-anonymous user", user: true, anonymous: false do
+      context "with user", user: true do
         use BaseSpec
         use ResolverSpec
       end
