@@ -1,35 +1,99 @@
 defmodule Arkenston.Subject.UserSpec do
   alias Arkenston.Subject
   alias Arkenston.Subject.User
-  alias Arkenston.Subject.User.{BaseSpec,ResolverSpec}
+  import Arkenston.Factories.UserFactory
+  import SubjectHelper
   use ESpec
 
-  defmacro __using__(_opts) do
-    quote do
-      @valid_attrs %{name: "text", password: "not_null", email: "it@example.com", role: :user}
-      @invalid_attrs %{name: nil, password: nil, email: nil, role: nil}
-      @check_attrs [:name, :email, :role]
-      @all_attrs [:name, :email, :password_hash, :role]
+  @valid_attrs %{name: "text", password: "not_null", email: "it@example.com", role: :user}
+  @invalid_attrs %{name: nil, password: nil, email: nil, role: nil}
 
-      def get_user(user) do
-        user |> Map.take(@all_attrs)
+  def get_user_list() do
+    Subject.list_users() |> Enum.map(&get_user/1)
+  end
+
+  context "subject", module: :repo, subject: true do
+    context "with user", user: true do
+      describe "list_users/0" do
+        it "returns all users" do
+          user = build(:user)
+          {:ok, inserted_user} = user |> Subject.create_user()
+          inserted = get_user(inserted_user)
+          expect get_user_list() |> to(have inserted)
+        end
+
+        it "does not return deleted user" do
+          user = build(:user)
+          {:ok, inserted_user} = user |> Subject.create_user()
+          inserted = get_user(inserted_user)
+          Subject.delete_user(inserted_user)
+          expect get_user_list() |> not_to(have inserted)
+        end
       end
 
-      def get_user_list() do
-        Subject.list_users() |> Enum.map(&get_user/1)
+      describe "get_user!/1" do
+        it "returns the user with given id" do
+          user = build(:user)
+          {:ok, inserted_user} = user |> Subject.create_user()
+          fetched_user = inserted_user.id |> Subject.get_user!()
+          expect check_user(fetched_user, user)
+        end
+
+        it "does not return deleted user" do
+          user = build(:user)
+          {:ok, inserted_user} = user |> Subject.create_user()
+          {:ok, %User{}} = inserted_user |> Subject.delete_user()
+          fetched_user = inserted_user.id |> Subject.get_user()
+          expect fetched_user |> to(be_nil())
+        end
       end
 
-      def check_user(user1, user2) do
-        result = true
-        result = result && (Map.take(user1, @check_attrs) == Map.take(user2, @check_attrs))
-        result = result && (User.check_password(user1, user2.password))
+      describe "create_user/1" do
+        it "with valid data creates a user" do
+          user = build(:user)
+          {:ok, inserted_user} = user |> Subject.create_user()
+          expect check_user(inserted_user, user)
+        end
 
-        result
+        it "with invalid data returns error changeset" do
+          user = build(:user, @invalid_attrs)
+          expect user |> Subject.create_user() |> to(match_pattern {:error, %Ecto.Changeset{}})
+        end
       end
 
-      context "with user", user: true do
-        use BaseSpec
-        use ResolverSpec
+      describe "update_user/2" do
+        it "with valid data updates a user" do
+          user = build(:user)
+          {:ok, inserted_user} = user |> Subject.create_user()
+          {:ok, updated_user} = inserted_user |> Subject.update_user(@valid_attrs)
+          expect check_user(updated_user, @valid_attrs)
+        end
+
+        it "with invalid data returns error changeset" do
+          user = build(:user)
+          {:ok, inserted_user} = user |> Subject.create_user()
+          {:error, %Ecto.Changeset{}} = inserted_user |> Subject.update_user(@invalid_attrs)
+          fetched_user = Subject.get_user(inserted_user.id)
+          expect check_user(fetched_user, user)
+        end
+      end
+
+      describe "delete_user/1" do
+        it "updates deleted field of user" do
+          user = build(:user)
+          {:ok, inserted_user} = user |> Subject.create_user()
+          {:ok, %User{}} = inserted_user |> Subject.delete_user()
+          deleted_user = Subject.get_user_by(id: inserted_user.id, deleted: nil)
+          expect deleted_user.deleted |> to(be_true())
+        end
+      end
+
+      describe "change_user/1" do
+        it "returns a user changeset" do
+          user = build(:user)
+          {:ok, inserted_user} = user |> Subject.create_user()
+          expect Subject.change_user(inserted_user) |> to(match_pattern %Ecto.Changeset{})
+        end
       end
     end
   end
