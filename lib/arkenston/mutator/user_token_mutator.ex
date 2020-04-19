@@ -1,5 +1,5 @@
-defmodule Arkenston.Subject.UserResolver do
-  alias Arkenston.{AuthHelper, Guardian, Subject}
+defmodule Arkenston.Mutator.UserTokenMutator do
+  alias Arkenston.{AuthHelper, Guardian}
   alias Arkenston.Subject.User
 
   @type refresh_token :: %{refresh_token: String.t}
@@ -54,52 +54,5 @@ defmodule Arkenston.Subject.UserResolver do
 
   def logout(_args, _info) do
     {:error, "Please log in first!"}
-  end
-
-  @spec prepare_fields(map) :: any
-  def prepare_fields(%{fields: fields}), do: fields
-  def prepare_fields(_fields), do: []
-
-  @spec all(where :: map, params :: map) :: {:ok, [Arkenston.Subject.User.t()]}
-  def all(args \\ %{}), do: all(args, %{context: %{}})
-  def all(where, %{context: context}) when is_map(where) do
-    {:ok, Subject.list_users(where, prepare_fields(context))}
-  end
-
-  def all(_args, %{context: context}) do
-    {:ok, Subject.list_users(%{}, prepare_fields(context))}
-  end
-
-  @spec one(where:: map, params :: map) :: {:error, String.t} | {:ok, User.t} | {:error, any}
-  def one(args), do: one(args, %{context: %{}})
-  def one(%{id: id}, %{context: context}) when not is_nil(id) do
-    case Subject.get_user(id, prepare_fields(context)) do
-      nil -> {:error, :not_found}
-      user -> {:ok, user}
-    end
-  end
-
-  def one(where, %{context: context}) when is_map(where) and map_size(where) != 0 do
-    case Subject.get_user_by(where, prepare_fields(context)) do
-      nil -> {:error, :not_found}
-      user -> {:ok, user}
-    end
-  end
-
-  def one(_args, %{context: %{current_user: current_user}} = info) when not is_nil(current_user) do
-    one(%{id: current_user.id}, info)
-  end
-
-  def one(_args, _info) do
-    {:error, :invalid_request}
-  end
-
-  @spec create(parent :: any, args :: map, params :: map) :: {:ok, User.t | Ecto.Changeset.t}
-  def create(args), do: create(nil, args, %{context: %{}})
-  def create(_parent, %{input: attrs}, %{context: context}) do
-    case Subject.create_user(attrs, context) do
-      {:ok, user} -> {:ok, user}
-      {:error, %Ecto.Changeset{} = changeset} -> {:ok, changeset}
-    end
   end
 end

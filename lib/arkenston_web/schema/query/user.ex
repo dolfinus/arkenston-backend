@@ -8,7 +8,7 @@ defmodule ArkenstonWeb.Schema.Query.User do
       arg :email, :string
       arg :role, :integer
       arg :deleted, :boolean
-      resolve &Arkenston.Subject.UserResolver.all/2
+      resolve &Arkenston.Resolver.UserResolver.all/2
     end
 
     field :user, :user do
@@ -17,7 +17,7 @@ defmodule ArkenstonWeb.Schema.Query.User do
       arg :email, :string
       arg :role, :integer
       arg :deleted, :boolean
-      resolve &Arkenston.Subject.UserResolver.one/2
+      resolve &Arkenston.Resolver.UserResolver.one/2
     end
   end
 end

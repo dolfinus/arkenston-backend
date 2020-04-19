@@ -11,6 +11,14 @@ defmodule Arkenston.Repo do
   @type query :: Ecto.Query.t
   @type operation :: atom
 
+  @spec data(ctx :: map) :: Dataloader.Ecto.t
+  def data(%{context: context}) do
+    Dataloader.Ecto.new(__MODULE__, query: &generate_query/2, default_params: context)
+  end
+  def data(_ctx) do
+    Dataloader.Ecto.new(__MODULE__, query: &generate_query/2)
+  end
+
   @spec get_author(context :: map) :: author
   defp get_author(%{current_user: %User{} = user}) do
     user
@@ -80,7 +88,7 @@ defmodule Arkenston.Repo do
   end
 
   @type queryable :: Ecto.Queryable.t | module
-  @type fields :: [atom]
+  @type fields :: [atom|{atom, fields}]
   @type limit :: pos_integer
   @type page :: pos_integer
   @type size :: pos_integer
@@ -91,7 +99,8 @@ defmodule Arkenston.Repo do
   @type order_opt :: %{order: keyword(order)|%{optional(atom) => order}}
   @type limit_opt :: %{limit: limit}
   @type pagination_opt :: %{page: page} | %{size: size} | %{page: page, size: size}
-  @type query_opts :: filter_opt|deleted_opt|order_opt|limit_opt|pagination_opt
+  @type fields_opt :: %{fields: fields}
+  @type query_opts :: filter_opt|deleted_opt|order_opt|limit_opt|pagination_opt|fields_opt
 
   @doc """
   Apply filter for 'deleted' column
@@ -318,11 +327,18 @@ defmodule Arkenston.Repo do
   """
   @spec generate_query(query :: queryable, opts :: query_opts | list) :: queryable
   def generate_query(query, opts \\ %{})
+
   def generate_query(query, opts) when is_list(opts) do
-    generate_query(query, opts |> Enum.into(%{}))
+    generate_query(query, %{fields: opts})
   end
 
-  def generate_query(query, opts) when is_map(opts) do
+  def generate_query(query, %{fields: fields} = opts) when is_list(fields) do
+    fields_map = fields |> Enum.into(%{})
+
+    generate_query(query, Map.merge(opts, fields_map))
+  end
+
+  def generate_query(query, opts) do
     filter_opts = Map.drop(opts, [:limit, :order, :page, :size])
     query
     |> handle_pagination(opts)

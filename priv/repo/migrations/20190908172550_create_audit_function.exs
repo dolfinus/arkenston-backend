@@ -31,8 +31,7 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
                 %1$s AS rev,
                 %2$s AS orig
             WHERE
-                rev.id = orig.latest_revision_#{@id_name}
-            AND rev.deleted is FALSE',
+                rev.id = orig.latest_revision_#{@id_name}',
             audit_table_name,
             TG_TABLE_NAME
           );

@@ -55,6 +55,7 @@ defmodule Arkenston.MixProject do
       {:absinthe, "~> 1.5.0-rc.4", override: true},
       {:absinthe_plug, "~> 1.5.0-rc.2"},
       {:absinthe_error_payload, "~> 1.1"},
+      {:dataloader, "~> 1.0"},
       {:distillery, "~> 2.1", only: :prod},
       {:fast_yaml, "~> 1.0"},
       {:p1_utils, "~> 1.0"},

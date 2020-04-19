@@ -17,9 +17,9 @@ defmodule Arkenston.Schema do
 
       schema orig_name do
         unquote(block)
-        has_one  :first_revision,  unquote(target).Revision
-        has_one  :latest_revision, unquote(target).Revision
-        has_many :revisions,       unquote(target).Revision
+        belongs_to  :first_revision,  unquote(target).Revision
+        belongs_to  :latest_revision, unquote(target).Revision
+        has_many :revisions,          unquote(target).Revision
       end
 
       defmodule Revision do

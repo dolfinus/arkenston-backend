@@ -1,6 +1,6 @@
 defmodule ArkenstonWeb.Schema.Types.Object.User do
   use Absinthe.Schema.Notation
-  import ArkenstonWeb.Schema.Types.AuditedObject
+  use ArkenstonWeb.Schema.Types.AuditedObject
 
   audited_object :user do
     field :id,      non_null(:id)

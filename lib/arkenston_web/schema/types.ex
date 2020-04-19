@@ -12,7 +12,7 @@ defmodule ArkenstonWeb.Schema.Types do
 
       import_types ArkenstonWeb.Schema.Query.User
 
-      import_types ArkenstonWeb.Schema.Mutation.Token
+      import_types ArkenstonWeb.Schema.Mutation.UserToken
       import_types ArkenstonWeb.Schema.Mutation.User
     end
   end
