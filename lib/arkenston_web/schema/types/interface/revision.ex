@@ -5,6 +5,7 @@ defmodule ArkenstonWeb.Schema.Types.Interface.Revision do
   interface :revision do
     field :version,    non_null(:integer)
     field :created_at, non_null(:datetime)
+    field :note,       :string
     field :created_by, :user, resolve: dataloader(Arkenston.Repo)
 
     resolve_type fn

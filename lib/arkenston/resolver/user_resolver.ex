@@ -14,19 +14,13 @@ defmodule Arkenston.Resolver.UserResolver do
     {:ok, Subject.list_users(where, FieldsHelper.prepare_fields(User, context))}
   end
 
-  @spec one(where:: where, params :: params) :: {:ok, User.t} | {:error, any}
+  @spec one(where:: where, params :: params) :: {:ok, User.t | nil}
   def one(%{id: id}, %{context: context}) when not is_nil(id) do
-    case Subject.get_user(id, FieldsHelper.prepare_fields(User, context)) do
-      nil -> {:error, :not_found}
-      user -> {:ok, user}
-    end
+    {:ok, Subject.get_user(id, FieldsHelper.prepare_fields(User, context))}
   end
 
   def one(where, %{context: context}) when is_map(where) and map_size(where) != 0 do
-    case Subject.get_user_by(where, FieldsHelper.prepare_fields(User, context)) do
-      nil -> {:error, :not_found}
-      user -> {:ok, user}
-    end
+    {:ok, Subject.get_user_by(where, FieldsHelper.prepare_fields(User, context))}
   end
 
   def one(_args, %{context: %{current_user: current_user}} = info) when not is_nil(current_user) do

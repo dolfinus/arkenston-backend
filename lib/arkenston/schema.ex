@@ -17,9 +17,10 @@ defmodule Arkenston.Schema do
 
       schema orig_name do
         unquote(block)
-        belongs_to  :first_revision,  unquote(target).Revision
-        belongs_to  :latest_revision, unquote(target).Revision
-        has_many    :revisions,       unquote(target).Revision
+        belongs_to   :first_revision,  unquote(target).Revision
+        belongs_to   :latest_revision, unquote(target).Revision
+        has_many     :revisions,       unquote(target).Revision
+        field :note, :string, define_field: false
       end
 
       defmodule Revision do
@@ -36,6 +37,7 @@ defmodule Arkenston.Schema do
           belongs_to :created_by, User
           field :created_at,     :utc_datetime
           field :version,        :integer
+          field :note,           :string
         end
       end
     end

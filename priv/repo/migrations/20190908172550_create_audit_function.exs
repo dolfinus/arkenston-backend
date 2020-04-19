@@ -103,6 +103,8 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
           NEW.first_revision_#{@id_name} = latest_revision_#{@id_name};
         END IF;
 
+        NEW.note = null;
+
         RETURN NEW;
       END;
 

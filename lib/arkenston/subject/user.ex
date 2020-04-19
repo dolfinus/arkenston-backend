@@ -9,8 +9,9 @@ defmodule Arkenston.Subject.User do
   @type name :: String.t
   @type role :: RoleEnum.t
   @type email :: String
-  @type password :: String.t
+  @type password :: String.t | nil
   @type deleted :: boolean
+  @type note :: String.t | nil
 
   @type t :: %__MODULE__{
     id: id,
@@ -35,9 +36,10 @@ defmodule Arkenston.Subject.User do
   @email_format @config[:format][:email]
 
   @doc false
-  def create_changeset(user, attrs) do
-    user
-    |> cast(attrs, [:name, :role, :email, :password])
+  @spec create_changeset(attrs :: map) :: Ecto.Changeset.t
+  def create_changeset(attrs) do
+    %__MODULE__{}
+    |> cast(attrs, [:name, :role, :email, :password, :note])
     |> put_password_hash()
     |> put_role()
     |> validate_required([:name, :role, :email, :password_hash])
@@ -48,10 +50,11 @@ defmodule Arkenston.Subject.User do
     |> unique_constraint(:role)
   end
 
+  @spec update_changeset(user :: t, attrs :: map) :: Ecto.Changeset.t
   @doc false
   def update_changeset(user, attrs \\ %{}) do
     user
-    |> cast(attrs, [:name, :role, :email, :password, :password_hash])
+    |> cast(attrs, [:name, :role, :email, :password, :password_hash, :note])
     |> put_password_hash()
     |> put_role()
     |> validate_required([:name, :role, :email, :password_hash])
@@ -63,22 +66,24 @@ defmodule Arkenston.Subject.User do
   end
 
   @doc false
-  def delete_changeset(user) do
+  @spec delete_changeset(user :: t, attrs :: map) :: Ecto.Changeset.t
+  def delete_changeset(user, attrs \\ %{}) do
     user
-    |> update_changeset()
+    |> update_changeset(attrs)
     |> change([deleted: true])
   end
 
+  @spec check_password(user :: t, password :: String.t) :: boolean
   def check_password(user, password) do
     Argon2.verify_pass(password, user.password_hash)
   end
 
+  @spec calc_password_hash(password :: String.t) :: binary
   def calc_password_hash(password) do
     Argon2.hash_pwd_salt(password)
   end
 
-  defp put_role(%Ecto.Changeset{valid?: true, changes:
-    %{role: role}} = changeset) when not is_nil(role) do
+  defp put_role(%Ecto.Changeset{valid?: true, changes: %{role: role}} = changeset) when not is_nil(role) do
     changeset
   end
 

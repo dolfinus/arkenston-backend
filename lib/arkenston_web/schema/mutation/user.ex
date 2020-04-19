@@ -10,14 +10,19 @@ defmodule ArkenstonWeb.Schema.Mutation.User do
     end
 
     field :update_user, :user_payload do
-      arg :id, non_null(:id)
+      arg :id, :id
+      arg :name, :string
+      arg :email, :string
       arg :input, non_null(:update_user_input)
       resolve &Arkenston.Mutator.UserMutator.update/3
       middleware &build_payload/2
     end
 
     field :delete_user, :null_payload do
-      arg :id, non_null(:id)
+      arg :id, :id
+      arg :name, :string
+      arg :email, :string
+      arg :input, :delete_user_input
       resolve &Arkenston.Mutator.UserMutator.delete/3
       middleware &build_payload/2
     end
