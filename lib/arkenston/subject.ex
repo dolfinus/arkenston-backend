@@ -20,7 +20,7 @@ defmodule Arkenston.Subject do
 
   """
 
-  @spec list_users(opts :: QueryHelper.query_opts, fields :: FieldsHelper.fields) :: [User.t]
+  @spec list_users(opts :: QueryHelper.query_opts | list[keyword], fields :: FieldsHelper.fields) :: [User.t]
   def list_users(opts \\ %{}, fields \\ []) do
     User
     |> QueryHelper.generate_query(opts)
@@ -40,7 +40,7 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_user_by(opts :: QueryHelper.query_opts, fields :: FieldsHelper.fields) :: User.t|nil
+  @spec get_user_by(opts :: QueryHelper.query_opts | list[keyword], fields :: FieldsHelper.fields) :: User.t|nil
   def get_user_by(opts \\ %{}, fields \\ []) do
     User
     |> QueryHelper.generate_query(opts)
@@ -61,7 +61,7 @@ defmodule Arkenston.Subject do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_user_by!(opts :: QueryHelper.query_opts, fields :: FieldsHelper.fields) :: User.t|no_return
+  @spec get_user_by!(opts :: QueryHelper.query_opts | list[keyword], fields :: FieldsHelper.fields) :: User.t|no_return
   def get_user_by!(opts \\ %{}, fields \\ []) do
     User
     |> QueryHelper.generate_query(opts)

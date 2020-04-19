@@ -18,9 +18,9 @@ defmodule Arkenston.Mutator.UserMutator do
       %{id: id} when not is_nil(id) ->
         Subject.get_user(id)
       %{name: name} when not is_nil(name) ->
-        Subject.get_user_by(%{name: name})
+        Subject.get_user_by(name: name)
       %{email: email} when not is_nil(email) ->
-        Subject.get_user_by(%{email: email})
+        Subject.get_user_by(email: String.downcase(email))
       _ ->
         case context do
           %{current_user: current_user} ->
@@ -48,9 +48,9 @@ defmodule Arkenston.Mutator.UserMutator do
       %{id: id} when not is_nil(id) ->
         Subject.get_user(id)
       %{name: name} when not is_nil(name) ->
-        Subject.get_user_by(%{name: name})
+        Subject.get_user_by(name: name)
       %{email: email} when not is_nil(email) ->
-        Subject.get_user_by(%{email: email})
+        Subject.get_user_by(email: String.downcase(email))
       _ ->
         nil
     end

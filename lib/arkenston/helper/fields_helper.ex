@@ -14,7 +14,7 @@ defmodule Arkenston.Helper.FieldsHelper do
           {field, result}
 
         {value, nested} when is_atom(value) ->
-          nested_fields = prepare_fields(nested)
+          nested_fields = prepare_fields(module, nested)
 
           field_id = :"#{value}_id"
           nested_fields = nested_fields ++ case module.__schema__(:fields) |> Enum.member?(field_id) do
@@ -29,7 +29,7 @@ defmodule Arkenston.Helper.FieldsHelper do
 
     result
   end
-  def prepare_fields(_fields), do: []
+  def prepare_fields(_module, _fields), do: []
 
   @doc """
   Limit return fields list in SELECT query

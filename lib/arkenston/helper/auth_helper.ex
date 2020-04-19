@@ -21,14 +21,14 @@ defmodule Arkenston.Helper.AuthHelper do
 
   @spec login_with_email_pass(email :: String.t, password :: String.t) :: {:error, String.t} | {:ok, User.t}
   def login_with_email_pass(email, password) do
-    user = Subject.get_user_by(%{email: String.downcase(email)})
+    user = Subject.get_user_by(email: String.downcase(email))
 
     login_with_pass(user, password)
   end
 
   @spec login_with_name_pass(name :: String.t, password :: String.t) :: {:error, String.t} | {:ok, User.t}
   def login_with_name_pass(name, password) do
-    user = Subject.get_user_by(%{name: name})
+    user = Subject.get_user_by(name: name)
 
     login_with_pass(user, password)
   end

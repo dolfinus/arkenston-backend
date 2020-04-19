@@ -250,11 +250,10 @@ defmodule Arkenston.Helper.QueryHelper do
 
   def generate_query(query, %{fields: fields} = opts) when is_list(fields) do
     fields_map = fields |> Enum.into(%{})
-
-    generate_query(query, Map.merge(opts, fields_map))
+    generate_query(query, opts |> Map.drop([:fields]) |> Map.merge(fields_map))
   end
 
-  def generate_query(query, opts) do
+  def generate_query(query, opts) when is_map(opts) do
     filter_opts = Map.drop(opts, [:limit, :order, :page, :size])
     query
     |> handle_pagination(opts)
