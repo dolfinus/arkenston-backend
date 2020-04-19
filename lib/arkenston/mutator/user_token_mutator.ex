@@ -1,5 +1,6 @@
 defmodule Arkenston.Mutator.UserTokenMutator do
-  alias Arkenston.{AuthHelper, Guardian}
+  alias Arkenston.Guardian
+  alias Arkenston.Helper.AuthHelper
   alias Arkenston.Subject.User
 
   @type refresh_token :: %{refresh_token: String.t}

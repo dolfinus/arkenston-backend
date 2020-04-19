@@ -5,6 +5,8 @@ defmodule Arkenston.Subject do
 
   import Ecto.Query, warn: false
 
+  alias Arkenston.Helper.QueryHelper
+  alias Arkenston.Helper.FieldsHelper
   alias Arkenston.Repo
   alias Arkenston.Subject.User
 
@@ -18,11 +20,11 @@ defmodule Arkenston.Subject do
 
   """
 
-  @spec list_users(opts :: Repo.query_opts, fields :: Repo.fields) :: [%User{}]
+  @spec list_users(opts :: QueryHelper.query_opts, fields :: FieldsHelper.fields) :: [User.t]
   def list_users(opts \\ %{}, fields \\ []) do
     User
-    |> Repo.generate_query(opts)
-    |> Repo.return_fields(fields)
+    |> QueryHelper.generate_query(opts)
+    |> FieldsHelper.return_fields(fields)
     |> Repo.all()
   end
 
@@ -38,12 +40,12 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_user_by(opts :: Repo.query_opts, fields :: Repo.fields) :: %User{}|nil
+  @spec get_user_by(opts :: QueryHelper.query_opts, fields :: FieldsHelper.fields) :: User.t|nil
   def get_user_by(opts \\ %{}, fields \\ []) do
     User
-    |> Repo.generate_query(opts)
-    |> Repo.return_fields(fields)
-    |> Repo.first()
+    |> QueryHelper.generate_query(opts)
+    |> FieldsHelper.return_fields(fields)
+    |> QueryHelper.first()
     |> Repo.one()
   end
 
@@ -59,12 +61,12 @@ defmodule Arkenston.Subject do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_user_by!(opts :: Repo.query_opts, fields :: Repo.fields) :: %User{}|no_return
+  @spec get_user_by!(opts :: QueryHelper.query_opts, fields :: FieldsHelper.fields) :: User.t|no_return
   def get_user_by!(opts \\ %{}, fields \\ []) do
     User
-    |> Repo.generate_query(opts)
-    |> Repo.return_fields(fields)
-    |> Repo.first()
+    |> QueryHelper.generate_query(opts)
+    |> FieldsHelper.return_fields(fields)
+    |> QueryHelper.first()
     |> Repo.one!()
   end
 
@@ -82,7 +84,7 @@ defmodule Arkenston.Subject do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_user!(id :: User.id, fields :: Repo.fields) :: %User{}|no_return
+  @spec get_user!(id :: User.id, fields :: FieldsHelper.fields) :: User.t|no_return
   def get_user!(id, fields \\ []), do: get_user_by!(%{id: id}, fields)
 
   @doc """
@@ -97,7 +99,7 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_user(id :: User.id, fields :: Repo.fields) :: %User{}|nil
+  @spec get_user(id :: User.id, fields :: FieldsHelper.fields) :: User.t|nil
   def get_user(id, fields \\ []), do: get_user_by(%{id: id}, fields)
 
   @doc """
@@ -112,7 +114,7 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_user(attrs :: map, context :: map) :: {:ok, any}|{:error, any}
+  @spec create_user(attrs :: map, context :: map) :: {:ok, User.t}|{:error, Repo.changeset}
   def create_user(attrs \\ %{}, context \\ %{}) do
     %User{}
       |> User.create_changeset(attrs)
@@ -131,7 +133,7 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_user(user :: %User{}, attrs :: map, context :: map) :: {:ok, any}|{:error, any}
+  @spec update_user(user :: User.t, attrs :: map, context :: map) :: {:ok, User.t}|{:error, Repo.changeset}
   def update_user(%User{} = user, attrs \\ %{}, context \\ %{}) do
     user
       |> User.update_changeset(attrs)
@@ -150,7 +152,7 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_user(user :: %User{}, context :: map) :: {:ok, any}|{:error, any}
+  @spec delete_user(user :: User.t, context :: map) :: {:ok, User.t}|{:error, Repo.changeset}
   def delete_user(%User{} = user, context \\ %{}) do
     user
       |> User.delete_changeset()
@@ -166,7 +168,7 @@ defmodule Arkenston.Subject do
       %Ecto.Changeset{source: %User{}}
 
   """
-  @spec change_user(user :: %User{}) :: Repo.changeset
+  @spec change_user(user :: User.t) :: Repo.changeset
   def change_user(%User{} = user) do
     User.update_changeset(user)
   end

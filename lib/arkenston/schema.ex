@@ -19,7 +19,7 @@ defmodule Arkenston.Schema do
         unquote(block)
         belongs_to  :first_revision,  unquote(target).Revision
         belongs_to  :latest_revision, unquote(target).Revision
-        has_many :revisions,          unquote(target).Revision
+        has_many    :revisions,       unquote(target).Revision
       end
 
       defmodule Revision do
@@ -35,6 +35,7 @@ defmodule Arkenston.Schema do
           belongs_to String.to_atom("#{singularize(orig_name)}"), unquote(target)
           belongs_to :created_by, User
           field :created_at,     :utc_datetime
+          field :version,        :integer
         end
       end
     end
