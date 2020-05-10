@@ -1,0 +1,15 @@
+{
+  "skip_files": [
+    "deps",
+    "priv",
+    "rel",
+    "lib/arkenston.ex",
+    "lib/arkenston/application.ex",
+    "lib/arkenston/schema.ex",
+    "lib/arkenston_web.ex",
+    "lib/arkenston_web/channels/user_socket.ex",
+    "lib/arkenston_web/endpoint.ex",
+    "lib/arkenston_web/router.ex",
+    "lib/arkenston_web/schema"
+  ]
+}

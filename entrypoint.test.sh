@@ -3,5 +3,9 @@
 set -e
 
 ./wait_for_postgres.sh
-mix test
+if [ -z "$TRAVIS" ]; then
+  mix coveralls.travis
+else
+  mix test
+fi
 mix dialyzer

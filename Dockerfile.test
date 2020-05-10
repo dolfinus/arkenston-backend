@@ -9,6 +9,7 @@ RUN \
 
 ENV ERL_AFLAGS="-kernel shell_history enabled"
 
+COPY coveralls.json ./
 COPY --chown=root:root entrypoint.test.sh wait_for_postgres.sh ./
 RUN chmod +x ./entrypoint* ./wait_for_postgres.sh
 ENTRYPOINT ["./entrypoint.test.sh"]

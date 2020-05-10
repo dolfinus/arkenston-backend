@@ -17,7 +17,7 @@ services:
       - ./lib:/opt/app/lib
       - ./priv:/opt/app/priv
       - ./spec:/opt/app/spec
-      - ./coverage:/opt/app/cover
+      - ./coveralls.json:/opt/app/coveralls.json
       - ./mix.exs:/opt/app/mix.exs
       - ./mix.lock:/opt/app/mix.lock
       - ./.iex.exs:/opt/app/.iex.exs

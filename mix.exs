@@ -11,10 +11,13 @@ defmodule Arkenston.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      preferred_cli_env: [espec: :test],
+      preferred_cli_env: [espec: :test, coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
       spec_paths: ["spec"],
       spec_pattern: "*_{factory,spec,helper}.{ex,exs}",
-      test_coverage: [tool: Coverex.Task, coveralls: true],
+      test_coverage: [
+        tool: ExCoveralls,
+        test_task: "espec"
+      ],
       dialyzer: [
         plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
         ignore_warnings: ".dialyzer_ignore.exs"
@@ -72,7 +75,8 @@ defmodule Arkenston.MixProject do
       {:ex_machina, "~> 2.4", only: :test},
       {:espec, "~> 1.8", only: :test},
       {:propcheck, "~> 1.2", only: :test},
-      {:coverex, "~> 1.5", only: :test}
+      {:coverex, "~> 1.5", only: :test},
+      {:excoveralls, "~> 0.12", only: :test}
     ]
   end
 
