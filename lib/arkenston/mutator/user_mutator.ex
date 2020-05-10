@@ -14,7 +14,37 @@ defmodule Arkenston.Mutator.UserMutator do
   @spec update(parent :: any, args :: map, params :: map) :: {:ok, User.t | Ecto.Changeset.t}
   def update(parent \\ nil, args, info \\ %{context: %{}})
   def update(_parent, %{input: attrs} = input, %{context: context}) do
-    user = case input do
+    with  user when not is_nil(user) <- get_user(input, context),
+          {:ok, user} <- user |> Subject.update_user(attrs, context) do
+            {:ok, user}
+    else
+          {:error, %Ecto.Changeset{} = changeset} ->
+            {:ok, changeset}
+          nil ->
+            {:error, :not_found}
+    end
+  end
+
+  @spec delete(parent :: any, args :: map, params :: map) :: {:ok, User.t | Ecto.Changeset.t}
+  def delete(parent \\ nil, args, info \\ %{context: %{}})
+  def delete(_parent, %{input: attrs} = input, %{context: context}) do
+    with  user when not is_nil(user) <- get_user(input),
+          {:ok, _user} <- user |> Subject.delete_user(attrs, context) do
+            {:ok, nil}
+    else
+          {:error, %Ecto.Changeset{} = changeset} ->
+            {:ok, changeset}
+          nil ->
+            {:error, :not_found}
+    end
+  end
+
+  def delete(parent, args, info) do
+    delete(parent, %{args | input: %{}}, info)
+  end
+
+  defp get_user(input, context \\ %{}) do
+    case input do
       %{id: id} when not is_nil(id) ->
         Subject.get_user(id)
       %{name: name} when not is_nil(name) ->
@@ -28,48 +58,6 @@ defmodule Arkenston.Mutator.UserMutator do
           _ ->
             nil
         end
-    end
-
-    with  user when not is_nil(user) <- user,
-          {:ok, user} <- user |> Subject.update_user(attrs, context) do
-            {:ok, user}
-    else
-          {:error, %Ecto.Changeset{} = changeset} ->
-            {:ok, changeset}
-          nil ->
-            {:error, :not_found}
-    end
-  end
-
-  @spec delete(parent :: any, args :: map, params :: map) :: {:ok, User.t | Ecto.Changeset.t}
-  def delete(parent \\ nil, args, info \\ %{context: %{}})
-  def delete(_parent, input, %{context: context}) do
-    user = case input do
-      %{id: id} when not is_nil(id) ->
-        Subject.get_user(id)
-      %{name: name} when not is_nil(name) ->
-        Subject.get_user_by(name: name)
-      %{email: email} when not is_nil(email) ->
-        Subject.get_user_by(email: String.downcase(email))
-      _ ->
-        nil
-    end
-
-    attrs = case input do
-      %{input: attrs} ->
-        attrs
-      _ ->
-        %{}
-    end
-
-    with  user when not is_nil(user) <- user,
-          {:ok, _user} <- user |> Subject.delete_user(attrs, context) do
-            {:ok, nil}
-    else
-          {:error, %Ecto.Changeset{} = changeset} ->
-            {:ok, changeset}
-          nil ->
-            {:error, :not_found}
     end
   end
 end
