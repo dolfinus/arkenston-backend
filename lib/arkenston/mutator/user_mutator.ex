@@ -43,7 +43,7 @@ defmodule Arkenston.Mutator.UserMutator do
 
   @spec delete(parent :: any, args :: map, params :: map) :: {:ok, User.t | Ecto.Changeset.t}
   def delete(parent \\ nil, args, info \\ %{context: %{}})
-  def delete(_parent, %{input: attrs} = input, %{context: context}) do
+  def delete(_parent, input, %{context: context}) do
     user = case input do
       %{id: id} when not is_nil(id) ->
         Subject.get_user(id)
@@ -53,6 +53,13 @@ defmodule Arkenston.Mutator.UserMutator do
         Subject.get_user_by(email: String.downcase(email))
       _ ->
         nil
+    end
+
+    attrs = case input do
+      %{input: attrs} ->
+        attrs
+      _ ->
+        %{}
     end
 
     with  user when not is_nil(user) <- user,

@@ -41,7 +41,7 @@ defmodule Arkenston.Subject do
 
   """
   @spec get_user_by(opts :: QueryHelper.query_opts | list[keyword], fields :: FieldsHelper.fields) :: User.t|nil
-  def get_user_by(opts \\ %{}, fields \\ []) do
+  def get_user_by(opts, fields \\ []) do
     User
     |> QueryHelper.generate_query(opts)
     |> FieldsHelper.return_fields(fields)
@@ -62,7 +62,7 @@ defmodule Arkenston.Subject do
 
   """
   @spec get_user_by!(opts :: QueryHelper.query_opts | list[keyword], fields :: FieldsHelper.fields) :: User.t|no_return
-  def get_user_by!(opts \\ %{}, fields \\ []) do
+  def get_user_by!(opts, fields \\ []) do
     User
     |> QueryHelper.generate_query(opts)
     |> FieldsHelper.return_fields(fields)
