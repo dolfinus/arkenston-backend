@@ -158,18 +158,4 @@ defmodule Arkenston.Subject do
     |> User.delete_changeset(attrs)
     |> Repo.audited_update(context)
   end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking user changes.
-
-  ## Examples
-
-      iex> change_user(user)
-      %Ecto.Changeset{source: %User{}}
-
-  """
-  @spec change_user(user :: User.t) :: Repo.changeset
-  def change_user(%User{} = user) do
-    User.update_changeset(user)
-  end
 end

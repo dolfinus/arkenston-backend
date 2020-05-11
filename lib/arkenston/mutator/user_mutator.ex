@@ -13,8 +13,8 @@ defmodule Arkenston.Mutator.UserMutator do
 
   @spec update(parent :: any, args :: map, params :: map) :: {:ok, User.t | Ecto.Changeset.t}
   def update(parent \\ nil, args, info \\ %{context: %{}})
-  def update(_parent, %{input: attrs} = input, %{context: context}) do
-    with  user when not is_nil(user) <- get_user(input, context),
+  def update(_parent, %{input: attrs} = args, %{context: context}) do
+    with  user when not is_nil(user) <- get_user(args, context),
           {:ok, user} <- user |> Subject.update_user(attrs, context) do
             {:ok, user}
     else
@@ -27,8 +27,15 @@ defmodule Arkenston.Mutator.UserMutator do
 
   @spec delete(parent :: any, args :: map, params :: map) :: {:ok, User.t | Ecto.Changeset.t}
   def delete(parent \\ nil, args, info \\ %{context: %{}})
-  def delete(_parent, %{input: attrs} = input, %{context: context}) do
-    with  user when not is_nil(user) <- get_user(input),
+  def delete(_parent, args, %{context: context}) do
+    attrs = case args do
+      %{input: attrs} ->
+        attrs
+      _ ->
+        %{}
+    end
+
+    with  user when not is_nil(user) <- get_user(args),
           {:ok, _user} <- user |> Subject.delete_user(attrs, context) do
             {:ok, nil}
     else
@@ -37,10 +44,6 @@ defmodule Arkenston.Mutator.UserMutator do
           nil ->
             {:error, :not_found}
     end
-  end
-
-  def delete(parent, args, info) do
-    delete(parent, %{args | input: %{}}, info)
   end
 
   defp get_user(input, context \\ %{}) do

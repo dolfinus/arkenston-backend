@@ -5,7 +5,7 @@ defmodule Arkenston.Mutator.UserTokenMutatorSpec do
   use ESpec
 
   context "mutator", module: :mutator, mutator: true do
-    context "with user token", user: true, token: true do
+    context "user token", user: true, token: true do
       describe "login/1" do
         it "returns tokens for valid email/password" do
           user = build(:user)
