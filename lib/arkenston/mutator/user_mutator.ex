@@ -35,7 +35,7 @@ defmodule Arkenston.Mutator.UserMutator do
         %{}
     end
 
-    with  user when not is_nil(user) <- get_user(args),
+    with  user when not is_nil(user) <- get_user(args, context),
           {:ok, _user} <- user |> Subject.delete_user(attrs, context) do
             {:ok, nil}
     else
