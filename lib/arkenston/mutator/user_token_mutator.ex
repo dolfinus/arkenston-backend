@@ -24,7 +24,7 @@ defmodule Arkenston.Mutator.UserTokenMutator do
           {:ok, _old_stuff,  {access_token, _new_claims}} <- Guardian.exchange(refresh_token, "refresh", "access") do
             {:ok, %{refresh_token: refresh_token, access_token: access_token, user: user}}
           else
-            error -> error
+            {:error, error} -> {:error, %AbsintheErrorPayload.ValidationMessage{code: error}}
     end
   end
 
@@ -37,8 +37,10 @@ defmodule Arkenston.Mutator.UserTokenMutator do
           {:ok, _old_stuff, {access_token, _new_claims}} <- Guardian.exchange(refresh_token, "refresh", "access") do
             {:ok, %{access_token: access_token, user: user}}
           else
-            error ->
-              error
+            {:error, %ArgumentError{message: message}} ->
+              {:error, %AbsintheErrorPayload.ValidationMessage{code: message}}
+            {:error, error} ->
+              {:error, %AbsintheErrorPayload.ValidationMessage{code: error}}
     end
   end
 
@@ -49,7 +51,10 @@ defmodule Arkenston.Mutator.UserTokenMutator do
           {:ok, _claims} <- Guardian.revoke(token) do
             {:ok, nil}
           else
-            error -> error
+            {:error, %ArgumentError{message: message}} ->
+              {:error, %AbsintheErrorPayload.ValidationMessage{code: message}}
+            {:error, error} ->
+              {:error, %AbsintheErrorPayload.ValidationMessage{code: error}}
     end
   end
 

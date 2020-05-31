@@ -21,7 +21,7 @@ defmodule Arkenston.Mutator.UserMutator do
           {:error, %Ecto.Changeset{} = changeset} ->
             {:ok, changeset}
           nil ->
-            {:error, :not_found}
+            {:error, %AbsintheErrorPayload.ValidationMessage{code: :not_found}}
     end
   end
 
@@ -42,7 +42,7 @@ defmodule Arkenston.Mutator.UserMutator do
           {:error, %Ecto.Changeset{} = changeset} ->
             {:ok, changeset}
           nil ->
-            {:error, :not_found}
+            {:error, %AbsintheErrorPayload.ValidationMessage{code: :not_found}}
     end
   end
 
