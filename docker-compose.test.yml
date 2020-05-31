@@ -1,12 +1,12 @@
 version: '3.6'
 services:
-  db:
+  db_test:
     image: postgres:alpine
     container_name: db_test
     env_file: .env.test
     networks:
       - db
-  backend:
+  backend_test:
     image: dolfinus/arkenston-backend:test
     container_name: backend_test
     build:
@@ -33,7 +33,8 @@ services:
       - default
       - db
     depends_on:
-      - db
+      - db_test
 networks:
   db:
     internal: true
+    name: db_test

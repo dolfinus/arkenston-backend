@@ -1,7 +1,7 @@
 
 version: '3.6'
 services:
-  db:
+  db_dev:
     image: postgres:alpine
     container_name: db_dev
     env_file: .env.dev
@@ -9,7 +9,7 @@ services:
       - db
     volumes:
       - /var/lib/postgresql/data:/var/lib/postgresql/data
-  backend:
+  backend_dev:
     image: dolfinus/arkenston-backend:dev
     container_name: backend_dev
     build:
@@ -31,7 +31,8 @@ services:
       - default
       - db
     depends_on:
-      - db
+      - db_dev
 networks:
   db:
     internal: true
+    name: db_dev
