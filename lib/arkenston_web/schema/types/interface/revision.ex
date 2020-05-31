@@ -3,6 +3,7 @@ defmodule ArkenstonWeb.Schema.Types.Interface.Revision do
   import Absinthe.Resolution.Helpers, only: [dataloader: 1]
 
   interface :revision do
+    field :id,         non_null(:uuid4)
     field :version,    non_null(:integer)
     field :created_at, non_null(:datetime)
     field :note,       :string

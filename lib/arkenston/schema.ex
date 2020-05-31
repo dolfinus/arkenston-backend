@@ -9,18 +9,24 @@ defmodule Arkenston.Schema do
     target = __CALLER__.module
 
     quote do
-      orig_name  = unquote(shm)
-      audit_name = "#{orig_name}_audit"
+      alias Arkenston.Subject.User
+
+      view_name  = unquote(shm)
+      data_name  = "#{view_name}_data"
+      audit_name = "#{view_name}_audit"
 
       @primary_key {unquote(@id_name), unquote(@id_type), autogenerate: false, read_after_writes: true}
       @foreign_key_type unquote(@id_type)
 
-      schema orig_name do
+      schema view_name do
         unquote(block)
-        belongs_to   :first_revision,  unquote(target).Revision
-        belongs_to   :latest_revision, unquote(target).Revision
-        has_many     :revisions,       unquote(target).Revision
-        field :note, :string, define_field: false
+        field      :version,    :integer
+        field      :created_at, :utc_datetime
+        belongs_to :created_by, User
+        field      :updated_at, :utc_datetime
+        belongs_to :updated_by, User
+        field      :note,       :string
+        has_many   :revisions,  unquote(target).Revision
       end
 
       defmodule Revision do
@@ -33,7 +39,7 @@ defmodule Arkenston.Schema do
 
         schema audit_name do
           unquote(block)
-          belongs_to String.to_atom("#{singularize(orig_name)}"), unquote(target)
+          belongs_to String.to_atom("#{singularize(view_name)}"), unquote(target)
           belongs_to :created_by, User
           field :created_at,     :utc_datetime
           field :version,        :integer

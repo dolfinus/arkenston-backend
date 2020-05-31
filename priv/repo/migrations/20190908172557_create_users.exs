@@ -9,14 +9,13 @@ defmodule Arkenston.Repo.Migrations.CreateUsers do
       add :role,          :integer, null: false, default: 0
       add :password_hash, :string
       add :deleted,       :boolean, null: false, default: false
-      add :note,          :string
     end
 
-    create unique_index(:users, :name,  where: "deleted IS FALSE")
-    create unique_index(:users, :email, where: "deleted IS FALSE")
-    create index(:users, [:id, :role],  where: "deleted IS FALSE")
-    create index(:users, [:id, :name,  :role], where: "deleted IS FALSE")
-    create index(:users, [:id, :email, :role], where: "deleted IS FALSE")
+    create unique_index(:users_data, :name,  where: "deleted IS FALSE")
+    create unique_index(:users_data, :email, where: "deleted IS FALSE")
+    create index(:users_data, [:id, :role],  where: "deleted IS FALSE")
+    create index(:users_data, [:id, :name,  :role], where: "deleted IS FALSE")
+    create index(:users_data, [:id, :email, :role], where: "deleted IS FALSE")
   end
 
   def down do

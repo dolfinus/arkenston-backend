@@ -11,6 +11,11 @@ defmodule Arkenston.Subject.User do
   @type email :: String
   @type password :: String.t | nil
   @type deleted :: boolean
+  @type created_at :: DateTime.t
+  @type created_by :: __MODULE__.t | nil
+  @type updated_at :: DateTime.t
+  @type updated_by :: __MODULE__.t | nil
+  @type version :: number
   @type note :: String.t | nil
 
   @type t :: %__MODULE__{
@@ -19,7 +24,13 @@ defmodule Arkenston.Subject.User do
     role: role,
     email: email,
     password: password,
-    deleted: deleted
+    deleted: deleted,
+    created_at: created_at,
+    created_by: created_by,
+    updated_at: updated_at,
+    updated_by: updated_by,
+    version: version,
+    note: note
   }
 
   audited_schema "users" do
@@ -45,9 +56,8 @@ defmodule Arkenston.Subject.User do
     |> validate_required([:name, :role, :email, :password_hash])
     |> validate_format(:name,  @name_format)
     |> validate_format(:email, @email_format)
-    |> unique_constraint(:name)
-    |> unique_constraint(:email)
-    |> unique_constraint(:role)
+    |> unique_constraint(:name,  name: :users_data_name_index)
+    |> unique_constraint(:email, name: :users_data_email_index)
   end
 
   @spec update_changeset(user :: t, attrs :: map) :: Ecto.Changeset.t
@@ -60,9 +70,8 @@ defmodule Arkenston.Subject.User do
     |> validate_required([:name, :role, :email, :password_hash])
     |> validate_format(:name,  @name_format)
     |> validate_format(:email, @email_format)
-    |> unique_constraint(:name)
-    |> unique_constraint(:email)
-    |> unique_constraint(:role)
+    |> unique_constraint(:name,  name: :users_data_name_index)
+    |> unique_constraint(:email, name: :users_data_email_index)
   end
 
   @doc false

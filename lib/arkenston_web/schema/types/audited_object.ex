@@ -17,9 +17,13 @@ defmodule ArkenstonWeb.Schema.Types.AuditedObject do
         interface :with_revision
 
         unquote(block)
-        field :first_revision,  non_null(unquote(revision_name)), resolve: dataloader(Arkenston.Repo)
-        field :latest_revision, non_null(unquote(revision_name)), resolve: dataloader(Arkenston.Repo)
-        field :revisions,       non_null(list_of(unquote(revision_name))), resolve: dataloader(Arkenston.Repo)
+        field :version,    non_null(:integer)
+        field :created_at, non_null(:datetime)
+        field :updated_at, :datetime
+        field :note,       :string
+        field :created_by, :user, resolve: dataloader(Arkenston.Repo)
+        field :updated_by, :user, resolve: dataloader(Arkenston.Repo)
+        field :revisions,  non_null(list_of(non_null(unquote(revision_name)))), resolve: dataloader(Arkenston.Repo)
       end
 
       object unquote(revision_name) do
