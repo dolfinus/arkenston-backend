@@ -38,7 +38,9 @@ defmodule Arkenston.Mutator.UserTokenMutator do
             {:ok, %{access_token: access_token, user: user}}
           else
             {:error, %ArgumentError{message: message}} ->
-              {:error, %AbsintheErrorPayload.ValidationMessage{code: message}}
+              {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: message}}
+            {:error, "typ"} ->
+              {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: :token_type_invalid}}
             {:error, error} ->
               {:error, %AbsintheErrorPayload.ValidationMessage{code: error}}
     end
@@ -52,7 +54,9 @@ defmodule Arkenston.Mutator.UserTokenMutator do
             {:ok, nil}
           else
             {:error, %ArgumentError{message: message}} ->
-              {:error, %AbsintheErrorPayload.ValidationMessage{code: message}}
+              {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: message}}
+            {:error, "typ"} ->
+              {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: :token_type_invalid}}
             {:error, error} ->
               {:error, %AbsintheErrorPayload.ValidationMessage{code: error}}
     end

@@ -105,16 +105,12 @@ defmodule Arkenston.Mutator.UserTokenMutatorSpec do
             variables: %{name: user.name, password: user.password}
           })
 
-          IO.puts(inspect(auth_response))
-
           access_token = ~i(auth_response.data.login.result.access_token)
 
           exchange_response = make_query(build_conn(), %{
             query: exchange_mutation(),
             variables: %{refresh_token: access_token}
           })
-
-          IO.puts(inspect(exchange_response))
 
           expect ~i(exchange_response.data.exchange.successful) |> to(be_false())
         end
