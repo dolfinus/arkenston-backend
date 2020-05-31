@@ -46,4 +46,7 @@ if Mix.env() == "prod" do
 
   config :arkenston, Arkenston.Guardian,
     secret_key: %{"k" => secret_key_base, "kty" => "oct"}
+
+  config :arkenston, Arkenston.I18n,
+    locale: System.get_env("BACKEND_LOCALE") || "en"
 end

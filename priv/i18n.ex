@@ -1,6 +1,7 @@
 defmodule Arkenston.I18n do
-  import Linguist.MemorizedVocabulary
+  use Linguist.Vocabulary
 
+  @locale Application.get_env(:arkenston, Arkenston.I18n)[:locale]
   locale_files = Path.wildcard([__DIR__, "i18n", "*.{yml,yaml}"] |> Enum.join("/"))
 
   Enum.each(locale_files, fn(path) ->
@@ -9,4 +10,9 @@ defmodule Arkenston.I18n do
         locale(Enum.at(lang, 1), path)
     end
   end)
+
+  def translate(path, bindings \\ [])
+  def translate(path, bindings) do
+    t(@locale, path, bindings)
+  end
 end
