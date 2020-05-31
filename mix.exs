@@ -34,7 +34,8 @@ defmodule Arkenston.MixProject do
       extra_applications: [
         :logger,
         :runtime_tools,
-        :absinthe_plug
+        :absinthe_plug,
+        :indifferent
       ]
     ]
   end
@@ -70,6 +71,7 @@ defmodule Arkenston.MixProject do
       {:guardian, "~> 2.1"},
       {:guardian_phoenix, "~> 2.0"},
       {:guardian_db, "~> 2.0"},
+      {:indifferent, "~> 0.9"},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:faker, "~> 0.13", only: :test},
       {:ex_machina, "~> 2.4", only: :test},
