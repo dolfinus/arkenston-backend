@@ -7,7 +7,7 @@ defmodule Arkenston.Mutator.UserTokenMutator do
   @type access_token :: %{access_token: String.t}
 
   @type login_args :: %{email: User.email, password: User.password} | %{name: User.name, password: User.password}
-  @type login_result :: %{refresh_token: String.t, access_token: String.t}
+  @type login_result :: %{refresh_token: String.t, access_token: String.t, user: User.t}
 
   @spec login(args :: login_args, info :: map) :: {:error, any} | {:ok, login_result}
   def login(args, info \\ %{})
@@ -28,7 +28,8 @@ defmodule Arkenston.Mutator.UserTokenMutator do
     end
   end
 
-  @spec exchange(args :: refresh_token, info :: map) :: {:error, any} | {:ok, access_token}
+  @type exchange_result :: %{access_token: String.t, user: User.t}
+  @spec exchange(args :: refresh_token, info :: map) :: {:error, any} | {:ok, exchange_result}
   def exchange(args, info \\ %{})
   def exchange(%{refresh_token: refresh_token}, _info) do
     with  {:ok, claims} <- Guardian.decode_and_verify(refresh_token, %{"typ" => "refresh"}),
@@ -41,8 +42,7 @@ defmodule Arkenston.Mutator.UserTokenMutator do
     end
   end
 
-  @type logout_result :: {:ok, any} | {:error, any}
-  @spec logout(args :: refresh_token, info :: map) :: {:error, atom} | {:ok, nil}
+  @spec logout(args :: refresh_token, info :: map) :: {:error, any} | {:ok, nil}
   def logout(args, info \\ %{})
   def logout(%{refresh_token: token}, _info) do
     with  {:ok, _claims} <- Guardian.decode_and_verify(token, %{"typ" => "refresh"}),
