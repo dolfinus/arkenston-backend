@@ -1,34 +1,47 @@
 defmodule Arkenston.Mutator.UserMutator do
   alias Arkenston.Subject
   alias Arkenston.Subject.User
+  alias Arkenston.Permissions
 
-  @spec create(parent :: any, args :: map, params :: map) :: {:ok, User.t | Ecto.Changeset.t}
-  def create(parent \\ nil, args, info \\ %{context: %{}})
+  @spec create(parent :: any, args :: map, info :: map) :: {:ok, User.t | Ecto.Changeset.t}
+  def create(parent \\ nil, args, info \\ %{context: %{anonymous: true}})
   def create(_parent, %{input: attrs}, %{context: context}) do
-    case Subject.create_user(attrs, context) do
-      {:ok, user} -> {:ok, Subject.get_user(user.id)}
-      {:error, %Ecto.Changeset{} = changeset} -> {:ok, changeset}
+    with :ok <- Permissions.check_permissions_for(:user, :create, context, attrs),
+        {:ok, user} <- Subject.create_user(attrs, context) do
+          {:ok, Subject.get_user(user.id)}
+    else
+      {:error, %Ecto.Changeset{} = changeset}
+        ->
+          {:ok, changeset}
+      error
+        ->
+          error
     end
   end
 
-  @spec update(parent :: any, args :: map, params :: map) :: {:ok, User.t | Ecto.Changeset.t} | {:error, any}
-  def update(parent \\ nil, args, info \\ %{context: %{}})
+  @spec update(parent :: any, args :: map, info :: map) :: {:ok, User.t | Ecto.Changeset.t} | {:error, any}
+  def update(parent \\ nil, args, info \\ %{context: %{anonymous: true}})
   def update(_parent, %{input: attrs} = args, %{context: context}) do
     case get_user(args, context) do
       {field, nil} ->
         {:error, %AbsintheErrorPayload.ValidationMessage{field: field, code: :not_found}}
       {_field, user} ->
-        case user |> Subject.update_user(attrs, context) do
-          {:ok, user} ->
-            {:ok, Subject.get_user(user.id)}
-          {:error, %Ecto.Changeset{} = changeset} ->
-            {:ok, changeset}
+        with :ok <- Permissions.check_permissions_for(:user, :update, context, user, attrs),
+            {:ok, _user} <- user |> Subject.update_user(attrs, context) do
+              {:ok, Subject.get_user(user.id)}
+        else
+          {:error, %Ecto.Changeset{} = changeset}
+            ->
+              {:ok, changeset}
+          error
+            ->
+              error
         end
     end
   end
 
-  @spec delete(parent :: any, args :: map, params :: map) :: {:ok, User.t | Ecto.Changeset.t} | {:error, any}
-  def delete(parent \\ nil, args, info \\ %{context: %{}})
+  @spec delete(parent :: any, args :: map, info :: map) :: {:ok, User.t | Ecto.Changeset.t} | {:error, any}
+  def delete(parent \\ nil, args, info \\ %{context: %{anonymous: true}})
   def delete(_parent, args, %{context: context}) do
     attrs = case args do
       %{input: attrs} ->
@@ -41,11 +54,16 @@ defmodule Arkenston.Mutator.UserMutator do
       {field, nil} ->
         {:error, %AbsintheErrorPayload.ValidationMessage{field: field, code: :not_found}}
       {_field, user} ->
-        case user |> Subject.delete_user(attrs, context) do
-          {:ok, _user} ->
-            {:ok, nil}
-          {:error, %Ecto.Changeset{} = changeset} ->
-            {:ok, changeset}
+        with :ok <- Permissions.check_permissions_for(:user, :delete, context, user, args),
+            {:ok, _user} <- user |> Subject.delete_user(attrs, context) do
+              {:ok, nil}
+        else
+          {:error, %Ecto.Changeset{} = changeset}
+            ->
+              {:ok, changeset}
+          error
+            ->
+              error
         end
     end
   end

@@ -2,253 +2,143 @@ defmodule Arkenston.Mutator.UserTokenMutatorSpec do
   import Arkenston.Factories.UserFactory
   import SubjectHelper
   use GraphqlHelper
-  use ESpec
+  use ESpec, async: true
   import Indifferent.Sigils
 
-  context "mutator", module: :mutator, mutator: true do
-    context "user token", user: true, token: true do
-      describe "login/1" do
-        it "returns tokens for valid email/password" do
+  context "mutator", module: :mutator, mutation: true do
+    context "user token", user: true, token: true, auth: true do
+      describe "login" do
+        it "returns tokens for valid email/password", validation: true, valid: true do
           user = build(:user)
+          create_user(input: prepare_user(user), conn: shared.conn)
 
-          _create_response = make_query(build_conn(), %{
-            query: create_user_mutation(),
-            variables: %{input: prepare_user(user)}
-          })
+          auth_response = auth_by_email(user, shared.conn)
 
-          auth_response = make_query(build_conn(), %{
-            query: login_mutation(),
-            variables: %{email: user.email, password: user.password}
-          })
-
-          expect ~i(auth_response.data.login.successful) |> to(be_true())
-          expect ~i(auth_response.data.login.result.access_token) |> not_to(be_nil())
-          expect ~i(auth_response.data.login.result.refresh_token) |> not_to(be_nil())
+          assert ~i(auth_response.successful)
+          expect ~i(auth_response.result.access_token) |> not_to(be_nil())
+          expect ~i(auth_response.result.refresh_token) |> not_to(be_nil())
         end
 
-        it "returns tokens for valid name/password" do
+        it "returns tokens for valid name/password", validation: true, valid: true do
           user = build(:user)
+          create_user(input: prepare_user(user), conn: shared.conn)
 
-          _create_response = make_query(build_conn(), %{
-            query: create_user_mutation(),
-            variables: %{input: prepare_user(user)}
-          })
+          auth_response = auth_by_name(user, shared.conn)
 
-          auth_response = make_query(build_conn(), %{
-            query: login_mutation(),
-            variables: %{name: user.name, password: user.password}
-          })
-
-          expect ~i(auth_response.data.login.successful) |> to(be_true())
-          expect ~i(auth_response.data.login.result.access_token) |> not_to(be_nil())
-          expect ~i(auth_response.data.login.result.refresh_token) |> not_to(be_nil())
+          assert ~i(auth_response.successful)
+          expect ~i(auth_response.result.access_token) |> not_to(be_nil())
+          expect ~i(auth_response.result.refresh_token) |> not_to(be_nil())
         end
 
-        it "does not return tokens for invalid email/password" do
+        it "does not return tokens for invalid email/password", validation: true, valid: false do
           user = build(:user)
+          auth_response = auth_by_email(user, shared.conn)
 
-          auth_response = make_query(build_conn(), %{
-            query: login_mutation(),
-            variables: %{email: user.email, password: user.password}
-          })
-
-          expect ~i(auth_response.data.login.successful) |> to(be_false())
+          refute ~i(auth_response.successful)
         end
 
-        it "does not return tokens for invalid name/password" do
+        it "does not return tokens for invalid name/password", validation: true, valid: false do
           user = build(:user)
+          auth_response = auth_by_name(user, shared.conn)
 
-          auth_response = make_query(build_conn(), %{
-            query: login_mutation(),
-            variables: %{name: user.name, password: user.password}
-          })
-
-          expect ~i(auth_response.data.login.successful) |> to(be_false())
+          refute ~i(auth_response.successful)
         end
       end
 
-      describe "exchange/1" do
-        it "returns access token for valid refresh_token" do
+      describe "exchange" do
+        it "returns access token for valid refresh_token", validation: true, valid: true do
           user = build(:user)
+          create_user(input: prepare_user(user), conn: shared.conn)
 
-          _create_response = make_query(build_conn(), %{
-            query: create_user_mutation(),
-            variables: %{input: prepare_user(user)}
-          })
+          auth_response = auth_by_email(user, shared.conn)
+          refresh_token = ~i(auth_response.result.refresh_token)
 
-          auth_response = make_query(build_conn(), %{
-            query: login_mutation(),
-            variables: %{name: user.name, password: user.password}
-          })
+          exchange_response = exchange(refresh_token, shared.conn)
 
-          refresh_token = ~i(auth_response.data.login.result.refresh_token)
-
-          exchange_response = make_query(build_conn(), %{
-            query: exchange_mutation(),
-            variables: %{refresh_token: refresh_token}
-          })
-
-          expect ~i(exchange_response.data.exchange.successful) |> to(be_true())
-          expect ~i(exchange_response.data.exchange.result.access_token) |> not_to(be_nil())
+          assert ~i(exchange_response.successful) |> to(be_true())
+          expect ~i(exchange_response.result.access_token) |> not_to(be_nil())
         end
 
-        it "does not accept access token" do
+        it "does not accept access token", validation: true, valid: false do
           user = build(:user)
+          create_user(input: prepare_user(user), conn: shared.conn)
 
-          _create_response = make_query(build_conn(), %{
-            query: create_user_mutation(),
-            variables: %{input: prepare_user(user)}
-          })
+          auth_response = auth_by_email(user, shared.conn)
+          access_token = ~i(auth_response.result.access_token)
 
-          auth_response = make_query(build_conn(), %{
-            query: login_mutation(),
-            variables: %{name: user.name, password: user.password}
-          })
+          exchange_response = exchange(access_token, shared.conn)
 
-          access_token = ~i(auth_response.data.login.result.access_token)
-
-          exchange_response = make_query(build_conn(), %{
-            query: exchange_mutation(),
-            variables: %{refresh_token: access_token}
-          })
-
-          expect ~i(exchange_response.data.exchange.successful) |> to(be_false())
+          refute ~i(exchange_response.successful)
         end
 
-        it "does not accept malformed token" do
+        it "does not accept malformed token", validation: true, valid: false do
           user = build(:user)
+          create_user(input: prepare_user(user), conn: shared.conn)
 
-          _create_response = make_query(build_conn(), %{
-            query: create_user_mutation(),
-            variables: %{input: prepare_user(user)}
-          })
+          exchange_response = exchange(user.password, shared.conn)
 
-          exchange_response = make_query(build_conn(), %{
-            query: exchange_mutation(),
-            variables: %{refresh_token: user.password}
-          })
-
-          expect ~i(exchange_response.data.exchange.successful) |> to(be_false())
+          refute ~i(exchange_response.successful)
         end
 
-        it "does not accept revoked token" do
+        it "does not accept revoked token", validation: true, valid: false do
           user = build(:user)
+          create_user(input: prepare_user(user), conn: shared.conn)
 
-          _create_response = make_query(build_conn(), %{
-            query: create_user_mutation(),
-            variables: %{input: prepare_user(user)}
-          })
+          auth_response = auth_by_email(user, shared.conn)
+          refresh_token = ~i(auth_response.result.refresh_token)
 
-          auth_response = make_query(build_conn(), %{
-            query: login_mutation(),
-            variables: %{name: user.name, password: user.password}
-          })
+          logout(refresh_token, shared.conn)
+          exchange_response = exchange(refresh_token, shared.conn)
 
-          refresh_token = ~i(auth_response.data.login.result.refresh_token)
-
-          _logout_response = make_query(build_conn(), %{
-            query: logout_mutation(),
-            variables: %{refresh_token: refresh_token}
-          })
-
-          exchange_response = make_query(build_conn(), %{
-            query: exchange_mutation(),
-            variables: %{refresh_token: refresh_token}
-          })
-
-          expect ~i(exchange_response.data.exchange.successful) |> to(be_false())
+          refute ~i(exchange_response.successful)
         end
       end
 
-      describe "logout/1" do
-        it "returns success for valid refresh_token" do
+      describe "logout" do
+        it "returns success for valid refresh_token", validation: true, valid: true do
           user = build(:user)
+          create_user(input: prepare_user(user), conn: shared.conn)
 
-          _create_response = make_query(build_conn(), %{
-            query: create_user_mutation(),
-            variables: %{input: prepare_user(user)}
-          })
+          auth_response = auth_by_email(user, shared.conn)
+          refresh_token = ~i(auth_response.result.refresh_token)
 
-          auth_response = make_query(build_conn(), %{
-            query: login_mutation(),
-            variables: %{name: user.name, password: user.password}
-          })
+          logout_response = logout(refresh_token, shared.conn)
 
-          refresh_token = ~i(auth_response.data.login.result.refresh_token)
-
-          logout_response = make_query(build_conn(), %{
-            query: logout_mutation(),
-            variables: %{refresh_token: refresh_token}
-          })
-
-          expect ~i(logout_response.data.logout.successful) |> to(be_true())
+          assert ~i(logout_response.successful)
         end
 
-        it "does not accept access token" do
+        it "does not accept access token", validation: true, valid: false do
           user = build(:user)
+          create_user(input: prepare_user(user), conn: shared.conn)
 
-          _create_response = make_query(build_conn(), %{
-            query: create_user_mutation(),
-            variables: %{input: prepare_user(user)}
-          })
+          auth_response = auth_by_email(user, shared.conn)
+          access_token = ~i(auth_response.result.access_token)
 
-          auth_response = make_query(build_conn(), %{
-            query: login_mutation(),
-            variables: %{name: user.name, password: user.password}
-          })
+          logout_response = logout(access_token, shared.conn)
 
-          access_token = ~i(auth_response.data.login.result.access_token)
-
-          logout_response = make_query(build_conn(), %{
-            query: logout_mutation(),
-            variables: %{refresh_token: access_token}
-          })
-
-          expect ~i(logout_response.data.logout.successful) |> to(be_false())
+          refute ~i(logout_response.successful)
         end
 
-        it "does not accept malformed token" do
+        it "does not accept malformed token", validation: true, valid: false do
           user = build(:user)
+          create_user(input: prepare_user(user), conn: shared.conn)
 
-          _create_response = make_query(build_conn(), %{
-            query: create_user_mutation(),
-            variables: %{input: prepare_user(user)}
-          })
+          logout_response = logout(user.password, shared.conn)
 
-          logout_response = make_query(build_conn(), %{
-            query: logout_mutation(),
-            variables: %{refresh_token: user.password}
-          })
-
-          expect ~i(logout_response.data.logout.successful) |> to(be_false())
+          refute ~i(logout_response.successful)
         end
 
-        it "does not accept already revoked token" do
+        it "does not accept already revoked token", validation: true, valid: false do
           user = build(:user)
+          create_user(input: prepare_user(user), conn: shared.conn)
 
-          _create_response = make_query(build_conn(), %{
-            query: create_user_mutation(),
-            variables: %{input: prepare_user(user)}
-          })
+          auth_response = auth_by_email(user, shared.conn)
+          refresh_token = ~i(auth_response.result.refresh_token)
 
-          auth_response = make_query(build_conn(), %{
-            query: login_mutation(),
-            variables: %{name: user.name, password: user.password}
-          })
+          logout(refresh_token, shared.conn)
+          logout_response = logout(refresh_token, shared.conn)
 
-          refresh_token = ~i(auth_response.data.login.result.refresh_token)
-
-          _logout_response = make_query(build_conn(), %{
-            query: logout_mutation(),
-            variables: %{refresh_token: refresh_token}
-          })
-
-          logout_response = make_query(build_conn(), %{
-            query: logout_mutation(),
-            variables: %{refresh_token: refresh_token}
-          })
-
-          expect ~i(logout_response.data.logout.successful) |> to(be_false())
+          refute ~i(logout_response.successful)
         end
       end
     end

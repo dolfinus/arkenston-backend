@@ -60,7 +60,32 @@ config :arkenston, Arkenston.Guardian,
   # optional
   verify_issuer: true,
   secret_key: %{"k" => Mix.env() |> Atom.to_string(), "kty" => "oct"},
-  serializer: Arkenston.Guardian
+  serializer: Arkenston.Guardian,
+  all_permissions: %{ #append-only list, never change order of items
+    user: [
+      :create_user,
+      :create_moderator,
+      :create_admin,
+      :update_user,
+      :update_moderator,
+      :update_admin,
+      :update_self,
+      :change_user_password,
+      :change_moderator_password,
+      :change_admin_password,
+      :change_self_password,
+      :upgrade_user_to_moderator,
+      :upgrade_user_to_admin,
+      :upgrade_moderator_to_admin,
+      :downgrade_admin_to_moderator,
+      :downgrade_admin_to_user,
+      :downgrade_moderator_to_user,
+      :delete_user,
+      :delete_moderator,
+      :delete_admin,
+      :delete_self
+    ]
+  }
 
 config :guardian, Guardian.DB,
   repo: Arkenston.Repo, # Add your repository module

@@ -1,3 +1,5 @@
+ESpec.start
+
 ESpec.configure fn(config) ->
   config.before fn(tags) ->
     use Phoenix.ConnTest

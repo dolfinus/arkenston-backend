@@ -1,4 +1,7 @@
 defmodule SubjectHelper do
+  use GraphqlHelper
+  import Indifferent.Sigils
+
   @check_attrs [:name, :email, :role]
   @input_attrs [:name, :email, :role, :password]
 
@@ -195,32 +198,221 @@ defmodule SubjectHelper do
     {_, user_struct} = Enum.map_reduce(@input_attrs, %{}, fn (attr, result) ->
       value = user |> Indifferent.Access.get(attr)
 
-      {attr, result |> Map.put(attr, value)}
+      new_result = case value do
+        nil ->
+          result
+        _ ->
+          result |> Map.put(attr, value)
+      end
+
+      {attr, new_result}
     end)
 
-    %{user_struct| role: parse_role(user_struct)}
+    user_struct |> handle_role()
   end
 
-  def get_user(user) do
+  def handle_user(user) do
     {_, user_struct} = Enum.map_reduce(@check_attrs, %{}, fn (attr, result) ->
       value = user |> Indifferent.Access.get(attr)
 
       {attr, result |> Map.put(attr, value)}
     end)
 
-    %{user_struct| role: parse_role(user_struct)}
+    user_struct |> handle_role()
   end
 
   def check_user(user1, user2) do
-    get_user(user1) == get_user(user2)
+    handle_user(user1) == handle_user(user2)
   end
 
-  defp parse_role(user) do
-    with %{role: role} <- user do
-      case role do
-        role when is_atom(role) or is_binary(role) ->
-          String.upcase("#{role}")
-      end
+  defp handle_role(user) do
+    case user do
+      %{role: role} when is_atom(role) or is_binary(role) ->
+        user |> Map.put(:role, String.upcase("#{role}"))
+      _ ->
+        user
     end
+  end
+
+  def auth(user, conn \\ build_conn()) do
+    response = auth_by_email(user, conn)
+    ~i(response.result.access_token)
+  end
+
+  def auth_by_email(user, conn \\ build_conn()) do
+    auth_response = make_query(conn, %{
+      query: login_mutation(),
+      variables: %{email: user.email, password: user.password}
+    })
+    ~i(auth_response.data.login)
+  end
+
+  def auth_by_name(user, conn \\ build_conn()) do
+    auth_response = make_query(conn, %{
+      query: login_mutation(),
+      variables: %{name: user.name, password: user.password}
+    })
+    ~i(auth_response.data.login)
+  end
+
+  def exchange(refresh_token, conn \\ build_conn()) do
+    exchange_response = make_query(conn, %{
+      query: exchange_mutation(),
+      variables: %{refresh_token: refresh_token}
+    })
+    ~i(exchange_response.data.exchange)
+  end
+
+  def logout(refresh_token, conn \\ build_conn()) do
+    logout_response = make_query(conn, %{
+      query: logout_mutation(),
+      variables: %{refresh_token: refresh_token}
+    })
+    ~i(logout_response.data.logout)
+  end
+
+  def get_users(args \\ %{})
+  def get_users(args) when is_list(args) do
+    args = args |> Enum.into(%{})
+
+    get_users(args)
+  end
+
+  def get_users(args) when is_map(args) do
+    %{conn: conn} = args
+    input = args |> Map.delete([:conn, :access_token])
+
+    get_all_response = case args do
+      %{access_token: token} when not is_nil(token) ->
+        make_query(conn, %{
+            query: get_users_query(),
+            variables: input
+          },
+          token
+        )
+      _ ->
+        make_query(conn, %{
+          query: get_users_query(),
+          variables: input
+        })
+    end
+
+    get_all_response
+  end
+
+  def get_user(args \\ %{})
+  def get_user(args) when is_list(args) do
+    args = args |> Enum.into(%{})
+
+    get_user(args)
+  end
+
+  def get_user(args) when is_map(args) do
+    %{conn: conn} = args
+    input = args |> Map.delete([:conn, :access_token])
+
+    get_one_response = case args do
+      %{access_token: token} when not is_nil(token) ->
+        make_query(conn, %{
+            query: get_user_query(),
+            variables: input
+          },
+          token
+        )
+      _ ->
+        make_query(conn, %{
+          query: get_user_query(),
+          variables: input
+        })
+    end
+
+    get_one_response
+  end
+
+  def create_user(args \\ %{})
+  def create_user(args) when is_list(args) do
+    args = args |> Enum.into(%{})
+
+    create_user(args)
+  end
+
+  def create_user(args) when is_map(args) do
+    %{conn: conn} = args
+    input = args |> Map.take([:input, :id, :name, :email])
+
+    create_response = case args do
+      %{access_token: token} when not is_nil(token) ->
+        make_query(conn, %{
+            query: create_user_mutation(),
+            variables: input
+          },
+          token
+        )
+      _ ->
+        make_query(conn, %{
+          query: create_user_mutation(),
+          variables: input
+        })
+    end
+
+    ~i(create_response.data.createUser)
+  end
+
+  def update_user(args \\ %{})
+  def update_user(args) when is_list(args) do
+    args = args |> Enum.into(%{})
+
+    update_user(args)
+  end
+
+  def update_user(args) when is_map(args) do
+    %{conn: conn} = args
+    input = args |> Map.take([:input, :id, :name, :email])
+
+    update_response = case args do
+      %{access_token: token} when not is_nil(token) ->
+        make_query(conn, %{
+            query: update_user_mutation(),
+            variables: input
+          },
+          token
+        )
+      _ ->
+        make_query(conn, %{
+          query: update_user_mutation(),
+          variables: input
+        })
+    end
+
+    ~i(update_response.data.updateUser)
+  end
+
+  def delete_user(args \\ %{})
+  def delete_user(args) when is_list(args) do
+    args = args |> Enum.into(%{})
+
+    delete_user(args)
+  end
+
+  def delete_user(args) when is_map(args) do
+    %{conn: conn} = args
+    input = args |> Map.take([:input, :id, :name, :email])
+
+    delete_response = case args do
+      %{access_token: token} when not is_nil(token) ->
+        make_query(conn, %{
+            query: delete_user_mutation(),
+            variables: input
+          },
+          token
+        )
+      _ ->
+        make_query(conn, %{
+          query: delete_user_mutation(),
+          variables: input
+        })
+    end
+
+    ~i(delete_response.data.deleteUser)
   end
 end

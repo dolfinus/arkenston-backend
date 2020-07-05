@@ -1,6 +1,7 @@
 defmodule Arkenston.Mutator.UserTokenMutator do
   alias Arkenston.Guardian
   alias Arkenston.Helper.AuthHelper
+  alias Arkenston.Permissions
   alias Arkenston.Subject.User
 
   @type refresh_token :: %{refresh_token: String.t}
@@ -20,7 +21,8 @@ defmodule Arkenston.Mutator.UserTokenMutator do
     end
 
     with  {:ok, user} <- auth,
-          {:ok, refresh_token, _} <- Guardian.encode_and_sign(user, %{}, token_type: "refresh"),
+          permissions <- Permissions.permissions_for(user),
+          {:ok, refresh_token, _} <- Guardian.encode_and_sign(user, %{pem: permissions}, token_type: "refresh"),
           {:ok, _old_stuff,  {access_token, _new_claims}} <- Guardian.exchange(refresh_token, "refresh", "access") do
             {:ok, %{refresh_token: refresh_token, access_token: access_token, user: user}}
           else
@@ -41,6 +43,8 @@ defmodule Arkenston.Mutator.UserTokenMutator do
               {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: message}}
             {:error, "typ"} ->
               {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: :token_type_invalid}}
+            {:error, :token_expired} ->
+              {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: :token_expired}}
             {:error, error} ->
               {:error, %AbsintheErrorPayload.ValidationMessage{code: error}}
     end
@@ -57,6 +61,8 @@ defmodule Arkenston.Mutator.UserTokenMutator do
               {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: message}}
             {:error, "typ"} ->
               {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: :token_type_invalid}}
+            {:error, :token_expired} ->
+              {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: :token_expired}}
             {:error, error} ->
               {:error, %AbsintheErrorPayload.ValidationMessage{code: error}}
     end

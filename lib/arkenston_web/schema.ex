@@ -27,7 +27,7 @@ defmodule ArkenstonWeb.Schema do
 
   def middleware(middleware, _field, %Absinthe.Type.Object{identifier: identifier})
   when identifier in [:query, :subscription, :mutation] do
-    [Arkenston.Middleware.HandleFields | middleware]
+    [Arkenston.Middleware.HandleFields] ++ middleware
   end
 
   def middleware(middleware, _field, _object) do

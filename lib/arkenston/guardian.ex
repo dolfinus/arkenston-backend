@@ -1,8 +1,12 @@
 defmodule Arkenston.Guardian do
   require Logger
-  use Guardian, otp_app: :arkenston
   alias Arkenston.Subject
   alias Arkenston.Subject.User
+
+  use Guardian, otp_app: :arkenston,
+    permissions: Arkenston.Permissions.all_permissions()
+
+  use Guardian.Permissions, encoding: Guardian.Permissions.AtomEncoding
 
   @spec subject_for_token(user :: any, claims :: map) :: {:ok, String.t} | {:error, atom}
   def subject_for_token(%User{id: id}, _claims) do
