@@ -4,8 +4,8 @@ set -e
 
 ./wait_for_postgres.sh
 if [ -z "$TRAVIS" ]; then
-  mix coveralls.travis
+  mix coveralls.travis "$@"
 else
-  mix test
+  mix test "$@"
 fi
 mix dialyzer
