@@ -28,13 +28,26 @@ defmodule Arkenston.Repo do
     else
       case transaction(fn ->
         query("set local \"arkenston.current_user\" = '#{author.id}';")
-        apply(__MODULE__, op, args)
+        result = apply(__MODULE__, op, args)
+
+        case result do
+          {:ok, result} ->
+            {:ok, result}
+          {:error, error} ->
+            rollback(error)
+        end
       end) do
-        {:ok, success} ->
+        {:ok, {:ok, _} = success} ->
           success
 
+        {:ok, success} ->
+          {:ok, success}
+
+        {:error, {:error, _} = error} ->
+          {:error, error}
+
         {:error, error} ->
-          error
+          {:error, error}
       end
     end
   end
