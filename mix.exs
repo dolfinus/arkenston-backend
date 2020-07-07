@@ -66,6 +66,7 @@ defmodule Arkenston.MixProject do
       {:trans, "~> 2.2"},
       {:ecto_enum, "~> 1.4"},
       {:argon2_elixir, "~> 2.3"},
+      {:pbkdf2_elixir, "~> 1.2"},
       {:inflex, "~> 2.0" },
       {:linguist, github: "yogodoshi/linguist", branch: "cm/fix-elixir-1.7-compatibility"},
       {:guardian, "~> 2.1"},

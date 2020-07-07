@@ -19,18 +19,18 @@ defmodule Arkenston.Subject.User do
   @type note :: String.t | nil
 
   @type t :: %__MODULE__{
-    id: id,
-    name: name,
-    role: role,
-    email: email,
-    password: password,
-    deleted: deleted,
+    id:         id,
+    name:       name,
+    role:       role,
+    email:      email,
+    password:   password,
+    deleted:    deleted,
     created_at: created_at,
     created_by: created_by,
     updated_at: updated_at,
     updated_by: updated_by,
-    version: version,
-    note: note
+    version:    version,
+    note:       note
   }
 
   audited_schema "users" do
@@ -84,12 +84,36 @@ defmodule Arkenston.Subject.User do
 
   @spec check_password(user :: t, password :: String.t) :: boolean
   def check_password(user, password) do
+    alg = case user.password_hash do
+      "$pbkdf2" <> _ ->
+        :pbkdf2
+      _ ->
+        :argon2
+    end
+
+    check_password(user, password, alg)
+  end
+
+  @spec check_password(user :: t, password :: String.t, alg :: atom) :: boolean
+  def check_password(user, password, :argon2) do
     Argon2.verify_pass(password, user.password_hash)
   end
 
-  @spec calc_password_hash(password :: String.t) :: binary
+  def check_password(user, password, :pbkdf2) do
+    Pbkdf2.verify_pass(password, user.password_hash)
+  end
+
+  @spec calc_password_hash(password :: String.t, alg :: atom) :: binary
   def calc_password_hash(password) do
+    calc_password_hash(password, :argon2)
+  end
+
+  def calc_password_hash(password, :argon2) do
     Argon2.hash_pwd_salt(password)
+  end
+
+  def calc_password_hash(password, :pbkdf2) do
+    Pbkdf2.hash_pwd_salt(password)
   end
 
   defp put_role(%Ecto.Changeset{valid?: true, changes: %{role: role}} = changeset) when not is_nil(role) do

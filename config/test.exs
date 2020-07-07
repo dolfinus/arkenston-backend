@@ -16,3 +16,6 @@ config :logger, level: :warn
 config :argon2_elixir,
   t_cost: 2,
   m_cost: 12
+
+config :pbkdf2_elixir,
+  rounds: 1
