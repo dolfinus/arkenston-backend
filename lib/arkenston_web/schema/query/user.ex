@@ -6,7 +6,7 @@ defmodule ArkenstonWeb.Schema.Query.User do
       arg :id,      :uuid4
       arg :name,    :string
       arg :email,   :string
-      arg :role,    :integer
+      arg :role,    :user_role
       arg :deleted, :boolean
       resolve &Arkenston.Resolver.UserResolver.all/2
     end
@@ -15,7 +15,7 @@ defmodule ArkenstonWeb.Schema.Query.User do
       arg :id,      :uuid4
       arg :name,    :string
       arg :email,   :string
-      arg :role,    :integer
+      arg :role,    :user_role
       arg :deleted, :boolean
       resolve &Arkenston.Resolver.UserResolver.one/2
     end
