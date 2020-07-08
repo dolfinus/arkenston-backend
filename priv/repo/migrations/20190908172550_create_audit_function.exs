@@ -132,27 +132,54 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
         --RAISE LOG 'audit statement result %', latest_revision_#{@id_name};
 
         IF (TG_OP = 'INSERT') THEN
-          data_statement := FORMAT(
-            'INSERT INTO %1$I (
-              #{@id_name},
-              %3$s,
-              first_revision_#{@id_name},
-              latest_revision_#{@id_name}
-            )
+          IF current_user_#{@id_name} IS NOT NULL THEN
+            data_statement := FORMAT(
+              'INSERT INTO %1$I (
+                #{@id_name},
+                %3$s,
+                first_revision_#{@id_name},
+                latest_revision_#{@id_name},
+                created_by_#{@id_name}
+              )
 
-            VALUES (
-              ($1).#{@id_name},
-              %4$s,
-              ($2),
-              ($2)
-            )
-            RETURNING #{@id_name}
-            ',
-            data_table_name,
-            orig_table_key,
-            array_to_string(audit_table_columns, ',\n'),
-            array_to_string(orig_table_columns,  ',\n')
-          );
+              VALUES (
+                ($1).#{@id_name},
+                %4$s,
+                ($2),
+                ($2),
+                ''%5$s''::uuid
+              )
+              RETURNING #{@id_name}
+              ',
+              data_table_name,
+              orig_table_key,
+              array_to_string(audit_table_columns, ',\n'),
+              array_to_string(orig_table_columns,  ',\n'),
+              current_user_#{@id_name}
+            );
+          ELSE
+            data_statement := FORMAT(
+              'INSERT INTO %1$I (
+                #{@id_name},
+                %3$s,
+                first_revision_#{@id_name},
+                latest_revision_#{@id_name}
+              )
+
+              VALUES (
+                ($1).#{@id_name},
+                %4$s,
+                ($2),
+                ($2)
+              )
+              RETURNING #{@id_name}
+              ',
+              data_table_name,
+              orig_table_key,
+              array_to_string(audit_table_columns, ',\n'),
+              array_to_string(orig_table_columns,  ',\n')
+            );
+          END IF;
           --RAISE LOG 'insert statement sql %', data_statement;
 
           EXECUTE

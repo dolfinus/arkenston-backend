@@ -32,8 +32,11 @@ defmodule Arkenston.Repo.Migration do
     quote do
       create table(unquote(data_table)) do
         unquote(block)
-        add :note, :string
+        add unquote(created_by), references(unquote(users_data_table), type: unquote(@id_type)), null: true
+        add :created_at, :utc_datetime, null: false, default: {:fragment, "now()"}
       end
+      create index(unquote(data_table), unquote(created_by))
+      create index(unquote(data_table), :created_at)
       flush()
 
       create table(unquote(audit_table)) do
@@ -61,8 +64,8 @@ defmodule Arkenston.Repo.Migration do
         SELECT
             data.#{unquote(@id_name)},
             #{unquote(columns)},
-            first.created_at,
-            first.#{unquote(created_by)},
+            data.created_at,
+            data.#{unquote(created_by)},
             CASE
               WHEN latest.version = 1
                 THEN NULL
