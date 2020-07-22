@@ -3,31 +3,29 @@ defmodule Arkenston.Helper.FieldsHelper do
 
   alias Arkenston.Helper.QueryHelper
 
+  @id_name Application.get_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:name]
+
   @type fields :: [atom|{atom, fields}]
   @type fields_context :: %{fields: fields}
 
   @spec prepare_fields(module :: atom, context :: fields_context) :: fields
   def prepare_fields(module, %{fields: fields}) do
-    {_fields, result} = fields |> Enum.reduce(fields, fn field, result ->
+    Enum.reduce(fields, module.__schema__(:primary_key), fn field, result ->
       case field do
         value when is_atom(value) ->
-          {field, result}
+          field_id = :"#{value}_#{@id_name}"
+
+          new_fields = [field, field_id] |> Enum.filter(fn name ->
+            module.__schema__(:fields) |> Enum.member?(name)
+          end)
+
+          result ++ new_fields
 
         {value, nested} when is_atom(value) ->
-          nested_fields = prepare_fields(module, nested)
-
-          field_id = :"#{value}_id"
-          nested_fields = nested_fields ++ case module.__schema__(:fields) |> Enum.member?(field_id) do
-            true ->
-              [field_id]
-            _ ->
-              []
-          end
-          {field, nested_fields}
+          result ++ prepare_fields(module, %{fields: [value]}) ++ prepare_fields(module, %{fields: nested})
       end
     end)
-
-    result
+    |> Enum.uniq()
   end
   def prepare_fields(_module, _fields), do: []
 

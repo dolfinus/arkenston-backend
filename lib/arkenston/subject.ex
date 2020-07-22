@@ -6,7 +6,6 @@ defmodule Arkenston.Subject do
   import Ecto.Query, warn: false
 
   alias Arkenston.Helper.QueryHelper
-  alias Arkenston.Helper.FieldsHelper
   alias Arkenston.Repo
   alias Arkenston.Subject.User
 
@@ -20,11 +19,10 @@ defmodule Arkenston.Subject do
 
   """
 
-  @spec list_users(opts :: QueryHelper.query_opts | list[keyword], fields :: FieldsHelper.fields) :: [User.t]
-  def list_users(opts \\ %{}, fields \\ []) do
+  @spec list_users(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: [User.t]
+  def list_users(opts \\ %{}, context \\ %{}) do
     User
-    |> QueryHelper.generate_query(opts)
-    |> FieldsHelper.return_fields(fields)
+    |> QueryHelper.generate_query(opts, context)
     |> Repo.all()
   end
 
@@ -40,11 +38,10 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_user_by(opts :: QueryHelper.query_opts | list[keyword], fields :: FieldsHelper.fields) :: User.t|nil
-  def get_user_by(opts, fields \\ []) do
+  @spec get_user_by(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: User.t|nil
+  def get_user_by(opts, context \\ %{}) do
     User
-    |> QueryHelper.generate_query(opts)
-    |> FieldsHelper.return_fields(fields)
+    |> QueryHelper.generate_query(opts, context)
     |> QueryHelper.first()
     |> Repo.one()
   end
@@ -61,11 +58,10 @@ defmodule Arkenston.Subject do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_user_by!(opts :: QueryHelper.query_opts | list[keyword], fields :: FieldsHelper.fields) :: User.t|no_return
-  def get_user_by!(opts, fields \\ []) do
+  @spec get_user_by!(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: User.t|no_return
+  def get_user_by!(opts, context \\ %{}) do
     User
-    |> QueryHelper.generate_query(opts)
-    |> FieldsHelper.return_fields(fields)
+    |> QueryHelper.generate_query(opts, context)
     |> QueryHelper.first()
     |> Repo.one!()
   end
@@ -84,8 +80,8 @@ defmodule Arkenston.Subject do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_user!(id :: User.id, fields :: FieldsHelper.fields) :: User.t|no_return
-  def get_user!(id, fields \\ []), do: get_user_by!(%{id: id}, fields)
+  @spec get_user!(id :: User.id, context :: QueryHelper.context) :: User.t|no_return
+  def get_user!(id, context \\ %{}), do: get_user_by!(%{id: id}, context)
 
   @doc """
   Gets a single user by id.
@@ -99,8 +95,8 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_user(id :: User.id, fields :: FieldsHelper.fields) :: User.t|nil
-  def get_user(id, fields \\ []), do: get_user_by(%{id: id}, fields)
+  @spec get_user(id :: User.id, context :: QueryHelper.context) :: User.t|nil
+  def get_user(id, context \\ %{}), do: get_user_by(%{id: id}, context)
 
   @doc """
   Creates a user.

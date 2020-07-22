@@ -13,11 +13,8 @@ defmodule Arkenston.Repo do
   @type operation :: atom
 
   @spec data(ctx :: map) :: Dataloader.Ecto.t
-  def data(%{context: context}) do
-    Dataloader.Ecto.new(__MODULE__, query: &QueryHelper.generate_query/2, default_params: context)
-  end
-  def data(_ctx) do
-    Dataloader.Ecto.new(__MODULE__, query: &QueryHelper.generate_query/2)
+  def data(context) do
+    Dataloader.Ecto.new(__MODULE__, query: &QueryHelper.generate_query/2, default_params: %{context: context})
   end
 
   @spec audited(op :: operation, author :: author, args :: [any]) :: {:ok, any} | {:error, any}

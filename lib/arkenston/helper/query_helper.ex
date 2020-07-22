@@ -242,23 +242,32 @@ defmodule Arkenston.Helper.QueryHelper do
 
   """
   @spec generate_query(query :: queryable, opts :: query_opts | list) :: queryable
-  def generate_query(query, opts \\ %{})
+  def generate_query(query, opts \\ %{}, context \\ %{})
 
-  def generate_query(query, opts) when is_list(opts) do
-    generate_query(query, %{fields: opts})
+  def generate_query(query, opts, context) when is_list(opts) do
+    generate_query(query, opts |> Enum.into(%{}), context)
   end
 
-  def generate_query(query, %{fields: fields} = opts) when is_list(fields) do
-    fields_map = fields |> Enum.into(%{})
-    generate_query(query, opts |> Map.drop([:fields]) |> Map.merge(fields_map))
+  def generate_query(query, %{context: context} = opts, _context) when is_map(context) do
+    generate_query(query, opts |> Map.drop([:context]), context)
   end
 
-  def generate_query(query, opts) when is_map(opts) do
+  def generate_query(query, opts, context) do
+    opts = case opts do
+      %{fields: fields} ->
+        fields_map = fields |> Enum.into(%{})
+        opts |> Map.drop([:fields]) |> Map.merge(fields_map)
+      _ ->
+        opts
+    end
     filter_opts = Map.drop(opts, [:limit, :order, :page, :size])
+    fields = query |> FieldsHelper.prepare_fields(context)
+
     query
     |> handle_pagination(opts)
     |> handle_limit(opts)
     |> handle_order(opts)
     |> handle_filter(filter_opts)
+    |> FieldsHelper.return_fields(fields)
   end
 end
