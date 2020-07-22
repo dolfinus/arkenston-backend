@@ -14,7 +14,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
   end
 
   context "resolver", module: :resolver, query: true do
-    context "user", user: true do
+    context "subject", subject: true, user: true do
       describe "users" do
         it "without where clause return all users" do
           %{user: creator, access_token: access_token} = author()

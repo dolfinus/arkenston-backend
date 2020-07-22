@@ -1,10 +1,16 @@
 defmodule ArkenstonWeb.Schema do
   use Absinthe.Schema
-  alias Arkenston.Repo
   use ArkenstonWeb.Schema.Types
+  use Absinthe.Relay.Schema, [
+    flavor: :modern,
+    global_id_translator: ArkenstonWeb.Schema.Helpers.IDTranslator
+  ]
+
+  alias Arkenston.Repo
 
   query do
     import_fields :user_queries
+    import_fields :node_queries
   end
 
   mutation do
