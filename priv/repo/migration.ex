@@ -21,11 +21,12 @@ defmodule Arkenston.Repo.Migration do
 
     data_table       = "#{view_name}_data"  |> String.to_atom()
     audit_table      = "#{view_name}_audit" |> String.to_atom()
-    orig_primary_key = "#{singularize(view_name)}_#{@id_name}" |> String.to_atom()
-    created_by       = "created_by_#{@id_name}"                |> String.to_atom()
-    updated_by       = "updated_by_#{@id_name}"                |> String.to_atom()
-    first_revision   = "first_revision_#{@id_name}"            |> String.to_atom()
-    latest_revision  = "latest_revision_#{@id_name}"           |> String.to_atom()
+    entity_type      = singularize(view_name)
+    orig_primary_key = "#{entity_type}_#{@id_name}" |> String.to_atom()
+    created_by       = "created_by_#{@id_name}"     |> String.to_atom()
+    updated_by       = "updated_by_#{@id_name}"     |> String.to_atom()
+    first_revision   = "first_revision_#{@id_name}" |> String.to_atom()
+    latest_revision  = "latest_revision_#{@id_name}"|> String.to_atom()
 
     users_data_table = "users_data"
 
@@ -99,7 +100,7 @@ defmodule Arkenston.Repo.Migration do
 
       execute "CREATE TRIGGER #{unquote(view_name)}_audit
         INSTEAD OF INSERT OR UPDATE OR DELETE ON #{unquote(view_name)}
-          FOR EACH ROW EXECUTE PROCEDURE process_audit('#{unquote(orig_primary_key)}',#{unquote(columns_quoted)},'note')"
+          FOR EACH ROW EXECUTE PROCEDURE process_audit('#{unquote(orig_primary_key)}','#{unquote(entity_type)}',#{unquote(columns_quoted)},'note')"
     end
   end
 

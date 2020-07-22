@@ -4,12 +4,29 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
 
   def up do
     execute "CREATE EXTENSION IF NOT EXISTS \"pgcrypto\";"
+    execute "CREATE OR REPLACE FUNCTION generate_uuid(entity_name VARCHAR(4000)) RETURNS UUID AS $func$
+    DECLARE
+      domain varchar(12);
+      tmp    varchar(36);
+      result uuid;
+    BEGIN
+      domain := left(encode(digest(entity_name, 'sha1'), 'hex'), 12);
+      tmp    := left(gen_random_uuid()::varchar, 24);
+      result := (tmp || domain)::uuid;
+
+      RETURN result;
+    END;
+    $func$ LANGUAGE plpgsql"
+
+
     execute "CREATE OR REPLACE FUNCTION process_audit() RETURNS TRIGGER AS $audit$
       DECLARE
         view_name               text := TG_TABLE_NAME;
         data_table_name         text := TG_TABLE_NAME || '_data';
         audit_table_name        text := TG_TABLE_NAME || '_audit';
         orig_table_key          text := TG_ARGV[0];
+        entity_name             text := TG_ARGV[1];
+        revision_name           text := TG_ARGV[1] || '_revision';
         current_user_#{@id_name} uuid;
         audit_table_columns     text[];
         orig_table_columns      text[];
@@ -29,7 +46,7 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
         END IF;
 
         IF (TG_OP = 'INSERT') THEN
-          NEW.#{@id_name} := gen_random_uuid();
+          NEW.#{@id_name} := generate_uuid(entity_name);
         END IF;
 
         IF current_setting('arkenston.current_user', 't') IS NOT NULL AND current_setting('arkenston.current_user', 't') != '' THEN
@@ -37,7 +54,7 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
         END IF;
 
         -- Get original table column names excluding '#{@id_name}'
-        FOR i IN 1..TG_NARGS-1
+        FOR i IN 2..TG_NARGS-1
         LOOP
           all_audit_table_columns = array_append(all_audit_table_columns, TG_ARGV[i]);
           all_orig_table_columns  = array_append(all_orig_table_columns, FORMAT('($1).%1$I', TG_ARGV[i]));
@@ -77,21 +94,24 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
         IF current_user_#{@id_name} IS NOT NULL THEN
           audit_statement := FORMAT(
             'INSERT INTO %1$I (
-              %3$I,
-              %5$s,
+              #{@id_name},
+              %4$I,
+              %6$s,
               version,
               created_by_#{@id_name}
             )
 
             VALUES (
+              ''%2$s''::uuid,
               ($1).#{@id_name},
-              %4$s,
-              %2$s,
-              ''%6$s''::uuid
+              %5$s,
+              %3$s,
+              ''%7$s''::uuid
             )
             RETURNING #{@id_name}
             ',
             audit_table_name,
+            generate_uuid(revision_name),
             new_version,
             orig_table_key,
             array_to_string(all_orig_table_columns, ',\n'),
@@ -101,19 +121,22 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
         ELSE
           audit_statement := FORMAT(
             'INSERT INTO %1$I (
-              %3$I,
-              %5$s,
+              #{@id_name},
+              %4$I,
+              %6$s,
               version
             )
 
             VALUES (
+              ''%2$s''::uuid,
               ($1).#{@id_name},
-              %4$s,
-              %2$s
+              %5$s,
+              %3$s
             )
             RETURNING #{@id_name}
             ',
             audit_table_name,
+            generate_uuid(revision_name),
             new_version,
             orig_table_key,
             array_to_string(all_orig_table_columns, ',\n'),
@@ -233,5 +256,6 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
 
   def down do
     execute "DROP FUNCTION process_audit()"
+    execute "DROP FUNCTION generate_uuid()"
   end
 end

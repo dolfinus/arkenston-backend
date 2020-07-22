@@ -77,7 +77,8 @@ defmodule Arkenston.MixProject do
       {:faker, "~> 0.13", only: :test},
       {:ex_machina, "~> 2.4", only: :test},
       {:espec, "~> 1.8", only: :test},
-      {:excoveralls, "~> 0.12", only: :test}
+      {:excoveralls, "~> 0.12", only: :test},
+      {:uuid, "~> 1.1"}
     ]
   end
 
