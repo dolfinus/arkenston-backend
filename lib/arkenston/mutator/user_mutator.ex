@@ -56,7 +56,7 @@ defmodule Arkenston.Mutator.UserMutator do
       {_field, user} ->
         with :ok <- Permissions.check_permissions_for(:user, :delete, context, user, args),
             {:ok, _user} <- user |> Subject.delete_user(attrs, context) do
-              {:ok, nil}
+              {:ok, true}
         else
           {:error, %Ecto.Changeset{} = changeset}
             ->

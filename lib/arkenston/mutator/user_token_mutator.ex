@@ -55,7 +55,7 @@ defmodule Arkenston.Mutator.UserTokenMutator do
   def logout(%{refresh_token: token}, _info) do
     with  {:ok, _claims} <- Guardian.decode_and_verify(token, %{"typ" => "refresh"}),
           {:ok, _claims} <- Guardian.revoke(token) do
-            {:ok, nil}
+            {:ok, true}
           else
             {:error, %ArgumentError{message: message}} ->
               {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: message}}

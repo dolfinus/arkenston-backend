@@ -18,7 +18,7 @@ defmodule ArkenstonWeb.Schema.Mutation.UserToken do
       middleware &build_payload/2
     end
 
-    field :logout, :null_payload do
+    field :logout, :boolean_payload do
       arg :refresh_token, :string
       resolve &Arkenston.Mutator.UserTokenMutator.logout/2
       middleware &build_payload/2

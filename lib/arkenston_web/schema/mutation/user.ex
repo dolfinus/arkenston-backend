@@ -18,7 +18,7 @@ defmodule ArkenstonWeb.Schema.Mutation.User do
       middleware &build_payload/2
     end
 
-    field :delete_user, :null_payload do
+    field :delete_user, :boolean_payload do
       arg :id,    :uuid4
       arg :name,  :string
       arg :email, :string
