@@ -1,5 +1,6 @@
 defmodule GraphqlHelper do
   use Phoenix.ConnTest
+  import Indifferent.Sigils
   @endpoint ArkenstonWeb.Endpoint
 
   defmacro __using__(_opts) do
@@ -21,5 +22,11 @@ defmodule GraphqlHelper do
     |> put_req_header("authorization", "Bearer #{token}")
     |> post("/api/graphql", query)
     |> json_response(200)
+  end
+
+  def depaginate(result) do
+    ~i(result.edges) |> Enum.map(fn edge ->
+      ~i(edge.node)
+    end)
   end
 end

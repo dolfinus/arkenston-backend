@@ -6,6 +6,8 @@ defmodule Arkenston.Resolver.UserResolverSpec do
   use ESpec, async: true
   import Indifferent.Sigils
 
+  @default_page_size Application.get_env(:arkenston, ArkenstonWeb.Endpoint)[:page_size]
+
   let :author do
     user = build(:admin)
     {:ok, result} = Subject.create_user(user)
@@ -16,7 +18,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
   context "resolver", module: :resolver, query: true do
     context "subject", subject: true, user: true do
       describe "users" do
-        it "without where clause return all users" do
+        it "without where clause return users list with pagination" do
           %{user: creator, access_token: access_token} = author()
 
           users = build_list(3, :user)
@@ -30,8 +32,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
 
           get_all_response = get_users(access_token: access_token, conn: shared.conn)
 
-          all_users = ~i(get_all_response.data.users) |> Enum.map(&handle_user/1)
-
+          all_users = depaginate(~i(get_all_response.data.users)) |> Enum.map(&handle_user/1)
           expect all_users |> to(match_list inserted_users)
         end
 
@@ -50,7 +51,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
 
           get_all_response = get_users(id: inserted_user_id, access_token: access_token, conn: shared.conn)
 
-          all_users = ~i(get_all_response.data.users) |> Enum.map(&handle_user/1)
+          all_users = depaginate(~i(get_all_response.data.users)) |> Enum.map(&handle_user/1)
 
           expect all_users |> to(match_list [inserted_user])
         end
@@ -72,7 +73,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
 
           get_all_response = get_users(access_token: access_token, conn: shared.conn)
 
-          all_users = ~i(get_all_response.data.users) |> Enum.map(&handle_user/1)
+          all_users = depaginate(~i(get_all_response.data.users)) |> Enum.map(&handle_user/1)
 
           expect all_users |> not_to(have inserted_user)
         end

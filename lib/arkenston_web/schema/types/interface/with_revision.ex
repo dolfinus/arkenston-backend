@@ -1,5 +1,6 @@
 defmodule ArkenstonWeb.Schema.Types.Interface.WithRevision do
   use Absinthe.Schema.Notation
+  use Absinthe.Relay.Schema.Notation, :modern
   use ArkenstonWeb.Schema.Helpers.Association
 
   interface :with_revision do
@@ -13,9 +14,9 @@ defmodule ArkenstonWeb.Schema.Types.Interface.WithRevision do
     field :updated_by, :user do
       resolve assoc(:updated_by)
     end
-    field :revisions,  non_null(list_of(non_null(:revision))) do
-      resolve assoc(:revisions)
-    end
+    #connection field :revisions, node_type: :revision do
+    #  assoc(:revisions)
+    #end
 
     resolve_type fn
       _, _ -> nil

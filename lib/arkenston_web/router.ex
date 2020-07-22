@@ -1,11 +1,12 @@
 defmodule ArkenstonWeb.Router do
   use ArkenstonWeb, :router
   @api Application.get_env(:arkenston, ArkenstonWeb.Endpoint)[:api]
+  @max_complexity Application.get_env(:arkenston, ArkenstonWeb.Endpoint)[:max_complexity]
 
   pipeline :graphql do
     plug Plug.Parsers,
-      parsers: [:json, Absinthe.Plug.Parser],
-      pass: ["application/json"],
+      parsers: [:urlencoded, :multipart, :json, Absinthe.Plug.Parser],
+      pass: ["*/*"],
       json_decoder: Phoenix.json_library()
 
     plug Arkenston.Context
@@ -14,7 +15,7 @@ defmodule ArkenstonWeb.Router do
   scope "/api" do
     pipe_through :graphql
 
-    forward "/graphql",  Absinthe.Plug,          schema: ArkenstonWeb.Schema
+    forward "/graphql",  Absinthe.Plug,          schema: ArkenstonWeb.Schema, analyze_complexity: true, max_complexity: @max_complexity
     forward "/graphiql", Absinthe.Plug.GraphiQL, schema: ArkenstonWeb.Schema, default_url: {__MODULE__, :graphiql_default_url}, interface: :playground
   end
 

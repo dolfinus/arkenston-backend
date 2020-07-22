@@ -28,12 +28,10 @@ config :arkenston, Arkenston.Repo,
   migration_timestamps: [type: :utc_datetime],
   migration_primary_key: [name: :id, type: :binary_id, autogenerate: false, read_after_writes: true, default: {:fragment, "gen_random_uuid()"}]
 
-# Configures the endpoint
 config :arkenston, ArkenstonWeb.Endpoint,
-  render_errors: [view: ArkenstonWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: Arkenston.PubSub, adapter: Phoenix.PubSub.PG2],
-  root: ".",
-  version: Application.spec(:phoenix_distillery, :vsn)
+  page_size: 20,
+  max_page_size: 5000,
+  max_complexity: 5000
 
 # Configures Elixir's Logger
 config :logger, :console,

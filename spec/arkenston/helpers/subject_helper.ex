@@ -69,24 +69,35 @@ defmodule SubjectHelper do
 
   def get_users_query() do
     """
-    query ($id: UUID4, $name: String, $email: String, $role: UserRole){
-      users(id: $id, name: $name, email: $email, role: $role) {
-        id
-        name
-        email
-        role
-        note
-        created_at
-        created_by {
-          id
-          name
+    query ($id: UUID4, $name: String, $email: String, $role: UserRole, $first: PageSize, $last: PageSize, $after: String, $before: String){
+      users(id: $id, name: $name, email: $email, role: $role, first: $first, last: $last, after: $after, before: $before) {
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
         }
-        updated_at
-        updated_by {
-          id
-          name
+        edges {
+          cursor
+          node {
+            id
+            name
+            email
+            role
+            note
+            created_at
+            created_by {
+              id
+              name
+            }
+            updated_at
+            updated_by {
+              id
+              name
+            }
+            version
+          }
         }
-        version
       }
     }
     """

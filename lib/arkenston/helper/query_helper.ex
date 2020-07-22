@@ -2,21 +2,27 @@ defmodule Arkenston.Helper.QueryHelper do
   import Ecto.Query, warn: false
 
   alias Arkenston.Helper.FieldsHelper
+  alias Absinthe.Relay.Connection
 
   @type query :: Ecto.Query.t
   @type queryable :: Ecto.Queryable.t | module
   @type limit :: pos_integer
-  @type page :: pos_integer
-  @type size :: pos_integer
+  @type offset :: pos_integer
+  @type first :: pos_integer
+  @type last :: pos_integer
+  @type count :: pos_integer
   @type order :: :desc|:asc
 
   @type filter_opt :: %{optional(atom) => atom|number|String.t|map}
   @type deleted_opt :: %{deleted: boolean|nil}
   @type order_opt :: %{order: keyword(order)|%{optional(atom) => order}}
-  @type limit_opt :: %{limit: limit}
-  @type pagination_opt :: %{page: page} | %{size: size} | %{page: page, size: size}
+  @type pagination_opt :: %{optional(:first) => first, optional(:last) => last, optional(:count) => count}
   @type fields_opt :: %{fields: FieldsHelper.fields}
-  @type query_opts :: filter_opt|deleted_opt|order_opt|limit_opt|pagination_opt|fields_opt
+  @type query_opts :: filter_opt|deleted_opt|order_opt|pagination_opt|fields_opt
+
+  @default_page_size Application.get_env(:arkenston, ArkenstonWeb.Endpoint)[:page_size]
+  @max_page_size Application.get_env(:arkenston, ArkenstonWeb.Endpoint)[:max_page_size]
+  @reserved_field_names [:order, :first, :last, :count, :before, :after]
 
   @doc """
   Apply filter for 'deleted' column
@@ -139,26 +145,33 @@ defmodule Arkenston.Helper.QueryHelper do
   end
 
   @doc """
-  Add result limit handler
+  Add pagination case handler
 
   ## Examples
 
-      iex> handle_limit(query)
-      query
+      iex> get_offset_limit()
+      {:ok, #{@max_page_size}, #{@default_page_size}}
 
-      iex> handle_limit(User, %{limit: 1})
-      from i in query,
-        limit: ^1
+      iex> get_offset_limit(%{first: 2})
+      {:ok, #{@max_page_size}, 2}
+
+      iex> get_offset_limit(%{last: 2, count: 5})
+      {:ok, 5-2, 2}
+
+      iex> get_offset_limit(%{last: 2})
+      {:error, _}
 
   """
-  @spec handle_limit(query :: queryable, opts :: query_opts) :: queryable
-  def handle_limit(query, opts \\ %{}) do
-    case opts do
-      %{limit: limit} ->
-        from i in query, limit: ^limit
+  @spec get_offset_limit(opts :: query_opts) :: {:ok, offset, limit} | {:error, String.t}
+  def get_offset_limit(opts \\ %{}) do
+    opts = if not Map.has_key?(opts, :first) and not Map.has_key?(opts, :last) do
+      opts |> Map.put(:first, @default_page_size)
+    else
+      opts
+    end
 
-      _ ->
-        query
+    with {:ok, _offset, _limit} = result <- Connection.offset_and_limit_for_query(opts, count: Map.get(opts, :count), max: @max_page_size) do
+      result
     end
   end
 
@@ -170,60 +183,63 @@ defmodule Arkenston.Helper.QueryHelper do
       iex> handle_pagination(query)
       query
 
-      iex> handle_pagination(User, %{page: 2})
+      iex> handle_pagination(User, %{first: 2})
       from i in query,
         limit: ^40,
         offset: ^20
 
-      iex> handle_pagination(User, %{size: 40})
+      iex> handle_pagination(User, %{first: 10, after: "YXJyYXljb25uZWN0aW9uOjA="})
       from i in query,
-        limit: ^40,
-        offset: ^0
+        limit: ^10,
+        offset: ^1
 
-      iex> handle_pagination(User, %{page: 2, size: 40})
+      iex> handle_pagination(User, %{last: 1, before: "YXJyYXljb25uZWN0aW9uOjE="})
       from i in query,
-        limit: ^80,
-        offset: ^40
+        limit: ^1,
+        offset: ^(2-1)
 
   """
   @spec handle_pagination(query :: queryable, opts :: query_opts) :: queryable
   def handle_pagination(query, opts \\ %{}) do
-    case opts do
-      %{page: page, size: size} ->
-        paginate(query, page, size)
-
-      %{size: size} ->
-        paginate(query, 1, size)
-
-      %{page: page} ->
-        paginate(query, page, 20)
-
-      _ ->
+    with {:ok, offset, limit} <- get_offset_limit(opts) do
         query
+        |> limit(^(limit + 1))
+        |> offset(^offset)
     end
   end
 
   @doc """
-  Add LIMIT clause to SELECT query
+  Add pagination case handler
 
   ## Examples
 
-      iex> paginage(query, 1, 10)
+      iex> paginate_slice(User, %{first: 2})
       from i in query,
-        limit: 10,
-        offset: 0
+        limit: ^40,
+        offset: ^20
 
-      iex> paginage(query, 2, 10)
+      iex> paginate_slice(User, %{first: 10, after: "YXJyYXljb25uZWN0aW9uOjA="})
       from i in query,
-        limit: 10,
-        offset: 10
+        limit: ^10,
+        offset: ^1
+
+      iex> paginate_slice(User, %{last: 1, before: "YXJyYXljb25uZWN0aW9uOjE="})
+      from i in query,
+        limit: ^1,
+        offset: ^(2-1)
 
   """
-  @spec paginate(query :: queryable, page :: page, size :: size) :: queryable
-  def paginate(query, page, size) do
-    from query,
-      limit: ^size,
-      offset: ^((page-1) * size)
+  @spec paginate_slice(records :: list, opts :: query_opts) :: queryable
+  def paginate_slice(records, opts \\ %{}) do
+    with {:ok, offset, limit} <- get_offset_limit(opts) do
+      args = [
+        has_previous_page: offset > 0,
+        has_next_page: length(records) > limit,
+        max: @max_page_size
+      ]
+
+      Connection.from_slice(Enum.take(records, limit), offset, args)
+    end
   end
 
   @doc """
@@ -234,14 +250,14 @@ defmodule Arkenston.Helper.QueryHelper do
       iex> generate_query(query)
       query
 
-      iex> generate_query(User, %{some: thing, limit: 1, order: %{colum: desc}})
+      iex> generate_query(User, %{some: thing, first: 1, order: %{colum: desc}})
       from i in query,
         where: i.some == thing,
         limit: 1,
         order_by: [desc: column]
 
   """
-  @spec generate_query(query :: queryable, opts :: query_opts | list) :: queryable
+  @spec generate_query(query :: queryable, opts :: query_opts | list, context :: map) :: queryable
   def generate_query(query, opts \\ %{}, context \\ %{})
 
   def generate_query(query, opts, context) when is_list(opts) do
@@ -260,13 +276,12 @@ defmodule Arkenston.Helper.QueryHelper do
       _ ->
         opts
     end
-    filter_opts = Map.drop(opts, [:limit, :order, :page, :size])
+    filter_opts = Map.drop(opts, @reserved_field_names)
     fields = query |> FieldsHelper.prepare_fields(context)
 
     query
-    |> handle_pagination(opts)
-    |> handle_limit(opts)
     |> handle_order(opts)
+    |> handle_pagination(opts)
     |> handle_filter(filter_opts)
     |> FieldsHelper.return_fields(fields)
   end
