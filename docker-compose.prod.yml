@@ -21,7 +21,7 @@ services:
       - default
       - db
     depends_on:
-       - db
+      - db
 networks:
   db:
     internal: true

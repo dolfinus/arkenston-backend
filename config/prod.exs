@@ -10,6 +10,8 @@ import Config
 # which you should run after static files are built and
 # before starting your production server.
 
+config :arkenston, :environment, :prod
+
 config :arkenston, ArkenstonWeb.Endpoint,
   server: true
 

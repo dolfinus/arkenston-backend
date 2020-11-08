@@ -34,6 +34,7 @@ defmodule Arkenston.MixProject do
       extra_applications: [
         :logger,
         :runtime_tools,
+        :ecto_sql,
         :absinthe_plug,
         :indifferent
       ]

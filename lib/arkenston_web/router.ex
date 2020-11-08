@@ -4,11 +4,6 @@ defmodule ArkenstonWeb.Router do
   @max_complexity Application.get_env(:arkenston, ArkenstonWeb.Endpoint)[:max_complexity]
 
   pipeline :graphql do
-    plug Plug.Parsers,
-      parsers: [:urlencoded, :multipart, :json, Absinthe.Plug.Parser],
-      pass: ["*/*"],
-      json_decoder: Phoenix.json_library()
-
     plug Arkenston.Context
   end
 

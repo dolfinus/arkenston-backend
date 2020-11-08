@@ -8,6 +8,8 @@ import Config
 # with webpack to recompile .js and .css sources.
 
 # Configure your database
+config :arkenston, :environment, :dev
+
 config :arkenston, Arkenston.Repo,
   show_sensitive_data_on_connection_error: true
 

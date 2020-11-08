@@ -11,7 +11,7 @@ use Distillery.Releases.Config,
     # This sets the default release built by `mix distillery.release`
     default_release: :default,
     # This sets the default environment used by `mix distillery.release`
-    default_environment: Mix.env()
+    default_environment: Application.get_env(:arkenston, :environment)
 
 # For a full list of config options for both releases
 # and environments, visit https://hexdocs.pm/distillery/config/distillery.html
@@ -23,7 +23,7 @@ use Distillery.Releases.Config,
 # and environment configuration is called a profile
 
 environment :prod do
-  set include_erts: false
+  set include_erts: true
   set include_src: false
   set cookie: :";GZV0O2MAw87GHVU(XX!^xNqD8ZUjvV:UHpVgc?]h]4^P{hRkp@vW4c?g2d;2A]Q"
   set vm_args: "rel/vm.args"
@@ -54,4 +54,3 @@ release :arkenston do
     :runtime_tools
   ]
 end
-

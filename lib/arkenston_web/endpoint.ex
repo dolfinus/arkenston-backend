@@ -15,7 +15,7 @@ defmodule ArkenstonWeb.Endpoint do
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
   plug Plug.Parsers,
-    parsers: [:json],
+    parsers: [:urlencoded, :multipart, :json, Absinthe.Plug.Parser],
     pass: ["application/json"],
     json_decoder: Phoenix.json_library()
 

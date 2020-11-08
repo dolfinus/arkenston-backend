@@ -1,26 +1,33 @@
 FROM dolfinus/arkenston-backend:base as build
 ENV MIX_ENV prod
 
-COPY --chown=arkenston:arkenston config/config.exs config/$MIX_ENV.exs config/runtime.exs ./config/
-COPY --chown=arkenston:arkenston lib/  ./lib/
-COPY --chown=arkenston:arkenston priv/ ./priv/
-COPY --chown=arkenston:arkenston rel/  ./rel/
-RUN mix distillery.release
-
-FROM dolfinus/arkenston-backend:base
-ENV MIX_ENV prod
+FROM build as prod
 
 COPY --chown=arkenston:arkenston config/config.exs config/$MIX_ENV.exs config/runtime.exs ./config/
 RUN \
   mix deps.get && \
   mix deps.compile --force
 
+COPY --chown=arkenston:arkenston priv/ ./priv/
+COPY --chown=arkenston:arkenston lib/  ./lib/
+COPY --chown=arkenston:arkenston rel/  ./rel/
+
+RUN mix distillery.release
+
+FROM alpine
+ENV MIX_ENV prod
+
+RUN apk add --update --no-cache \
+  bash \
+  postgresql-client \
+  tzdata
+
+RUN mkdir -p /opt/app && adduser -u 2000 -h /opt/app -s /bin/bash -D arkenston
+WORKDIR /opt/app
+
 COPY --chown=root:root entrypoint.prod.sh wait_for_postgres.sh ./
 RUN chmod +x ./entrypoint* ./wait_for_postgres.sh
 
-COPY --from=build --chown=arkenston:arkenston /opt/app/_build ./_build
-COPY --from=build --chown=arkenston:arkenston /opt/app/deps   ./deps
-COPY --from=build --chown=arkenston:arkenston /opt/app/priv/  ./priv/
-COPY --from=build --chown=arkenston:arkenston /opt/app/mix.*  ./
+COPY --from=prod --chown=arkenston:arkenston /opt/app/_build/${MIX_ENV}/rel/arkenston ./
 
 ENTRYPOINT ["./entrypoint.prod.sh"]

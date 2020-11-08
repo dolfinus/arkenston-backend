@@ -76,11 +76,12 @@ defmodule Arkenston.ReleaseTasks do
 
   @spec run_seeds_for(repo :: Ecto.Repo.t) :: no_return
   defp run_seeds_for(repo) do
+    app = Keyword.get(repo.config(), :otp_app)
+
     # Run the seed script if it exists
     seed_script = priv_path_for(repo, "seeds.exs")
-
     if File.exists?(seed_script) do
-      IO.puts("Running seed script...")
+      IO.puts("Running seed script for #{app}...")
       Code.eval_file(seed_script)
     end
   end

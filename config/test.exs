@@ -1,5 +1,7 @@
 import Config
 
+config :arkenston, :environment, :test
+
 # Configure your database
 config :arkenston, Arkenston.Repo,
   show_sensitive_data_on_connection_error: true,
