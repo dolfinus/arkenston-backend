@@ -80,7 +80,8 @@ defmodule Arkenston.MixProject do
       {:ex_machina, "~> 2.4", only: :test},
       {:espec, "~> 1.8", only: :test},
       {:excoveralls, "~> 0.12", only: :test},
-      {:uuid, "~> 1.1"}
+      {:uuid, "~> 1.1"},
+      {:memoize, "~> 1.3"}
     ]
   end
 

@@ -1,4 +1,5 @@
 defmodule ArkenstonWeb.Schema.Helpers.IDTranslator do
+  use Memoize
   alias Arkenston.Helper.UUID
 
   @behaviour Absinthe.Relay.Node.IDTranslator
@@ -19,7 +20,7 @@ defmodule ArkenstonWeb.Schema.Helpers.IDTranslator do
     end
   end
 
-  defp detect_type(global_id) do
+  defmemop detect_type(global_id) do
     types = @possible_types
     |> Enum.filter(fn type -> UUID.check_uuid(global_id, type) end)
 
