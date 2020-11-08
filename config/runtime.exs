@@ -7,30 +7,61 @@
 # General application configuration
 import Config
 
+db_user     = System.get_env("POSTGRES_USER")     || "postgres"
+db_password = System.get_env("POSTGRES_PASSWORD") || "postgres"
+db_name     = System.get_env("POSTGRES_DB")       || "db"
+db_host     = System.get_env("POSTGRES_HOST")     || "localhost"
+
+frontend_host   = System.get_env("FRONTENT_HOST")   || "localhost"
+frontend_port   = System.get_env("FRONTENT_PORT")   || "80" |> String.to_integer()
+frontend_scheme = System.get_env("FRONTENT_SCHEME") || "http"
+frontend_path   = System.get_env("FRONTENT_PATH")   || "/"
+
+backend_host   = System.get_env("BACKEND_HOST")   || "localhost"
+backend_port   = System.get_env("BACKEND_PORT")   || "3000" |> String.to_integer()
+backend_scheme = System.get_env("BACKEND_SCHEME") || "http"
+backend_path   = System.get_env("BACKEND_PATH")   || "/api"
+
 # Configure your database
 config :arkenston, Arkenston.Repo,
-  username: System.get_env("POSTGRES_USER")     || "postgres",
-  password: System.get_env("POSTGRES_PASSWORD") || "postgres",
-  database: System.get_env("POSTGRES_DB")       || "db",
-  hostname: System.get_env("POSTGRES_HOST")     || "localhost",
+  username: db_user,
+  password: db_password,
+  database: db_name,
+  hostname: db_host,
   pool_size: 10
 
 # Configures the endpoint
 config :arkenston, ArkenstonWeb.Endpoint,
   url: [
-    host:   System.get_env("FRONTENT_HOST")   || "localhost",
-    port:   System.get_env("FRONTENT_PORT")   || "80" |> String.to_integer(),
-    scheme: System.get_env("FRONTENT_SCHEME") || "http",
-    path:   System.get_env("FRONTENT_PATH")   || "/",
+    host:   frontend_host,
+    port:   frontend_port,
+    scheme: frontend_scheme,
+    path:   frontend_path,
   ],
   http: [
-    port: 3000
+    port: backend_port
   ],
   api: [
-    host:   System.get_env("BACKEND_HOST")   || "localhost",
-    port:   System.get_env("BACKEND_PORT")   || "3000" |> String.to_integer(),
-    scheme: System.get_env("BACKEND_SCHEME") || "http",
-    path:   System.get_env("BACKEND_PATH")   || "/api",
+    host:   backend_host,
+    port:   backend_port,
+    scheme: backend_scheme,
+    path:   backend_path,
+  ],
+  graphiql_url: "#{backend_scheme}://#{backend_host}:#{backend_port}#{backend_path}/graphql",
+  cors: [
+    origins: [
+      "#{frontend_scheme}://#{frontend_host}:#{frontend_port}",
+      "#{frontend_scheme}://#{frontend_host}:#{frontend_port}" |> String.replace(frontend_host, "localhost"),
+      "#{frontend_scheme}://#{frontend_host}:#{frontend_port}" |> String.replace(frontend_host, "127.0.0.1"),
+      "#{backend_scheme}://#{backend_host}:#{backend_port}",
+      "#{backend_scheme}://#{backend_host}:#{backend_port}" |> String.replace(backend_host, "localhost"),
+      "#{backend_scheme}://#{backend_host}:#{backend_port}" |> String.replace(backend_host, "127.0.0.1")
+    ],
+    allow_credentials: true,
+    max_age: 86400,
+    allow_methods: ["POST", "OPTIONS", "HEAD"],
+    allow_headers: ["Content-Type"],
+    log: [rejected: :error]
   ]
 
 if Mix.env() == "prod" do

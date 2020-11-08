@@ -82,7 +82,8 @@ defmodule Arkenston.MixProject do
       {:espec, "~> 1.8", only: :test},
       {:excoveralls, "~> 0.12", only: :test},
       {:uuid, "~> 1.1"},
-      {:memoize, "~> 1.3"}
+      {:memoize, "~> 1.3"},
+      {:corsica, "~> 1.1"}
     ]
   end
 

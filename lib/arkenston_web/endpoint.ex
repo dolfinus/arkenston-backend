@@ -22,5 +22,7 @@ defmodule ArkenstonWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
 
+  plug Corsica, Application.get_env(:arkenston, ArkenstonWeb.Endpoint)[:cors]
+
   plug ArkenstonWeb.Router
 end
