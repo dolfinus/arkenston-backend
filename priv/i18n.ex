@@ -7,7 +7,7 @@ defmodule Arkenston.I18n do
   Enum.each(locale_files, fn(path) ->
     case Regex.run(~r/.*(\w+)\.ya?ml$/iuU, path) do
       lang when not is_nil(lang) ->
-        locale(Enum.at(lang, 1), path)
+        locale(Enum.at(lang, 1) |> String.to_atom(), path)
     end
   end)
 
