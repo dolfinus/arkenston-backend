@@ -6,6 +6,7 @@ defmodule Arkenston.Helper.QueryHelper do
 
   @type query :: Ecto.Query.t
   @type queryable :: Ecto.Queryable.t | module
+  @type context :: map
   @type limit :: pos_integer
   @type offset :: pos_integer
   @type first :: pos_integer
@@ -257,15 +258,15 @@ defmodule Arkenston.Helper.QueryHelper do
         order_by: [desc: column]
 
   """
-  @spec generate_query(query :: queryable, opts :: query_opts | list, context :: map) :: queryable
+  @spec generate_query(query :: queryable, opts :: query_opts|list, context :: context) :: queryable
   def generate_query(query, opts \\ %{}, context \\ %{})
 
   def generate_query(query, opts, context) when is_list(opts) do
     generate_query(query, opts |> Enum.into(%{}), context)
   end
 
-  def generate_query(query, %{context: context} = opts, _context) when is_map(context) do
-    generate_query(query, opts |> Map.drop([:context]), context)
+  def generate_query(query, %{context: ctx} = opts, _context) when is_map(ctx) do
+    generate_query(query, opts |> Map.drop([:context]), ctx)
   end
 
   def generate_query(query, opts, context) do
