@@ -9,10 +9,34 @@ RUN \
   mix deps.compile --force
 
 COPY --chown=arkenston:arkenston priv/ ./priv/
+
+# Remove dialyzer PLTs
+RUN find ./priv -name *.plt -type f -delete || true
+RUN find ./priv -name *.plt.hash -type f -delete || true
+
 COPY --chown=arkenston:arkenston lib/  ./lib/
 COPY --chown=arkenston:arkenston rel/  ./rel/
 
 RUN mix distillery.release
+
+FROM alpine as pre-prod
+ENV MIX_ENV prod
+
+WORKDIR /opt/app
+
+COPY --from=prod /opt/app/_build/${MIX_ENV}/rel/arkenston/ ./
+
+# Remove release archive
+RUN rm -rf ./releases/*/*.tar.gz
+
+# Remove Windows-specific files
+RUN find ./releases -name win -type d -exec rm -rf \; || true
+RUN find ./ -name *.ps1 -type f -delete || true
+RUN find ./ -name *.bat -type f -delete || true
+
+# Remove files of other architectures
+RUN find ./releases -name sparc* -type d -exec rm -rf \; || true
+RUN find ./releases -name ppc* -type d -exec rm -rf \; || true
 
 FROM alpine
 ENV MIX_ENV prod
@@ -28,6 +52,6 @@ WORKDIR /opt/app
 COPY --chown=root:root entrypoint.prod.sh wait_for_postgres.sh ./
 RUN chmod +x ./entrypoint* ./wait_for_postgres.sh
 
-COPY --from=prod --chown=arkenston:arkenston /opt/app/_build/${MIX_ENV}/rel/arkenston ./
+COPY --from=pre-prod --chown=arkenston:arkenston /opt/app/ ./
 
 ENTRYPOINT ["./entrypoint.prod.sh"]

@@ -32,7 +32,7 @@ config :arkenston, ArkenstonWeb.Endpoint,
   page_size: 20,
   max_page_size: 5000,
   max_complexity: 5000,
-  render_errors: [view: ArkenstonWeb.ErrorView, accepts: ~w(html json)]
+  render_errors: [view: ArkenstonWeb.ErrorView, accepts: ~w(json)]
 
 # Configures Elixir's Logger
 config :logger, :console,

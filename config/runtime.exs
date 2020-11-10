@@ -22,6 +22,9 @@ backend_port   = System.get_env("BACKEND_PORT")   || "3000" |> String.to_integer
 backend_scheme = System.get_env("BACKEND_SCHEME") || "http"
 backend_path   = System.get_env("BACKEND_PATH")   || "/api"
 
+locales = ["en", "ru"]
+default_locale = System.get_env("BACKEND_LOCALE") || "en"
+
 # Configure your database
 config :arkenston, Arkenston.Repo,
   username: db_user,
@@ -64,6 +67,18 @@ config :arkenston, ArkenstonWeb.Endpoint,
     log: [rejected: :error]
   ]
 
+config :ex_cldr,
+  default_locale: default_locale,
+  default_backend: Linguist.Cldr
+
+config :linguist,
+  pluralization_key: :count
+
+config :linguist, Linguist.Cldr,
+  default_locale: default_locale,
+  locales: locales,
+  force_locale_download: Mix.env() == "prod"
+
 if Mix.env() == "prod" do
   secret_key_base =
     System.get_env("SECRET_KEY_BASE") ||
@@ -77,7 +92,4 @@ if Mix.env() == "prod" do
 
   config :arkenston, Arkenston.Guardian,
     secret_key: %{"k" => secret_key_base, "kty" => "oct"}
-
-  config :arkenston, Arkenston.I18n,
-    locale: System.get_env("BACKEND_LOCALE") || "en"
 end
