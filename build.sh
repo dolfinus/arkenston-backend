@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ENV="$1"
 shift
 COMMAND="$@"
