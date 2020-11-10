@@ -20,10 +20,6 @@ defmodule Arkenston.ReleaseTasks do
   def seed(_argv) do
     start_services()
 
-    create_storage()
-
-    run_migrations()
-
     run_seeds()
 
     stop_services()
