@@ -25,7 +25,7 @@ services:
       - ./.dialyzer_ignore.exs:/opt/app/.dialyzer_ignore.exs
       - ./erlang-history:/opt/app/.cache/erlang-history
     ports:
-      - 3001:3000
+      - 3001:3001
     env_file: .env.dev
     networks:
       - default
