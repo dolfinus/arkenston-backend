@@ -2,6 +2,7 @@ FROM dolfinus/arkenston-backend:base
 ENV MIX_ENV test
 
 COPY --chown=arkenston:arkenston config/config.exs config/$MIX_ENV.exs config/runtime.exs ./config/
+
 RUN \
   mix deps.get && \
   mix deps.compile --force && \
@@ -10,6 +11,6 @@ RUN \
 ENV ERL_AFLAGS="-kernel shell_history enabled"
 
 COPY coveralls.json ./
-COPY --chown=root:root entrypoint.test.sh wait_for_postgres.sh ./
+COPY --chown=arkenston:arkenston entrypoint.test.sh wait_for_postgres.sh ./
 RUN chmod +x ./entrypoint* ./wait_for_postgres.sh
 ENTRYPOINT ["./entrypoint.test.sh"]

@@ -5,13 +5,16 @@ RUN apk add --update --no-cache \
   postgresql-client \
   yaml-dev \
   tzdata \
-  make \
-  sudo
+  make
 
 RUN apk add --update --virtual build-dependencies build-base gcc
 
 RUN mkdir -p /opt/app && adduser -u 2000 -h /opt/app -s /bin/bash -D arkenston
 WORKDIR /opt/app
+
+RUN chown arkenston:arkenston -R /opt
+
+USER arkenston
 
 COPY --chown=arkenston:arkenston mix.* ./
 

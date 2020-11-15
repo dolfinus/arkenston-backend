@@ -49,7 +49,7 @@ RUN apk add --update --no-cache \
 RUN mkdir -p /opt/app && adduser -u 2000 -h /opt/app -s /bin/bash -D arkenston
 WORKDIR /opt/app
 
-COPY --chown=root:root entrypoint.prod.sh wait_for_postgres.sh ./
+COPY --chown=arkenston:arkenston entrypoint.prod.sh wait_for_postgres.sh ./
 RUN chmod +x ./entrypoint* ./wait_for_postgres.sh
 
 COPY --from=pre-prod --chown=arkenston:arkenston /opt/app/ ./
