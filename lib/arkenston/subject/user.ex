@@ -2,6 +2,8 @@ defmodule Arkenston.Subject.User do
   use Ecto.Schema
   import Ecto.Changeset
   import Arkenston.Schema
+
+  use Arkenston.Helper.StructHelper
   import EctoEnum
   defenum RoleEnum, user: 0, moderator: 1, admin: 2
 
