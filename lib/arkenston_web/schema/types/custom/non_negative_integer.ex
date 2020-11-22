@@ -10,7 +10,7 @@ defmodule ArkenstonWeb.Schema.Types.Custom.NonNegativeInteger do
     parse(&decode/1)
   end
 
-  @spec decode(Absinthe.Blueprint.Input.Integer.t()) :: {:ok, term()} | :error
+  @spec decode(Absinthe.Blueprint.Input.Integer.t()) :: {:ok, integer} | :error
   @spec decode(Absinthe.Blueprint.Input.Null.t()) :: {:ok, nil}
   defp decode(%Absinthe.Blueprint.Input.Integer{value: value}) do
     if value >= 0 do
