@@ -12,10 +12,23 @@ defmodule Arkenston.Helper.FieldsHelper do
   def prepare_fields(module, %{fields: fields}) do
     Enum.reduce(fields, module.__schema__(:primary_key), fn field, result ->
       case field do
-        value when is_atom(value) ->
+        value when is_atom(value) or is_binary(value) ->
+          field = field
+                  |> to_string()
+                  |> Macro.underscore()
+                  |> String.to_atom()
+
           field_id = :"#{value}_#{@id_name}"
 
-          new_fields = [field, field_id] |> Enum.filter(fn name ->
+          new_fields = [field, field_id]
+
+          new_fields = if Keyword.has_key?(module.__info__(:functions), :__trans__) and Trans.translatable?(module, field) do
+            new_fields ++ [:translations]
+          else
+            new_fields
+          end
+
+          new_fields = new_fields |> Enum.filter(fn name ->
             module.__schema__(:fields) |> Enum.member?(name)
           end)
 

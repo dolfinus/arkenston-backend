@@ -11,10 +11,14 @@ config :arkenston,
   ecto_repos: [Arkenston.Repo],
   users: [
     admin: [
-      name: "admin",
       role: "admin",
-      email: "admin@example.com",
       password: "12345678"
+    ]
+  ],
+  authors: [
+    admin: [
+      name: "admin",
+      email: "admin@example.com"
     ],
     format: [
       name: ~r/^[a-zA-Z0-9_\-\.]+$/,
@@ -65,6 +69,10 @@ config :arkenston, Arkenston.Guardian,
       :create_user,
       :create_moderator,
       :create_admin,
+      :create_user_with_existing_author,
+      :create_moderator_with_existing_author,
+      :create_admin_with_existing_author,
+      :change_self_author,
       :update_user,
       :update_moderator,
       :update_admin,
@@ -73,6 +81,10 @@ config :arkenston, Arkenston.Guardian,
       :change_moderator_password,
       :change_admin_password,
       :change_self_password,
+      :change_user_author,
+      :change_moderator_author,
+      :change_admin_author,
+      :change_self_author,
       :upgrade_user_to_moderator,
       :upgrade_user_to_admin,
       :upgrade_moderator_to_admin,
@@ -82,6 +94,19 @@ config :arkenston, Arkenston.Guardian,
       :delete_user,
       :delete_moderator,
       :delete_admin,
+      :delete_self
+    ],
+    author: [
+      :create_author,
+      :update_unassigned_author,
+      :update_user_author,
+      :update_moderator_author,
+      :update_admin_author,
+      :update_self,
+      :delete_unassigned_author,
+      :delete_user_author,
+      :delete_moderator_author,
+      :delete_admin_author,
       :delete_self
     ]
   }

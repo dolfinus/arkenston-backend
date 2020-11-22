@@ -1,21 +1,32 @@
 defmodule Arkenston.Helper.AuthHelper do
   @moduledoc false
 
+  alias Arkenston.Repo
   alias Arkenston.Subject
   alias Arkenston.Subject.User
 
   @spec login_with_email_pass(email :: String.t, password :: String.t) :: {:error, String.t} | {:ok, User.t}
   def login_with_email_pass(email, password) do
-    user = Subject.get_user_by(email: String.downcase(email))
+    author = Subject.get_author_by(email: String.downcase(email))
 
-    login_with_pass(user, password)
+    unless is_nil(author) do
+      author = author |> Repo.preload(:user)
+      login_with_pass(author.user, password)
+    else
+      login_with_pass(nil, password)
+    end
   end
 
   @spec login_with_name_pass(name :: String.t, password :: String.t) :: {:error, String.t} | {:ok, User.t}
   def login_with_name_pass(name, password) do
-    user = Subject.get_user_by(name: name)
+    author = Subject.get_author_by(name: name)
 
-    login_with_pass(user, password)
+    unless is_nil(author) do
+      author = author |> Repo.preload(:user)
+      login_with_pass(author.user, password)
+    else
+      login_with_pass(nil, password)
+    end
   end
 
   defp login_with_pass(%User{} = user, password) do

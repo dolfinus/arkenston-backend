@@ -4,19 +4,22 @@ defmodule Arkenston.Permissions do
   alias Arkenston.Subject.User
   alias Arkenston.Context
   alias Arkenston.Permissions.User, as: UserPermissions
+  alias Arkenston.Permissions.Author, as: AuthorPermissions
 
   @type permissions :: %{optional(atom) => [atom] | %{atom => integer()}}
 
   @spec permissions_for(user_or_context :: User.t | :anonymous | Context.t) :: permissions
   def permissions_for(%User{} = user) do
     %{
-      user: UserPermissions.permissions_for(user)
+      user: UserPermissions.permissions_for(user),
+      author: AuthorPermissions.permissions_for(user),
     }
   end
 
   def permissions_for(:anonymous) do
     %{
-      user: UserPermissions.permissions_for(:anonymous)
+      user: UserPermissions.permissions_for(:anonymous),
+      author: AuthorPermissions.permissions_for(:anonymous),
     }
   end
 
@@ -40,6 +43,18 @@ defmodule Arkenston.Permissions do
     case type do
       :user ->
         UserPermissions.check_permissions_for(operation, context, old_entity, new_entity)
+      :author ->
+        AuthorPermissions.check_permissions_for(operation, context, old_entity, new_entity)
+    end
+  end
+
+  @spec get_current_user(context :: Context.t) :: User.t | nil
+  def get_current_user(context) do
+    case context do
+    %{current_user: user} when not is_nil(user) ->
+      user
+    _ ->
+      nil
     end
   end
 end

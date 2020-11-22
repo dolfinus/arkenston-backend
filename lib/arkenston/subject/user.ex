@@ -4,15 +4,17 @@ defmodule Arkenston.Subject.User do
   import Arkenston.Schema
 
   use Arkenston.Helper.StructHelper
+
+  alias Arkenston.Subject.Author
+
   import EctoEnum
   defenum RoleEnum, user: 0, moderator: 1, admin: 2
 
   @type id :: Ecto.UUID.t
-  @type name :: String.t
   @type role :: RoleEnum.t
-  @type email :: String
   @type password :: String.t | nil
   @type deleted :: boolean
+  @type author :: Author.t | nil
   @type created_at :: DateTime.t
   @type created_by :: __MODULE__.t | nil
   @type updated_at :: DateTime.t
@@ -22,11 +24,10 @@ defmodule Arkenston.Subject.User do
 
   @type t :: %__MODULE__{
     id:         id,
-    name:       name,
     role:       role,
-    email:      email,
     password:   password,
     deleted:    deleted,
+    author:     author,
     created_at: created_at,
     created_by: created_by,
     updated_at: updated_at,
@@ -36,43 +37,33 @@ defmodule Arkenston.Subject.User do
   }
 
   audited_schema "users" do
-    field :name,          :string
     field :role,          RoleEnum
-    field :email,         :string
     field :password,      :string, virtual: true
     field :password_hash, :string
-  end
 
-  @config Application.get_env(:arkenston, :users)
-  @name_format  @config[:format][:name]
-  @email_format @config[:format][:email]
+    belongs_to :author, Author
+  end
 
   @doc false
   @spec create_changeset(attrs :: map) :: Ecto.Changeset.t
   def create_changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:name, :role, :email, :password, :note])
+    |> cast(attrs, [:author_id, :role, :password, :note])
     |> put_password_hash()
     |> put_role()
-    |> validate_required([:name, :role, :email, :password_hash])
-    |> validate_format(:name,  @name_format)
-    |> validate_format(:email, @email_format)
-    |> unique_constraint(:name,  name: :users_data_name_index)
-    |> unique_constraint(:email, name: :users_data_email_index)
+    |> validate_required([:author_id, :role, :password_hash])
+    |> unique_constraint(:author, name: :users_data_author_id_index)
   end
 
   @spec update_changeset(user :: t, attrs :: map) :: Ecto.Changeset.t
   @doc false
   def update_changeset(user, attrs \\ %{}) do
     user
-    |> cast(attrs, [:name, :role, :email, :password, :password_hash, :note])
+    |> cast(attrs, [:author_id, :role, :password, :password_hash, :note])
     |> put_password_hash()
     |> put_role()
-    |> validate_required([:name, :role, :email, :password_hash])
-    |> validate_format(:name,  @name_format)
-    |> validate_format(:email, @email_format)
-    |> unique_constraint(:name,  name: :users_data_name_index)
-    |> unique_constraint(:email, name: :users_data_email_index)
+    |> validate_required([:author_id, :role, :password_hash])
+    |> unique_constraint(:author, name: :users_data_author_id_index)
   end
 
   @doc false

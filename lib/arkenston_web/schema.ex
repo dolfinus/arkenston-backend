@@ -10,12 +10,14 @@ defmodule ArkenstonWeb.Schema do
 
   query do
     import_fields :user_queries
+    import_fields :author_queries
     import_fields :node_queries
   end
 
   mutation do
     import_fields :user_token_mutations
     import_fields :user_mutations
+    import_fields :author_mutations
   end
 
   def dataloader(ctx) do

@@ -1,29 +1,34 @@
 defmodule Arkenston.Resolver.UserResolverSpec do
-  import Arkenston.Factories.UserFactory
+  import Arkenston.Factories.MainFactory
   alias Arkenston.Subject
+  alias Arkenston.Repo
   import SubjectHelper
   use GraphqlHelper
   use ESpec, async: true
   import Indifferent.Sigils
 
-  @default_page_size Application.get_env(:arkenston, ArkenstonWeb.Endpoint)[:page_size]
-
-  let :author do
+  let :creator do
     user = build(:admin)
-    {:ok, result} = Subject.create_user(user)
+    author = build(:author)
 
-    %{user: user, id: result.id, access_token: auth(user, shared.conn)}
+    {:ok, result} = Subject.create_author(author)
+    {:ok, result} = Subject.create_user(user |> Map.put(:author_id, result.id))
+
+    result = result |> Repo.preload(:author)
+
+    %{user: result, id: result.id, access_token: auth(user, author, shared.conn)}
   end
 
   context "resolver", module: :resolver, query: true do
     context "subject", subject: true, user: true do
       describe "users" do
         it "without where clause return users list with pagination" do
-          %{user: creator, access_token: access_token} = author()
+          %{user: creator, access_token: access_token} = creator()
 
           users = build_list(3, :user)
           inserted_users = users |> Enum.map(fn (user) ->
-            create_response = create_user(input: prepare_user(user), access_token: access_token, conn: shared.conn)
+            author = build(:author)
+            create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
             ~i(create_response.result)
           end)
@@ -37,11 +42,12 @@ defmodule Arkenston.Resolver.UserResolverSpec do
         end
 
         it "with id returns list with specific user only" do
-          %{access_token: access_token} = author()
+          %{access_token: access_token} = creator()
 
           users = build_list(3, :user)
           inserted_users = users |> Enum.map(fn (user) ->
-            create_response = create_user(input: prepare_user(user), access_token: access_token, conn: shared.conn)
+            author = build(:author)
+            create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
             ~i(create_response.result)
           end)
@@ -57,11 +63,12 @@ defmodule Arkenston.Resolver.UserResolverSpec do
         end
 
         it "does not return deleted user" do
-          %{access_token: access_token} = author()
+          %{access_token: access_token} = creator()
 
           users = build_list(3, :user)
           inserted_users = users |> Enum.map(fn (user) ->
-            create_response = create_user(input: prepare_user(user), access_token: access_token, conn: shared.conn)
+            author = build(:author)
+            create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
             ~i(create_response.result)
           end)
@@ -81,11 +88,12 @@ defmodule Arkenston.Resolver.UserResolverSpec do
 
       describe "user" do
         it "with id returns specific user" do
-          %{access_token: access_token} = author()
+          %{access_token: access_token} = creator()
 
           users = build_list(3, :user)
           inserted_users = users |> Enum.map(fn (user) ->
-            create_response = create_user(input: prepare_user(user), access_token: access_token, conn: shared.conn)
+            author = build(:author)
+            create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
             ~i(create_response.result)
           end)
@@ -102,18 +110,20 @@ defmodule Arkenston.Resolver.UserResolverSpec do
 
         it "without id returns current user from context" do
           users = build_list(3, :user)
-          %{access_token: access_token} = author()
+          %{access_token: access_token} = creator()
 
           inserted_users = users |> Enum.map(fn (user) ->
-            create_response = create_user(input: prepare_user(user), access_token: access_token, conn: shared.conn)
+            author = build(:author)
+            create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
             ~i(create_response.result)
           end)
 
           user = ~i(users[0])
           inserted_user = ~i(inserted_users[0]) |> handle_user()
+          author = %{email: ~i(inserted_user.author.email)}
 
-          access_token = auth(user, shared.conn)
+          access_token = auth(user, author, shared.conn)
 
           get_one_response = get_user(access_token: access_token, conn: shared.conn)
           one_user = ~i(get_one_response.data.user) |> handle_user()
@@ -128,11 +138,12 @@ defmodule Arkenston.Resolver.UserResolverSpec do
         end
 
         it "does not return deleted user" do
-          %{access_token: access_token} = author()
+          %{access_token: access_token} = creator()
 
           users = build_list(3, :user)
           inserted_users = users |> Enum.map(fn (user) ->
-            create_response = create_user(input: prepare_user(user), access_token: access_token, conn: shared.conn)
+            author = build(:author)
+            create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
             ~i(create_response.result)
           end)

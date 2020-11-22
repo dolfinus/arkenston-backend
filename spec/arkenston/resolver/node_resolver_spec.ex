@@ -1,27 +1,35 @@
 defmodule Arkenston.Resolver.NodeResolverSpec do
-  import Arkenston.Factories.UserFactory
+  import Arkenston.Factories.MainFactory
   alias Arkenston.Subject
+  alias Arkenston.Repo
   import SubjectHelper
   import NodeHelper
   use GraphqlHelper
   use ESpec, async: true
   import Indifferent.Sigils
 
-  let :author do
+  let :creator do
     user = build(:admin)
-    {:ok, result} = Subject.create_user(user)
+    author = build(:author)
 
-    %{user: user, id: result.id, access_token: auth(user, shared.conn)}
+    {:ok, result} = Subject.create_author(author)
+    {:ok, result} = Subject.create_user(user |> Map.put(:author_id, result.id))
+
+    result = result |> Repo.preload(:author)
+
+    %{author: author, user: user, id: result.id, access_token: auth(user, author, shared.conn)}
   end
 
   context "resolver", module: :resolver, query: true do
     context "nodes", nodes: true, node: true do
       describe "node" do
-        it "with user id return user" do
-          %{access_token: access_token} = author()
+        it "return user for user id" do
+          %{access_token: access_token} = creator()
 
           user = build(:user)
-          create_response = create_user(input: prepare_user(user), access_token: access_token, conn: shared.conn)
+          author = build(:author)
+
+          create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
           created_user = ~i(create_response.result)
 
           node_response = get_node(id: ~i(created_user.id), access_token: access_token, conn: shared.conn)
@@ -29,6 +37,27 @@ defmodule Arkenston.Resolver.NodeResolverSpec do
           expect node_response |> not_to(be_nil())
           expect ~i(node_response.__typename) |> to(eq("User"))
           assert check_user(node_response, user)
+        end
+
+        it "return author for author id" do
+          %{access_token: access_token} = creator()
+
+          author = build(:author)
+
+          create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+          created_author = ~i(create_response.result)
+
+          node_response = get_node(id: ~i(created_author.id), access_token: access_token, conn: shared.conn)
+
+          expect node_response |> not_to(be_nil())
+          expect ~i(node_response.__typename) |> to(eq("Author"))
+          assert check_user(node_response, author)
+        end
+
+        it "return error for unknown id" do
+          node_response = get_node(id: Ecto.UUID.generate(), conn: shared.conn)
+
+          expect node_response |> to(be_nil())
         end
       end
     end

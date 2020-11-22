@@ -1,18 +1,19 @@
 alias Arkenston.Repo
 alias Arkenston.Subject
 alias Arkenston.Subject.User
-config = Application.get_env(:arkenston, :users)
+authors_config = Application.get_env(:arkenston, :authors)
+users_config = Application.get_env(:arkenston, :users)
 
-case Subject.get_user_by(name: config[:admin][:name], role: :admin) do
+author = Subject.get_author_by(name: authors_config[:admin][:name])
+case Subject.get_user_by(author_id: author.id, role: :admin) do
   nil ->
     Repo.insert!(
       %{User.create_changeset(
           %{
-            name: config[:admin][:name],
-            email: config[:admin][:email],
-            password: config[:admin][:password],
+            password: users_config[:admin][:password],
             role: :admin,
-            note: "Seed database with #{config[:admin][:name]} user"
+            author_id: author.id,
+            note: "Seed database with #{authors_config[:admin][:name]} user"
           }
         )
       | valid?: true}

@@ -8,7 +8,7 @@ defmodule Arkenston.Repo do
   alias Arkenston.Helper.QueryHelper
   alias Arkenston.Subject.User
 
-  @type author :: User.t | nil
+  @type user :: User.t | nil
   @type changeset :: Ecto.Changeset.t
   @type operation :: atom
 
@@ -17,22 +17,52 @@ defmodule Arkenston.Repo do
     Dataloader.Ecto.new(__MODULE__, query: &QueryHelper.generate_query/2, default_params: %{context: context})
   end
 
-  @spec audited(op :: operation, author :: author, args :: [any]) :: {:ok, any} | {:error, any}
-  defp audited(op, %User{} = author, args) do
-    if in_transaction?() do
-      query("set local \"arkenston.current_user\" = '#{author.id}';")
-      apply(__MODULE__, op, args)
-    else
-      case transaction(fn ->
-        query("set local \"arkenston.current_user\" = '#{author.id}';")
-        result = apply(__MODULE__, op, args)
+  @spec detect_rollback(callback :: term) :: {:ok, any} | no_return
+  def detect_rollback(result) do
+    case result do
+      {:error, error} ->
+        rollback(error)
+      :error ->
+        rollback(:unknown_error)
+      result ->
+        result
+    end
+  end
 
-        case result do
-          {:ok, result} ->
-            {:ok, result}
-          {:error, error} ->
-            rollback(error)
-        end
+  defmacro within_transaction(do: block) do
+    do_within_transaction(block)
+  end
+
+  defmacro within_transaction(input) do
+    do_within_transaction(quote do
+      unquote(input).()
+    end)
+  end
+
+  def do_within_transaction(block) do
+    quote do
+      result = unquote(block)
+
+      detect_rollback(result)
+    end
+  end
+
+  defmacro new_transaction(do: block) do
+    do_new_transaction(block)
+  end
+
+  defmacro new_transaction(input) do
+    do_new_transaction(quote do
+      unquote(input).()
+    end)
+  end
+
+  def do_new_transaction(input) do
+    quote do
+      case transaction(fn ->
+        result = unquote(input)
+
+        detect_rollback(result)
       end) do
         {:ok, {:ok, _} = success} ->
           success
@@ -49,15 +79,31 @@ defmodule Arkenston.Repo do
     end
   end
 
-  defp audited(op, _author, args) do
+  def transational(args \\ []) do
+    if in_transaction?() do
+      within_transaction(args)
+    else
+      new_transaction(args)
+    end
+  end
+
+  @spec audited(op :: operation, user :: user, args :: [any]) :: {:ok, any} | {:error, any}
+  defp audited(op, %User{} = user, args) do
+    transational(fn ->
+      query("set local \"arkenston.current_user\" = '#{user.id}';")
+      apply(__MODULE__, op, args)
+    end)
+  end
+
+  defp audited(op, _user, args) do
     apply(__MODULE__, op, args)
   end
 
   @spec audited_insert(changeset :: changeset, context :: map, opts :: [keyword]) :: {:ok, any} | {:error, any}
   def audited_insert(changeset, context \\ %{}, opts \\ []) do
-    author = get_author(context)
+    created_by = get_user(context)
 
-    audited(:insert, author, [changeset, opts])
+    audited(:insert, created_by, [changeset, opts])
   end
 
   @spec audited_insert!(changeset :: changeset, context :: map, opts :: [keyword]) :: any | no_return
@@ -73,9 +119,9 @@ defmodule Arkenston.Repo do
 
   @spec audited_update(changeset :: changeset, context :: map, opts :: [keyword]) :: {:ok, any} | {:error, any}
   def audited_update(changeset, context \\ %{}, opts \\ []) do
-    author = get_author(context)
+    updated_by = get_user(context)
 
-    audited(:update, author, [changeset, opts])
+    audited(:update, updated_by, [changeset, opts])
   end
 
   @spec audited_update!(changeset :: changeset, context :: map, opts :: [keyword]) :: any | no_return
@@ -89,12 +135,12 @@ defmodule Arkenston.Repo do
     end
   end
 
-  @spec get_author(context :: map) :: author
-  defp get_author(%{current_user: %User{} = user}) do
+  @spec get_user(context :: map) :: user
+  defp get_user(%{current_user: %User{} = user}) do
     user
   end
 
-  defp get_author(_) do
+  defp get_user(_) do
     nil
   end
 end

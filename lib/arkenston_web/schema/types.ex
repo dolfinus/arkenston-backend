@@ -13,9 +13,11 @@ defmodule ArkenstonWeb.Schema.Types do
       import_types ArkenstonWeb.Schema.Types.Payload
 
       import_types ArkenstonWeb.Schema.Query.User
+      import_types ArkenstonWeb.Schema.Query.Author
 
       import_types ArkenstonWeb.Schema.Mutation.UserToken
       import_types ArkenstonWeb.Schema.Mutation.User
+      import_types ArkenstonWeb.Schema.Mutation.Author
     end
   end
 end

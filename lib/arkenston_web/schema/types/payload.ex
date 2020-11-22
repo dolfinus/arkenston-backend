@@ -3,6 +3,9 @@ defmodule ArkenstonWeb.Schema.Types.Payload do
 
   import_types AbsintheErrorPayload.ValidationMessageTypes
   import_types ArkenstonWeb.Schema.Types.Payload.Boolean
+
+  import_types ArkenstonWeb.Schema.Types.Payload.Author
+
   import_types ArkenstonWeb.Schema.Types.Payload.User
   import_types ArkenstonWeb.Schema.Types.Payload.UserAccessToken
   import_types ArkenstonWeb.Schema.Types.Payload.UserToken

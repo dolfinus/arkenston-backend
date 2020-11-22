@@ -8,6 +8,8 @@ defmodule ArkenstonWeb.Schema.Types.Node do
     resolve_type fn
       %{role: _}, _ ->
         :user
+      %{name: _, email: _}, _ ->
+        :author
       _, _ ->
         nil
     end
@@ -18,6 +20,8 @@ defmodule ArkenstonWeb.Schema.Types.Node do
       resolve fn
         %{type: :user, id: id}, _ ->
           {:ok, Subject.get_user(id)}
+        %{type: :author, id: id}, _ ->
+          {:ok, Subject.get_author(id)}
           _, _ ->
             :error
       end

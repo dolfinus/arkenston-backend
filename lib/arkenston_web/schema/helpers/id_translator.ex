@@ -3,7 +3,7 @@ defmodule ArkenstonWeb.Schema.Helpers.IDTranslator do
   alias Arkenston.Helper.UUID
 
   @behaviour Absinthe.Relay.Node.IDTranslator
-  @possible_types [:user, :user_revision]
+  @possible_types [:user, :user_revision, :author, :author_revision]
 
   @spec to_global_id(type :: binary | atom, source_id :: binary, schema :: any) :: {:ok, binary}
   def to_global_id(_type, source_id, _schema) do

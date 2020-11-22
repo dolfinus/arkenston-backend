@@ -3,11 +3,12 @@ defmodule Arkenston.Mutator.UserTokenMutator do
   alias Arkenston.Helper.AuthHelper
   alias Arkenston.Permissions
   alias Arkenston.Subject.User
+  alias Arkenston.Subject.Author
 
   @type refresh_token :: %{refresh_token: String.t}
   @type access_token :: %{access_token: String.t}
 
-  @type login_args :: %{email: User.email, password: User.password} | %{name: User.name, password: User.password}
+  @type login_args :: %{email: Author.email, password: User.password} | %{name: Author.name, password: User.password}
   @type login_result :: %{refresh_token: String.t, access_token: String.t, user: User.t}
 
   @spec login(args :: login_args, info :: map) :: {:error, any} | {:ok, login_result}

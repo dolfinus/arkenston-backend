@@ -1,5 +1,5 @@
 default:
-  users:
+  authors:
     admin:
       first_name: Администратор
       middle_name: ''
