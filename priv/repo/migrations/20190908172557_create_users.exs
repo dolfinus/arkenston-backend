@@ -8,7 +8,6 @@ defmodule Arkenston.Repo.Migrations.CreateUsers do
       add :email,         :string,  null: false
       add :role,          :integer, null: false, default: 0
       add :password_hash, :string
-      add :deleted,       :boolean, null: false, default: false
     end
 
     create unique_index(:users_data, :name,  where: "deleted IS FALSE")

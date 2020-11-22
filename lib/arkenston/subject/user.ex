@@ -39,7 +39,6 @@ defmodule Arkenston.Subject.User do
     field :email,         :string
     field :password,      :string, virtual: true
     field :password_hash, :string
-    field :deleted,       :boolean
   end
 
   @config Application.get_env(:arkenston, :users)

@@ -35,6 +35,7 @@ defmodule Arkenston.Repo.Migration do
         unquote(block)
         add unquote(created_by), references(unquote(users_data_table), type: unquote(@id_type)), null: true
         add :created_at, :utc_datetime, null: false, default: {:fragment, "now()"}
+        add :deleted,    :boolean, null: false, default: false
       end
       create index(unquote(data_table), unquote(created_by))
       create index(unquote(data_table), :created_at)
@@ -47,6 +48,7 @@ defmodule Arkenston.Repo.Migration do
         add :version,    :integer, null: false, default: "1"
         add :created_at, :utc_datetime, null: false, default: {:fragment, "now()"}
         add :note,       :string
+        add :deleted,    :boolean, null: false, default: false
       end
 
       create index(unquote(audit_table), unquote(created_by))

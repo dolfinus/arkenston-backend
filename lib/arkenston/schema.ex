@@ -27,6 +27,7 @@ defmodule Arkenston.Schema do
         belongs_to :updated_by, User
         field      :note,       :string
         has_many   :revisions,  unquote(target).Revision
+        field      :deleted,    :boolean
       end
 
       defmodule Revision do
@@ -44,6 +45,7 @@ defmodule Arkenston.Schema do
           field :created_at,     :utc_datetime
           field :version,        :integer
           field :note,           :string
+          field :deleted,        :boolean
         end
       end
     end
