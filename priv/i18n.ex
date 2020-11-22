@@ -11,8 +11,12 @@ defmodule Arkenston.I18n do
     end
   end)
 
+  def locale() do
+    @locale |> to_string()
+  end
+
   def translate(path, bindings \\ [])
   def translate(path, bindings) do
-    t(@locale, path, bindings)
+    t(locale(), path, bindings)
   end
 end
