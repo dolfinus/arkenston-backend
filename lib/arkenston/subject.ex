@@ -14,11 +14,11 @@ defmodule Arkenston.Subject do
 
     author_filter = case opts do
       %{name: name, email: email} ->
-        QueryHelper.handle_filter(Author, %{name: name, email: email})
+        QueryHelper.handle_filter(Author, %{name: name, email: email, deleted: nil})
       %{name: name} ->
-        QueryHelper.handle_filter(Author, %{name: name})
+        QueryHelper.handle_filter(Author, %{name: name, deleted: nil})
       %{email: email} ->
-        QueryHelper.handle_filter(Author, %{email: email})
+        QueryHelper.handle_filter(Author, %{email: email, deleted: nil})
       _ ->
         nil
     end

@@ -126,7 +126,7 @@ defmodule SubjectHelper do
           cursor
           node {
             id
-            author {
+            author(deleted: $deleted) {
               id
               name
               email
@@ -185,7 +185,7 @@ defmodule SubjectHelper do
     query ($id: UUID4, $name: String, $email: String, $role: UserRole, $deleted: Boolean){
       user(id: $id, name: $name, email: $email, role: $role, deleted: $deleted) {
         id
-        author {
+        author(deleted: $deleted) {
           id
           name
           email
