@@ -538,7 +538,7 @@ defmodule SubjectHelper do
 
   def get_authors(args) when is_map(args) do
     %{conn: conn} = args
-    input = args |> Map.delete([:conn, :access_token])
+    input = args |> Map.drop([:conn, :access_token])
 
     get_all_response = case args do
       %{access_token: token} when not is_nil(token) ->
@@ -567,7 +567,7 @@ defmodule SubjectHelper do
 
   def get_users(args) when is_map(args) do
     %{conn: conn} = args
-    input = args |> Map.delete([:conn, :access_token])
+    input = args |> Map.drop([:conn, :access_token])
 
     get_all_response = case args do
       %{access_token: token} when not is_nil(token) ->
@@ -596,7 +596,7 @@ defmodule SubjectHelper do
 
   def get_author(args) when is_map(args) do
     %{conn: conn} = args
-    input = args |> Map.delete([:conn, :access_token])
+    input = args |> Map.drop([:conn, :access_token])
 
     get_one_response = case args do
       %{access_token: token} when not is_nil(token) ->
@@ -625,7 +625,7 @@ defmodule SubjectHelper do
 
   def get_user(args) when is_map(args) do
     %{conn: conn} = args
-    input = args |> Map.delete([:conn, :access_token])
+    input = args |> Map.drop([:conn, :access_token])
 
     get_one_response = case args do
       %{access_token: token} when not is_nil(token) ->
@@ -654,7 +654,7 @@ defmodule SubjectHelper do
 
   def create_author(args) when is_map(args) do
     %{conn: conn} = args
-    input = args |> Map.delete([:conn, :access_token])
+    input = args |> Map.drop([:conn, :access_token])
 
     create_response = case args do
       %{access_token: token} when not is_nil(token) ->
@@ -683,7 +683,7 @@ defmodule SubjectHelper do
 
   def create_user(args) when is_map(args) do
     %{conn: conn} = args
-    input = args |> Map.delete([:conn, :access_token])
+    input = args |> Map.drop([:conn, :access_token])
 
     create_response = case args do
       %{access_token: token} when not is_nil(token) ->
@@ -712,7 +712,7 @@ defmodule SubjectHelper do
 
   def update_author(args) when is_map(args) do
     %{conn: conn} = args
-    input = args |> Map.delete([:conn, :access_token])
+    input = args |> Map.drop([:conn, :access_token])
 
     update_response = case args do
       %{access_token: token} when not is_nil(token) ->
@@ -741,7 +741,7 @@ defmodule SubjectHelper do
 
   def update_user(args) when is_map(args) do
     %{conn: conn} = args
-    input = args |> Map.delete([:conn, :access_token])
+    input = args |> Map.drop([:conn, :access_token])
 
     update_response = case args do
       %{access_token: token} when not is_nil(token) ->
@@ -770,7 +770,7 @@ defmodule SubjectHelper do
 
   def change_user_author(args) when is_map(args) do
     %{conn: conn} = args
-    input = args |> Map.delete([:conn, :access_token])
+    input = args |> Map.drop([:conn, :access_token])
 
     change_user_author_response = case args do
       %{access_token: token} when not is_nil(token) ->
@@ -799,7 +799,7 @@ defmodule SubjectHelper do
 
   def delete_author(args) when is_map(args) do
     %{conn: conn} = args
-    input = args |> Map.delete([:conn, :access_token])
+    input = args |> Map.drop([:conn, :access_token])
 
     delete_response = case args do
       %{access_token: token} when not is_nil(token) ->
@@ -828,7 +828,7 @@ defmodule SubjectHelper do
 
   def delete_user(args) when is_map(args) do
     %{conn: conn} = args
-    input = args |> Map.delete([:conn, :access_token])
+    input = args |> Map.drop([:conn, :access_token])
 
     delete_response = case args do
       %{access_token: token} when not is_nil(token) ->
