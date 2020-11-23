@@ -440,10 +440,6 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           update_response = update_author(id: ~i(create_response.result.id), input: %{translations: [default, custom]}, access_token: access_token, conn: shared.conn)
 
-          expect ~i(update_response.result.first_name)  |> not_to(eq(author.first_name))
-          expect ~i(update_response.result.last_name)   |> not_to(eq(author.last_name))
-          expect ~i(update_response.result.middle_name) |> not_to(eq(author.middle_name))
-
           expect ~i(update_response.result.first_name)  |> to(eq(default.first_name))
           expect ~i(update_response.result.last_name)   |> to(eq(default.last_name))
           expect ~i(update_response.result.middle_name) |> to(eq(default.middle_name))
@@ -452,10 +448,6 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == default.locale end) |> Enum.at(0)
           custom_translation  = translations |> Enum.filter(fn item -> ~i(item.locale) == custom.locale  end) |> Enum.at(0)
-
-          expect ~i(default_translation.first_name)  |> not_to(eq(author.first_name))
-          expect ~i(default_translation.last_name)   |> not_to(eq(author.last_name))
-          expect ~i(default_translation.middle_name) |> not_to(eq(author.middle_name))
 
           expect ~i(default_translation.first_name)  |> to(eq(default.first_name))
           expect ~i(default_translation.last_name)   |> to(eq(default.last_name))
@@ -477,10 +469,6 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           update_response = update_author(id: ~i(create_response.result.id), input: %{translations: [default]}, access_token: access_token, conn: shared.conn)
 
-          expect ~i(update_response.result.first_name)  |> not_to(eq(author.first_name))
-          expect ~i(update_response.result.last_name)   |> not_to(eq(author.last_name))
-          expect ~i(update_response.result.middle_name) |> not_to(eq(author.middle_name))
-
           expect ~i(update_response.result.first_name)  |> to(eq(default.first_name))
           expect ~i(update_response.result.last_name)   |> to(eq(default.last_name))
           expect ~i(update_response.result.middle_name) |> to(eq(default.middle_name))
@@ -488,10 +476,6 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           translations = ~i(update_response.result.translations)
 
           default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == default.locale end) |> Enum.at(0)
-
-          expect ~i(default_translation.first_name)  |> not_to(eq(author.first_name))
-          expect ~i(default_translation.last_name)   |> not_to(eq(author.last_name))
-          expect ~i(default_translation.middle_name) |> not_to(eq(author.middle_name))
 
           expect ~i(default_translation.first_name)  |> to(eq(default.first_name))
           expect ~i(default_translation.last_name)   |> to(eq(default.last_name))

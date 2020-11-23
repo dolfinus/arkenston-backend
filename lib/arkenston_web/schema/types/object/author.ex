@@ -11,11 +11,11 @@ defmodule ArkenstonWeb.Schema.Types.Object.Author do
     field :middle_name, non_null(:string)
     field :last_name,   non_null(:string)
     field :deleted,     non_null(:boolean)
-  else
+  else # translation fields
     field :first_name,  non_null(:string)
     field :middle_name, non_null(:string)
     field :last_name,   non_null(:string)
-  after
+  after # resolvers
     connect_with(:user)
     translate(:first_name)
     translate(:middle_name)

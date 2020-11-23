@@ -9,6 +9,33 @@ defmodule Arkenston.Subject do
   alias Arkenston.Repo
   alias Arkenston.Subject.{User, Author}
 
+  defp filter_user_by_author(query, opts) do
+    opts = opts |> Enum.into(%{})
+
+    author_filter = case opts do
+      %{name: name, email: email} ->
+        QueryHelper.handle_filter(Author, %{name: name, email: email})
+      %{name: name} ->
+        QueryHelper.handle_filter(Author, %{name: name})
+      %{email: email} ->
+        QueryHelper.handle_filter(Author, %{email: email})
+      _ ->
+        nil
+    end
+
+    query = case author_filter do
+      nil ->
+        query
+      filter ->
+        from u in query,
+          join: a in subquery(filter), on: a.id == u.author_id
+    end
+
+    opts = opts |> Map.drop([:name, :email])
+
+    {query, opts}
+  end
+
   @doc """
   Returns the list of users.
 
@@ -21,7 +48,9 @@ defmodule Arkenston.Subject do
 
   @spec list_users(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: [User.t]
   def list_users(opts \\ %{}, context \\ %{}) do
-    User
+    {query, opts} = filter_user_by_author(User, opts)
+
+    query
     |> QueryHelper.generate_query(opts, context)
     |> Repo.all()
   end
@@ -57,7 +86,9 @@ defmodule Arkenston.Subject do
   """
   @spec get_user_by(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: User.t|nil
   def get_user_by(opts, context \\ %{}) do
-    User
+    {query, opts} = filter_user_by_author(User, opts)
+
+    query
     |> QueryHelper.generate_query(opts, context)
     |> QueryHelper.first()
     |> Repo.one()
@@ -97,7 +128,9 @@ defmodule Arkenston.Subject do
   """
   @spec get_user_by!(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: User.t|no_return
   def get_user_by!(opts, context \\ %{}) do
-    User
+    {query, opts} = filter_user_by_author(User, opts)
+
+    query
     |> QueryHelper.generate_query(opts, context)
     |> QueryHelper.first()
     |> Repo.one!()

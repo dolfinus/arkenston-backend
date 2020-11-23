@@ -9,7 +9,11 @@ defmodule Arkenston.Helper.FieldsHelper do
   @type fields_context :: %{fields: fields}
 
   @spec prepare_fields(module :: atom, context :: fields_context) :: fields
-  def prepare_fields(module, %{fields: fields}) do
+  def prepare_fields(%Ecto.Query{from: %Ecto.Query.FromExpr{source: {_table, module}}}, context) do
+    prepare_fields(module, context)
+  end
+
+  def prepare_fields(module, %{fields: fields}) when is_atom(module) do
     Enum.reduce(fields, module.__schema__(:primary_key), fn field, result ->
       case field do
         value when is_atom(value) or is_binary(value) ->

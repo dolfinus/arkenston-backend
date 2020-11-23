@@ -28,25 +28,43 @@ defmodule Arkenston.Helper.TranslationHelper do
     end |> nvl_field()
   end
 
-  def get_struct(%{__struct__: struct}) do
+  def get_module(%{__struct__: struct}) do
     struct
   end
 
-  def get_struct(input) do
+  def get_module(input) do
     input
   end
 
   def translation_fields(module_or_struct) do
-    get_struct(module_or_struct).__trans__(:fields)
+    with module when is_atom(module) <- get_module(module_or_struct),
+         true <- Kernel.function_exported?(module, :__trans__, 1) do
+          module.__trans__(:fields)
+    else
+      _ ->
+        []
+    end
   end
 
   def translation_container_name(module_or_struct) do
-    get_struct(module_or_struct).__trans__(:container)
+    with module when is_atom(module) <- get_module(module_or_struct),
+         true <- Kernel.function_exported?(module, :__trans__, 1) do
+          module.__trans__(:container)
+    else
+      _ ->
+        nil
+    end
   end
 
   def translation_container(object) do
-    container_name = translation_container_name(object)
-    object |> Map.get(container_name) || %{}
+    container = case translation_container_name(object) do
+      container_name when not is_nil(container_name) ->
+        object |> Map.get(container_name)
+      _ ->
+        nil
+    end
+
+    container || %{}
   end
 
   def translation_locales(object) do
@@ -205,19 +223,20 @@ defmodule Arkenston.Helper.TranslationHelper do
       def update_translations(changeset, attrs) do
         virtual_fields = TranslationHelper.translation_fields(__MODULE__)
 
-        translations = if Map.has_key?(attrs, :translations) do
-          new_translations = attrs |> Map.get(:translations) || %{}
+        translations = case Map.fetch(attrs, :translations) do
+          {:ok, value} ->
+            new_translations = value || %{}
 
-          virtual_fields_changes = attrs |> Map.take(virtual_fields)
+            virtual_fields_changes = attrs |> Map.take(virtual_fields)
 
-          TranslationHelper.merge_translations(new_translations, %{I18n.locale => virtual_fields_changes})
-        else
-          old_translations = changeset.translations || %{}
+            TranslationHelper.merge_translations(new_translations, %{I18n.locale => virtual_fields_changes})
+          :error ->
+            old_translations = changeset.translations || %{}
 
-          virtual_fields = TranslationHelper.translation_fields(__MODULE__)
-          virtual_fields_changes = attrs |> Map.take(virtual_fields)
+            virtual_fields = TranslationHelper.translation_fields(__MODULE__)
+            virtual_fields_changes = attrs |> Map.take(virtual_fields)
 
-          TranslationHelper.merge_translations(old_translations, %{I18n.locale => virtual_fields_changes})
+            TranslationHelper.merge_translations(old_translations, %{I18n.locale => virtual_fields_changes})
         end
 
         attrs

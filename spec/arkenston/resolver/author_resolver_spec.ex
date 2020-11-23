@@ -140,7 +140,7 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           all_authors = depaginate(~i(get_all_response.data.authors)) |> Enum.map(&handle_author/1)
 
           expect all_authors |> to(have inserted_author)
-      end
+        end
       end
 
       describe "author" do

@@ -98,27 +98,21 @@ defmodule Arkenston.Helper.QueryHelper do
   @spec handle_filter(query :: queryable, opts :: query_opts) :: queryable
   def handle_filter(query, opts \\ %{}) do
     {query, opts} = filter_deleted(query, opts)
-
     options = opts |> Enum.to_list()
 
-    {_filter_options, new_query} = Enum.map_reduce(options, query, fn (option, query) ->
+    options |> Enum.reduce(query, fn (option, query) ->
       case option do
-        {key, value} when is_nil(value) ->
-          new_query = from i in query,
-                        where: is_nil(field(i, ^key))
-          {nil, new_query}
-
+        {key, value} when is_nil(value)->
+          from i in query,
+            where: is_nil(field(i, ^key))
         {key, value} ->
-          new_query = from i in query,
-                        where: field(i, ^key) == ^value
-          {option, new_query}
+          from i in query,
+            where: field(i, ^key) == ^value
 
         _ ->
-          {option, query}
+          query
       end
     end)
-
-    new_query
   end
 
   @doc """
