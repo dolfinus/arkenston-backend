@@ -119,6 +119,28 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
 
           expect all_authors |> not_to(have inserted_author)
         end
+
+        it "returns deleted author if asked for" do
+          %{access_token: access_token} = creator()
+
+          authors = build_list(3, :author)
+          inserted_authors = authors |> Enum.map(fn (author) ->
+            create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            ~i(create_response.result)
+          end)
+
+          inserted_author_id = ~i(inserted_authors[0].id)
+          inserted_author = ~i(inserted_authors[0]) |> handle_author()
+
+          delete_author(id: inserted_author_id, access_token: access_token, conn: shared.conn)
+
+          get_all_response = get_authors(deleted: true, access_token: access_token, conn: shared.conn)
+
+          all_authors = depaginate(~i(get_all_response.data.authors)) |> Enum.map(&handle_author/1)
+
+          expect all_authors |> to(have inserted_author)
+      end
       end
 
       describe "author" do
@@ -230,6 +252,28 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           one_author = ~i(get_one_response.data.author)
 
           expect one_author |> to(be_nil())
+        end
+
+        it "returns deleted author if asked for" do
+          %{access_token: access_token} = creator()
+
+          authors = build_list(3, :author)
+          inserted_authors = authors |> Enum.map(fn (author) ->
+            create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            ~i(create_response.result)
+          end)
+
+          inserted_author_id = ~i(inserted_authors[0].id)
+          inserted_author = ~i(inserted_authors[0]) |> handle_author()
+
+          delete_author(id: inserted_author_id, access_token: access_token, conn: shared.conn)
+
+          get_one_response = get_author(id: inserted_author_id, deleted: true, access_token: access_token, conn: shared.conn)
+
+          one_author = ~i(get_one_response.data.author) |> handle_author()
+
+          expect one_author |> to(eq(inserted_author))
         end
       end
     end

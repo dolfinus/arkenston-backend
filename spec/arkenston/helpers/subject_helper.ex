@@ -72,8 +72,8 @@ defmodule SubjectHelper do
 
   def get_authors_query() do
     """
-    query ($id: UUID4, $name: String, $email: String, $first: PageSize, $last: PageSize, $after: String, $before: String){
-      authors(id: $id, name: $name, email: $email, first: $first, last: $last, after: $after, before: $before) {
+    query ($id: UUID4, $name: String, $email: String, $deleted: Boolean, $first: PageSize, $last: PageSize, $after: String, $before: String){
+      authors(id: $id, name: $name, email: $email, deleted: $deleted, first: $first, last: $last, after: $after, before: $before) {
         pageInfo {
           hasNextPage
           hasPreviousPage
@@ -114,8 +114,8 @@ defmodule SubjectHelper do
 
   def get_users_query() do
     """
-    query ($id: UUID4, $name: String, $email: String, $role: UserRole, $first: PageSize, $last: PageSize, $after: String, $before: String){
-      users(id: $id, name: $name, email: $email, role: $role, first: $first, last: $last, after: $after, before: $before) {
+    query ($id: UUID4, $name: String, $email: String, $role: UserRole, $deleted: Boolean, $first: PageSize, $last: PageSize, $after: String, $before: String){
+      users(id: $id, name: $name, email: $email, role: $role, deleted: $deleted, first: $first, last: $last, after: $after, before: $before) {
         pageInfo {
           hasNextPage
           hasPreviousPage
@@ -151,8 +151,8 @@ defmodule SubjectHelper do
 
   def get_author_query() do
     """
-    query ($id: UUID4, $name: String, $email: String){
-      author(id: $id, name: $name, email: $email) {
+    query ($id: UUID4, $name: String, $email: String, $deleted: Boolean){
+      author(id: $id, name: $name, email: $email, deleted: $deleted) {
         id
         name
         email
@@ -182,8 +182,8 @@ defmodule SubjectHelper do
 
   def get_user_query() do
     """
-    query ($id: UUID4, $name: String, $email: String, $role: UserRole){
-      user(id: $id, name: $name, email: $email, role: $role) {
+    query ($id: UUID4, $name: String, $email: String, $role: UserRole, $deleted: Boolean){
+      user(id: $id, name: $name, email: $email, role: $role, deleted: $deleted) {
         id
         author {
           id

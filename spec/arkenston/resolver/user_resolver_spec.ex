@@ -121,6 +121,29 @@ defmodule Arkenston.Resolver.UserResolverSpec do
 
           expect all_users |> not_to(have inserted_user)
         end
+
+        it "returns deleted user if asked for" do
+          %{access_token: access_token} = creator()
+
+          users = build_list(3, :user)
+          inserted_users = users |> Enum.map(fn (user) ->
+            author = build(:author)
+            create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            ~i(create_response.result)
+          end)
+
+          inserted_user_id = ~i(inserted_users[0].id)
+          inserted_user = ~i(inserted_users[0]) |> handle_user()
+
+          delete_user(id: inserted_user_id, access_token: access_token, conn: shared.conn)
+
+          get_all_response = get_users(deleted: true, access_token: access_token, conn: shared.conn)
+
+          all_users = depaginate(~i(get_all_response.data.users)) |> Enum.map(&handle_user/1)
+
+          expect all_users |> to(have inserted_user)
+        end
       end
 
       describe "user" do
@@ -196,6 +219,29 @@ defmodule Arkenston.Resolver.UserResolverSpec do
           one_user = ~i(get_one_response.data.user)
 
           expect one_user |> to(be_nil())
+        end
+
+        it "returns deleted user if asked for" do
+          %{access_token: access_token} = creator()
+
+          users = build_list(3, :user)
+          inserted_users = users |> Enum.map(fn (user) ->
+            author = build(:author)
+            create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            ~i(create_response.result)
+          end)
+
+          inserted_user_id = ~i(inserted_users[0].id)
+          inserted_user = ~i(inserted_users[0]) |> handle_user()
+
+          delete_user(id: inserted_user_id, access_token: access_token, conn: shared.conn)
+
+          get_one_response = get_user(id: inserted_user_id, deleted: true, access_token: access_token, conn: shared.conn)
+
+          one_user = ~i(get_one_response.data.user) |> handle_user()
+
+          expect one_user |> to(eq(inserted_user))
         end
       end
     end
