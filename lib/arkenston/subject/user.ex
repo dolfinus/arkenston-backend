@@ -117,7 +117,7 @@ defmodule Arkenston.Subject.User do
   end
 
   defp put_password_hash(%Ecto.Changeset{valid?: true, changes:
-    %{password: password}} = changeset) when not is_nil(password) do
+    %{password: password}} = changeset) when is_binary(password) and byte_size(password) != 0 do
     change(changeset, %{password_hash: calc_password_hash(password)})
   end
 

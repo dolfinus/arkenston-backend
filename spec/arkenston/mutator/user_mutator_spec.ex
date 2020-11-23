@@ -9,7 +9,9 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
   use ESpec, async: true
   import Indifferent.Sigils
 
-  @valid_attrs %{password: "not_null", role: :user}
+  let :valid_attrs do
+    %{password: "not_null", role: :user}
+  end
 
   let :creator_user do
     user = build(:user)
@@ -105,6 +107,17 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           invalid_user = build(:user)
           create_response = create_user(input: prepare_user(invalid_user), author: %{email: existing_author.email |> String.upcase()}, conn: shared.conn)
 
+          refute ~i(create_response.successful)
+        end
+
+        it "returns error for empty password", validation: true, valid: false do
+          user = build(:user)
+          author = build(:author)
+
+          create_response = create_user(input: prepare_user(user) |> Map.put(:password, ""), author: prepare_author(author), conn: shared.conn)
+          refute ~i(create_response.successful)
+
+          create_response = create_user(input: prepare_user(user) |> Map.put(:password, nil), author: prepare_author(author), conn: shared.conn)
           refute ~i(create_response.successful)
         end
 
@@ -213,17 +226,17 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           assert ~i(update_response.successful)
 
-          expected_user = prepare_user(user) |> Map.merge(@valid_attrs) |> Map.put(:author, author)
+          expected_user = prepare_user(user) |> Map.merge(valid_attrs()) |> Map.put(:author, author)
           assert check_user(~i(update_response.result), expected_user)
         end
 
         it "returns error for unknown id", validation: true, valid: false do
           %{access_token: access_token} = creator()
-          update_response = update_user(id: Ecto.UUID.generate(), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(id: Ecto.UUID.generate(), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           refute ~i(update_response.successful)
         end
@@ -235,11 +248,11 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_user(name: author.name |> String.upcase(), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(name: author.name |> String.upcase(), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           assert ~i(update_response.successful)
 
-          expected_user = prepare_user(user) |> Map.merge(@valid_attrs) |> Map.put(:author, author)
+          expected_user = prepare_user(user) |> Map.merge(valid_attrs()) |> Map.put(:author, author)
           assert check_user(~i(update_response.result), expected_user)
         end
 
@@ -248,7 +261,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           %{access_token: access_token} = creator()
 
-          update_response = update_user(name: author.name |> String.upcase(), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(name: author.name |> String.upcase(), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           refute ~i(update_response.successful)
         end
@@ -260,11 +273,11 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_user(email: author.email |> String.upcase(), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(email: author.email |> String.upcase(), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           assert ~i(update_response.successful)
 
-          expected_user = prepare_user(user) |> Map.merge(@valid_attrs) |> Map.put(:author, author)
+          expected_user = prepare_user(user) |> Map.merge(valid_attrs()) |> Map.put(:author, author)
           assert check_user(~i(update_response.result), expected_user)
         end
 
@@ -273,7 +286,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           %{access_token: access_token} = creator()
 
-          update_response = update_user(email: author.email |> String.upcase(), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(email: author.email |> String.upcase(), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           refute ~i(update_response.successful)
         end
@@ -286,10 +299,10 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
           access_token = auth(user, author, shared.conn)
-          update_response = update_user(input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           assert ~i(update_response.successful)
-          expected_user = prepare_user(user) |> Map.merge(@valid_attrs) |> Map.put(:author, author)
+          expected_user = prepare_user(user) |> Map.merge(valid_attrs()) |> Map.put(:author, author)
           assert check_user(~i(update_response.result), expected_user)
         end
 
@@ -300,7 +313,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(@valid_attrs), conn: shared.conn)
+          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(valid_attrs()), conn: shared.conn)
 
           refute ~i(update_response.successful)
         end
@@ -313,7 +326,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
           delete_user(id: ~i(create_response.result.id), access_token: access_token, conn: shared.conn)
 
-          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           refute ~i(update_response.successful)
         end
@@ -337,7 +350,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           %{access_token: access_token} = creator()
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
-          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           expect ~i(update_response.result.version) |> to(be(:>, ~i(create_response.result.version)))
         end
@@ -348,7 +361,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           %{access_token: access_token, id: updator_id} = creator()
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
-          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           expect ~i(update_response.result.updated_by.id) |> to(eq(updator_id))
         end
@@ -359,7 +372,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           %{access_token: access_token} = creator()
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
-          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           expect ~i(update_response.result.created_at) |> to(eq(~i(create_response.result.created_at)))
         end
@@ -370,7 +383,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           %{access_token: access_token} = creator()
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
-          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(id: ~i(create_response.result.id), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           expect ~i(create_response.result.updated_at) |> to(be_nil())
           expect ~i(update_response.result.updated_at) |> not_to(be_nil())
