@@ -62,6 +62,43 @@ defmodule Arkenston.Resolver.UserResolverSpec do
           expect all_users |> to(match_list [inserted_user])
         end
 
+
+        [:user, :moderator, :admin]
+        |> Enum.each(fn role ->
+          it "with #{role} role returns list with specific role only" do
+            %{access_token: access_token, user: creatr} = creator()
+
+            other_roles = [:user, :moderator, :admin] |> Enum.filter(fn item -> item != unquote(role) end)
+            other_roles |> Enum.each(fn other_role ->
+              users = build_list(3, other_role)
+              users |> Enum.map(fn (user) ->
+                author = build(:author)
+                create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
+              end)
+            end)
+
+            users = build_list(3, unquote(role))
+            inserted_users = users |> Enum.map(fn (user) ->
+              author = build(:author)
+              create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+              ~i(create_response.result)
+            end)
+
+            inserted_users = if unquote(role) == :admin do
+              (inserted_users ++ [creatr]) |> Enum.map(&handle_user/1)
+            else
+              inserted_users |> Enum.map(&handle_user/1)
+            end
+
+            get_all_response = get_users(role: "#{unquote(role)}" |> String.upcase(), access_token: access_token, conn: shared.conn)
+
+            all_users = depaginate(~i(get_all_response.data.users)) |> Enum.map(&handle_user/1)
+
+            expect all_users |> to(match_list inserted_users)
+          end
+        end)
+
         it "does not return deleted user" do
           %{access_token: access_token} = creator()
 
@@ -108,7 +145,8 @@ defmodule Arkenston.Resolver.UserResolverSpec do
           expect one_user |> to(eq inserted_user)
         end
 
-        it "without id returns current user from context" do
+
+        it "without input returns current user from context" do
           users = build_list(3, :user)
           %{access_token: access_token} = creator()
 
@@ -131,9 +169,10 @@ defmodule Arkenston.Resolver.UserResolverSpec do
           expect one_user |> to(eq inserted_user)
         end
 
-        it "without id and context returns error" do
+        it "without input and context returns error" do
           get_one_response = get_user(conn: shared.conn)
 
+          expect ~i(get_one_response.data.user) |> to(be_nil())
           expect ~i(get_one_response.errors) |> not_to(be_nil())
         end
 
