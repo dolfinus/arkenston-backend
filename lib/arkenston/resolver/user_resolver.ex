@@ -9,20 +9,11 @@ defmodule Arkenston.Resolver.UserResolver do
   @type params :: %{context: context}
 
   @spec all(where :: where, params :: params) :: {:ok, [User.t]}
-  def all(where \\ %{}, params \\ %{context: %{}})
   def all(where, %{context: context}) do
     {:ok, Subject.list_users(where, context)}
   end
-  def all(_args, _params) do
-    {:ok, []}
-  end
 
   @spec one(where:: where, params :: params) :: {:ok, User.t | nil}
-  def one(where \\ %{}, params \\ %{context: %{}})
-  def one(%{id: id}, %{context: context}) when not is_nil(id) do
-    {:ok, Subject.get_user(id, context)}
-  end
-
   def one(where, %{context: context}) when (is_map(where) and map_size(where) != 0) or (is_list(where) and length(where) != 0) do
     {:ok, Subject.get_user_by(where, context)}
   end

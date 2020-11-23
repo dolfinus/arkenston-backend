@@ -60,6 +60,44 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           expect all_authors |> to(match_list [inserted_author])
         end
 
+        it "with name returns list with specific author only" do
+          %{access_token: access_token} = creator()
+
+          authors = build_list(3, :author)
+          inserted_authors = authors |> Enum.map(fn (author) ->
+            create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            ~i(create_response.result)
+          end)
+
+          inserted_author = ~i(inserted_authors[0]) |> handle_author()
+
+          get_all_response = get_authors(name: ~i(inserted_author.name), access_token: access_token, conn: shared.conn)
+
+          all_authors = depaginate(~i(get_all_response.data.authors)) |> Enum.map(&handle_author/1)
+
+          expect all_authors |> to(match_list [inserted_author])
+        end
+
+        it "with email returns list with specific author only" do
+          %{access_token: access_token} = creator()
+
+          authors = build_list(3, :author)
+          inserted_authors = authors |> Enum.map(fn (author) ->
+            create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            ~i(create_response.result)
+          end)
+
+          inserted_author = ~i(inserted_authors[0]) |> handle_author()
+
+          get_all_response = get_authors(email: ~i(inserted_author.email), access_token: access_token, conn: shared.conn)
+
+          all_authors = depaginate(~i(get_all_response.data.authors)) |> Enum.map(&handle_author/1)
+
+          expect all_authors |> to(match_list [inserted_author])
+        end
+
         it "does not return deleted author" do
           %{access_token: access_token} = creator()
 
@@ -104,7 +142,45 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           expect one_author |> to(eq inserted_author)
         end
 
-        it "without id returns current author from context" do
+        it "with name returns specific author" do
+          %{access_token: access_token} = creator()
+
+          authors = build_list(3, :author)
+          inserted_authors = authors |> Enum.map(fn (author) ->
+            create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            ~i(create_response.result)
+          end)
+
+          inserted_author = ~i(inserted_authors[0]) |> handle_author()
+
+          get_one_response = get_author(name: ~i(inserted_author.name), access_token: access_token, conn: shared.conn)
+
+          one_author = ~i(get_one_response.data.author) |> handle_author()
+
+          expect one_author |> to(eq inserted_author)
+        end
+
+        it "with email returns specific author" do
+          %{access_token: access_token} = creator()
+
+          authors = build_list(3, :author)
+          inserted_authors = authors |> Enum.map(fn (author) ->
+            create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            ~i(create_response.result)
+          end)
+
+          inserted_author = ~i(inserted_authors[0]) |> handle_author()
+
+          get_one_response = get_author(email: ~i(inserted_author.email), access_token: access_token, conn: shared.conn)
+
+          one_author = ~i(get_one_response.data.author) |> handle_author()
+
+          expect one_author |> to(eq inserted_author)
+        end
+
+        it "without input returns current author from context" do
           %{access_token: access_token} = creator()
 
           users = build_list(3, :user)
@@ -128,9 +204,10 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           expect one_author |> to(eq inserted_author)
         end
 
-        it "without id and context returns error" do
+        it "without input and context returns error" do
           get_one_response = get_author(conn: shared.conn)
 
+          expect ~i(get_one_response.data.author) |> to(be_nil())
           expect ~i(get_one_response.errors) |> not_to(be_nil())
         end
 
