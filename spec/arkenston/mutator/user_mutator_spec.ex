@@ -5,7 +5,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
   import SubjectHelper
   use GraphqlHelper
   import Faker.Internet, only: [slug: 0, email: 0]
-  import Faker.Lorem, only: [word: 0, sentence: 0]
+  import Faker.Lorem, only: [word: 0, sentence: 0, characters: 1]
   use ESpec, async: true
   import Indifferent.Sigils
 
@@ -118,6 +118,17 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           refute ~i(create_response.successful)
 
           create_response = create_user(input: prepare_user(user) |> Map.put(:password, nil), author: prepare_author(author), conn: shared.conn)
+          refute ~i(create_response.successful)
+        end
+
+        it "returns error for too short password", validation: true, valid: false do
+          user = build(:user)
+          author = build(:author)
+
+          create_response = create_user(input: prepare_user(user) |> Map.put(:password, characters(1) |> to_string()), author: prepare_author(author), conn: shared.conn)
+          refute ~i(create_response.successful)
+
+          create_response = create_user(input: prepare_user(user) |> Map.put(:password, characters(5) |> to_string()), author: prepare_author(author), conn: shared.conn)
           refute ~i(create_response.successful)
         end
 
@@ -291,6 +302,20 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           refute ~i(update_response.successful)
         end
 
+        it "returns error for too short password", validation: true, valid: false do
+          user = build(:user)
+          author = build(:author)
+
+          %{access_token: access_token} = creator()
+          create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+          update_response = update_user(id: ~i(create_response.result.id), input: %{password: characters(1) |> to_string()}, access_token: access_token, conn: shared.conn)
+          refute ~i(update_response.successful)
+
+          update_response = update_user(id: ~i(create_response.result.id), input: %{password: characters(5) |> to_string()}, access_token: access_token, conn: shared.conn)
+          refute ~i(update_response.successful)
+        end
+
         it "returns success for current user", validation: true, valid: true do
           user = build(:user)
           author = build(:author)
@@ -441,7 +466,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
             %{access_token: access_token} = creator()
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            password = word()
+            password = characters(6) |> to_string()
             access_token = auth(user, author, shared.conn)
             update_response = update_user(id: ~i(create_response.result.id), input: %{password: password}, access_token: access_token, conn: shared.conn)
 
@@ -462,7 +487,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
               %{access_token: access_token} = creator()
               create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-              password = word()
+              password = characters(6) |> to_string()
               %{access_token: access_token} = unquote(:"creator_#{role}")()
               update_response = update_user(id: ~i(create_response.result.id), input: %{password: password}, access_token: access_token, conn: shared.conn)
 

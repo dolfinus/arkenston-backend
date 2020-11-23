@@ -44,6 +44,9 @@ defmodule Arkenston.Subject.User do
     belongs_to :author, Author
   end
 
+  @config Application.get_env(:arkenston, :users)
+  @password_length @config[:length][:password]
+
   @doc false
   @spec create_changeset(attrs :: map) :: Ecto.Changeset.t
   def create_changeset(attrs) do
@@ -117,8 +120,13 @@ defmodule Arkenston.Subject.User do
   end
 
   defp put_password_hash(%Ecto.Changeset{valid?: true, changes:
-    %{password: password}} = changeset) when is_binary(password) and byte_size(password) != 0 do
+    %{password: password}} = changeset) when is_binary(password) and byte_size(password) >= @password_length do
     change(changeset, %{password_hash: calc_password_hash(password)})
+  end
+
+  defp put_password_hash(%Ecto.Changeset{valid?: true, changes:
+    %{password: password}} = changeset) when is_binary(password) and byte_size(password) > 0 do
+    add_error(changeset, :password, "too short")
   end
 
   defp put_password_hash(changeset), do: changeset

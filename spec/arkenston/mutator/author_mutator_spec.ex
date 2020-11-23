@@ -28,7 +28,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
   end
 
   let :translation_with_unknown_locale do
-    %{locale: characters(2), first_name: first_name(), last_name: last_name(), middle_name: first_name()}
+    %{locale: characters(2) |> to_string(), first_name: first_name(), last_name: last_name(), middle_name: first_name()}
   end
 
   let :creator_user do

@@ -35,7 +35,7 @@ defmodule Arkenston.Mutator.AuthorMutator do
         with :ok <- Permissions.check_permissions_for(:author, :update, context, author, attrs),
             {:ok, _author} <- author |> Subject.update_author(attrs, context) do
               {:ok, Subject.get_author(author.id)}
-          end
+        end
       end
     end) do
       {:ok, result} ->
@@ -43,7 +43,7 @@ defmodule Arkenston.Mutator.AuthorMutator do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:ok, changeset}
       error ->
-          error
+        error
     end
   end
 
@@ -73,7 +73,7 @@ defmodule Arkenston.Mutator.AuthorMutator do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:ok, changeset}
       error ->
-          error
+        error
     end
   end
 

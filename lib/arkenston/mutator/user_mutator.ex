@@ -45,7 +45,7 @@ defmodule Arkenston.Mutator.UserMutator do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:ok, changeset}
       error ->
-          error
+        error
     end
   end
 
@@ -71,7 +71,7 @@ defmodule Arkenston.Mutator.UserMutator do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:ok, changeset}
       error ->
-          error
+        error
     end
   end
 
@@ -106,11 +106,15 @@ defmodule Arkenston.Mutator.UserMutator do
                 {:ok, _user} <- user |> Subject.delete_user(attrs, context),
                 {:ok, _user} <- user.author |> Subject.delete_author(attrs, context) do
                   {:ok, true}
+            else
+              error -> error
             end
           else
             with :ok <- Permissions.check_permissions_for(:user, :delete, context, user, attrs),
                 {:ok, _user} <- user |> Subject.delete_user(attrs, context) do
                   {:ok, true}
+            else
+              error -> error
             end
           end
       end
@@ -120,7 +124,7 @@ defmodule Arkenston.Mutator.UserMutator do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:ok, changeset}
       error ->
-          error
+        error
     end
   end
 

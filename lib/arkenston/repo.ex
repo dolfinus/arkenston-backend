@@ -71,7 +71,7 @@ defmodule Arkenston.Repo do
           {:ok, success}
 
         {:error, {:error, _} = error} ->
-          {:error, error}
+          error
 
         {:error, error} ->
           {:error, error}

@@ -13,6 +13,9 @@ config :arkenston,
     admin: [
       role: "admin",
       password: "12345678"
+    ],
+    length: [
+      password: 6
     ]
   ],
   authors: [
