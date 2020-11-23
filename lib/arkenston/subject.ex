@@ -9,31 +9,43 @@ defmodule Arkenston.Subject do
   alias Arkenston.Repo
   alias Arkenston.Subject.{User, Author}
 
+  defp filter_author(query, opts) do
+    opts = opts |> Enum.into(%{})
+
+    new_query = case opts do
+      %{name: name, email: email} ->
+        QueryHelper.handle_filter(query, opts |> Map.merge(%{name: {:lower, name}, email: {:lower, email}}))
+      %{name: name} ->
+        QueryHelper.handle_filter(query, opts |> Map.merge(%{name: {:lower, name}}))
+      %{email: email} ->
+        QueryHelper.handle_filter(query, opts |> Map.merge(%{email: {:lower, email}}))
+      _ ->
+        query
+    end
+
+    new_opts = opts |> Map.drop([:name, :email])
+
+    {new_query, new_opts}
+  end
+
   defp filter_user_by_author(query, opts) do
     opts = opts |> Enum.into(%{})
 
-    author_filter = case opts do
-      %{name: name, email: email} ->
-        QueryHelper.handle_filter(Author, %{name: name, email: email, deleted: nil})
-      %{name: name} ->
-        QueryHelper.handle_filter(Author, %{name: name, deleted: nil})
-      %{email: email} ->
-        QueryHelper.handle_filter(Author, %{email: email, deleted: nil})
-      _ ->
-        nil
-    end
+    {author_filter, _} = filter_author(Author, opts |> Map.take([:name, :email]) |> Map.put(:deleted, nil))
 
-    query = case author_filter do
-      nil ->
+    new_query = case author_filter do
+      value when is_atom(value) ->
         query
       filter ->
+        filter = from a in filter,
+                  select: a.id
         from u in query,
           join: a in subquery(filter), on: a.id == u.author_id
     end
 
-    opts = opts |> Map.drop([:name, :email])
+    new_opts = opts |> Map.drop([:name, :email])
 
-    {query, opts}
+    {new_query, new_opts}
   end
 
   @doc """
@@ -67,7 +79,9 @@ defmodule Arkenston.Subject do
 
   @spec list_authors(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: [Author.t]
   def list_authors(opts \\ %{}, context \\ %{}) do
-    Author
+    {query, opts} = filter_author(Author, opts)
+
+    query
     |> QueryHelper.generate_query(opts, context)
     |> Repo.all()
   end
@@ -108,7 +122,9 @@ defmodule Arkenston.Subject do
   """
   @spec get_author_by(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: Author.t|nil
   def get_author_by(opts, context \\ %{}) do
-    Author
+    {query, opts} = filter_author(Author, opts)
+
+    query
     |> QueryHelper.generate_query(opts, context)
     |> QueryHelper.first()
     |> Repo.one()
@@ -150,7 +166,9 @@ defmodule Arkenston.Subject do
   """
   @spec get_author_by!(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: Author.t|no_return
   def get_author_by!(opts, context \\ %{}) do
-    Author
+    {query, opts} = filter_author(Author, opts)
+
+    query
     |> QueryHelper.generate_query(opts, context)
     |> QueryHelper.first()
     |> Repo.one!()

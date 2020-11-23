@@ -4,7 +4,7 @@ defmodule Arkenston.Repo.Migrations.AlterUsers do
 
   @id_type Application.get_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:type]
 
-  def up do
+  def change do
     alter_audit_table :users do
       add_if_not_exists :author_id, references(:authors_data, type: unquote(@id_type)), null: false
     end

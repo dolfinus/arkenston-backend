@@ -14,7 +14,8 @@ defmodule Arkenston.Helper.QueryHelper do
   @type count :: pos_integer
   @type order :: :desc|:asc
 
-  @type filter_opt :: %{optional(atom) => atom|number|String.t|map}
+  @type filter_arg :: atom|number|String.t|map
+  @type filter_opt :: %{optional(atom) => filter_arg|{atom,filter_arg}}
   @type deleted_opt :: %{deleted: boolean|nil}
   @type order_opt :: %{order: keyword(order)|%{optional(atom) => order}}
   @type pagination_opt :: %{optional(:first) => first, optional(:last) => last, optional(:count) => count}
@@ -102,13 +103,15 @@ defmodule Arkenston.Helper.QueryHelper do
 
     options |> Enum.reduce(query, fn (option, query) ->
       case option do
+        {key, {:lower, value}} ->
+          from i in query,
+            where: fragment("lower(?)", field(i, ^key)) == fragment("lower(?)", ^value)
         {key, value} when is_nil(value)->
           from i in query,
             where: is_nil(field(i, ^key))
         {key, value} ->
           from i in query,
             where: field(i, ^key) == ^value
-
         _ ->
           query
       end

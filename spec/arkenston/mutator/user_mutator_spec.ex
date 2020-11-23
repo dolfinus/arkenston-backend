@@ -92,7 +92,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           create_user(input: prepare_user(existing_user), author: prepare_author(existing_author), conn: shared.conn)
 
           invalid_user = build(:user)
-          create_response = create_user(input: prepare_user(invalid_user), author: %{name: existing_author.name}, conn: shared.conn)
+          create_response = create_user(input: prepare_user(invalid_user), author: %{name: existing_author.name |> String.upcase()}, conn: shared.conn)
 
           refute ~i(create_response.successful)
         end
@@ -103,7 +103,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           create_user(input: prepare_user(existing_user), author: prepare_author(existing_author), conn: shared.conn)
 
           invalid_user = build(:user)
-          create_response = create_user(input: prepare_user(invalid_user), author: %{email: existing_author.email}, conn: shared.conn)
+          create_response = create_user(input: prepare_user(invalid_user), author: %{email: existing_author.email |> String.upcase()}, conn: shared.conn)
 
           refute ~i(create_response.successful)
         end
@@ -235,7 +235,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_user(name: author.name, input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(name: author.name |> String.upcase(), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
 
           assert ~i(update_response.successful)
 
@@ -248,7 +248,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           %{access_token: access_token} = creator()
 
-          update_response = update_user(name: author.name, input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(name: author.name |> String.upcase(), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
 
           refute ~i(update_response.successful)
         end
@@ -260,7 +260,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_user(email: author.email, input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(email: author.email |> String.upcase(), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
 
           assert ~i(update_response.successful)
 
@@ -273,7 +273,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           %{access_token: access_token} = creator()
 
-          update_response = update_user(email: author.email, input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
+          update_response = update_user(email: author.email |> String.upcase(), input: prepare_user(@valid_attrs), access_token: access_token, conn: shared.conn)
 
           refute ~i(update_response.successful)
         end
@@ -604,7 +604,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          change_user_author_response = change_user_author(name: existing_author.name, author: %{id: ~i(create_response.result.id)}, access_token: access_token, conn: shared.conn)
+          change_user_author_response = change_user_author(name: existing_author.name |> String.upcase(), author: %{id: ~i(create_response.result.id)}, access_token: access_token, conn: shared.conn)
 
           assert ~i(change_user_author_response.successful)
           assert check_author(~i(change_user_author_response.result.author), ~i(create_response.result))
@@ -678,7 +678,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          change_user_author_response = change_user_author(id: ~i(create_user_response.result.id), author: %{name: author.name}, access_token: access_token, conn: shared.conn)
+          change_user_author_response = change_user_author(id: ~i(create_user_response.result.id), author: %{name: author.name |> String.upcase()}, access_token: access_token, conn: shared.conn)
 
           assert ~i(change_user_author_response.successful)
           assert check_author(~i(change_user_author_response.result.author), ~i(create_response.result))
@@ -710,7 +710,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          change_user_author_response = change_user_author(id: ~i(create_response.result.id), author: %{name: existing_author.name}, access_token: access_token, conn: shared.conn)
+          change_user_author_response = change_user_author(id: ~i(create_response.result.id), author: %{name: existing_author.name |> String.upcase()}, access_token: access_token, conn: shared.conn)
 
           refute ~i(change_user_author_response.successful)
         end
@@ -726,7 +726,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          change_user_author_response = change_user_author(id: ~i(create_user_response.result.id), author: %{email: author.email}, access_token: access_token, conn: shared.conn)
+          change_user_author_response = change_user_author(id: ~i(create_user_response.result.id), author: %{email: author.email |> String.upcase()}, access_token: access_token, conn: shared.conn)
 
           assert ~i(change_user_author_response.successful)
           assert check_author(~i(change_user_author_response.result.author), ~i(create_response.result))
@@ -758,7 +758,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          change_user_author_response = change_user_author(id: ~i(create_response.result.id), author: %{email: existing_author.email}, access_token: access_token, conn: shared.conn)
+          change_user_author_response = change_user_author(id: ~i(create_response.result.id), author: %{email: existing_author.email |> String.upcase()}, access_token: access_token, conn: shared.conn)
 
           refute ~i(change_user_author_response.successful)
         end
@@ -844,7 +844,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           %{access_token: access_token} = creator()
           create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
-          delete_response = delete_user(name: author.name, access_token: access_token, conn: shared.conn)
+          delete_response = delete_user(name: author.name |> String.upcase(), access_token: access_token, conn: shared.conn)
 
           assert ~i(delete_response.successful)
           expect ~i(delete_response.result) |> to(be_nil())
@@ -865,7 +865,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           %{access_token: access_token} = creator()
           create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
-          delete_response = delete_user(email: author.email, access_token: access_token, conn: shared.conn)
+          delete_response = delete_user(email: author.email |> String.upcase(), access_token: access_token, conn: shared.conn)
 
           assert ~i(delete_response.successful)
           expect ~i(delete_response.result) |> to(be_nil())

@@ -68,6 +68,8 @@ defmodule Arkenston.Subject.Author do
 
     %__MODULE__{}
     |> cast(attrs, [:name, :email, :translations, :note])
+    |> put_lowercase_name()
+    |> put_lowercase_email()
     |> validate_required([:name, :email])
     |> validate_format(:name,  @name_format)
     |> validate_format(:email,  @email_format)
@@ -82,6 +84,8 @@ defmodule Arkenston.Subject.Author do
 
     user
     |> cast(attrs, [:name, :email, :translations, :note])
+    |> put_lowercase_name()
+    |> put_lowercase_email()
     |> validate_required([:name, :email])
     |> validate_format(:name,  @name_format)
     |> validate_format(:email,  @email_format)
@@ -96,4 +100,18 @@ defmodule Arkenston.Subject.Author do
     |> update_changeset(attrs)
     |> change([deleted: true])
   end
+
+  defp put_lowercase_name(%Ecto.Changeset{valid?: true, changes:
+    %{name: name}} = changeset) when is_binary(name) do
+    change(changeset, %{name: name |> String.downcase()})
+  end
+
+  defp put_lowercase_name(changeset), do: changeset
+
+  defp put_lowercase_email(%Ecto.Changeset{valid?: true, changes:
+    %{email: email}} = changeset) when is_binary(email) do
+    change(changeset, %{email: email |> String.downcase()})
+  end
+
+  defp put_lowercase_email(changeset), do: changeset
 end

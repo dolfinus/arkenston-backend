@@ -13,6 +13,7 @@ defmodule Arkenston.Mutator.UserTokenMutatorSpec do
           author = build(:author)
           create_user(input: prepare_user(user), author: prepare_author(author), conn: shared.conn)
 
+          author = author |> Map.put(:email, author.email |> String.upcase())
           auth_response = auth_by_email(user, author, shared.conn)
 
           assert ~i(auth_response.successful)
@@ -25,6 +26,7 @@ defmodule Arkenston.Mutator.UserTokenMutatorSpec do
           author = build(:author)
           create_user(input: prepare_user(user), author: prepare_author(author), conn: shared.conn)
 
+          author = author |> Map.put(:name, author.name |> String.upcase())
           auth_response = auth_by_name(user, author, shared.conn)
 
           assert ~i(auth_response.successful)

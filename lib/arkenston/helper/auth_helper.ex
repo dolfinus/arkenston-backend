@@ -7,7 +7,7 @@ defmodule Arkenston.Helper.AuthHelper do
 
   @spec login_with_email_pass(email :: String.t, password :: String.t) :: {:error, String.t} | {:ok, User.t}
   def login_with_email_pass(email, password) do
-    author = Subject.get_author_by(email: String.downcase(email))
+    author = Subject.get_author_by(email: email)
 
     unless is_nil(author) do
       author = author |> Repo.preload(:user)

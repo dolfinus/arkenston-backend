@@ -94,7 +94,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           existing_author = build(:author)
           create_author(input: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
 
-          invalid_author = build(:author, name: existing_author.name)
+          invalid_author = build(:author, name: existing_author.name |> String.upcase())
 
           create_response = create_author(input: prepare_author(invalid_author), access_token: access_token, conn: shared.conn)
 
@@ -107,7 +107,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           existing_author = build(:author)
           create_author(input: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
 
-          invalid_author = build(:author, email: existing_author.email)
+          invalid_author = build(:author, email: existing_author.email |> String.upcase())
 
           create_response = create_author(input: prepare_author(invalid_author), access_token: access_token, conn: shared.conn)
 
@@ -265,14 +265,29 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           author = build(:author)
 
           %{access_token: access_token} = creator()
-          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+          create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_author(name: author.name, input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: ~i(create_response.result.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           assert ~i(update_response.successful)
 
           expected_user = prepare_author(author) |> Map.merge(valid_attrs())
           assert check_user(~i(update_response.result), expected_user)
+        end
+
+        it "returns error for existing name", validation: true, valid: false do
+          author = build(:author)
+
+          %{access_token: access_token} = creator()
+
+          existing_author = build(:author)
+          create_author(input: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
+
+          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+          update_response = update_author(name: author.name, input: %{name: existing_author.name |> String.upcase()}, access_token: access_token, conn: shared.conn)
+
+          refute ~i(update_response.successful)
         end
 
         it "returns error for unknown name", validation: true, valid: true do
@@ -305,6 +320,21 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
 
           update_response = update_author(email: author.email, input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
+
+          refute ~i(update_response.successful)
+        end
+
+        it "returns error for existing email", validation: true, valid: false do
+          author = build(:author)
+
+          %{access_token: access_token} = creator()
+
+          existing_author = build(:author)
+          create_author(input: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
+
+          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+          update_response = update_author(name: author.name, input: %{email: existing_author.email |> String.upcase()}, access_token: access_token, conn: shared.conn)
 
           refute ~i(update_response.successful)
         end
