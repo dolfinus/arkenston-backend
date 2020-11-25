@@ -25,10 +25,11 @@ services:
       - ./erlang-history:/opt/app/.cache/erlang-history
     env_file: .env.test
     environment:
-      - CI="$CI"
-      - TRAVIS="$TRAVIS"
-      - TRAVIS_JOB_ID="$TRAVIS_JOB_ID"
-      - TRAVIS_PULL_REQUEST="$TRAVIS_PULL_REQUEST"
+      - CI=$CI
+      - TRAVIS=$TRAVIS
+      - TRAVIS_JOB_ID=$TRAVIS_JOB_ID
+      - TRAVIS_PULL_REQUEST=$TRAVIS_PULL_REQUEST
+      - COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN
     networks:
       - default
       - db

@@ -97,6 +97,7 @@ defmodule Arkenston.MixProject do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
+      coverage: ["ecto.reset", "coveralls.travis"],
       test: ["ecto.reset", "espec --cover"]
     ]
   end
