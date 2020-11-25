@@ -6,18 +6,14 @@ defmodule Arkenston.Context do
   alias Arkenston.Guardian
   alias Arkenston.Subject.User
 
-  def init(opts), do: opts
-
   @type t :: %{anonymous: false, current_user: User.t, token: String.t, permissions: map} | %{anonymous: true}
+
+  def init(opts), do: opts
 
   @spec call(Plug.Conn.t, Plug.opts) :: Plug.Conn.t
   def call(conn, _) do
-    with {:ok, %{} = context} <- build_context(conn) do
-        put_private(conn, :absinthe, %{context: context})
-    else
-        _ ->
-          conn
-    end
+    {:ok, context} = build_context(conn)
+    put_private(conn, :absinthe, %{context: context})
   end
 
   @spec build_context(Plug.Conn.t) :: {:ok, t} | {:error, any}

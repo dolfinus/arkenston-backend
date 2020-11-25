@@ -2,6 +2,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
   import Arkenston.Factories.MainFactory
   alias Arkenston.Subject
   alias Arkenston.Repo
+  import Arkenston.Helper.UUID
   import SubjectHelper
   use GraphqlHelper
   import Faker.Internet, only: [slug: 0, email: 0]
@@ -72,7 +73,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
         it "returns error for unknown author id", validation: true, valid: false do
           invalid_user = build(:user)
-          create_response = create_user(input: prepare_user(invalid_user), author: %{id: Ecto.UUID.generate()}, conn: shared.conn)
+          create_response = create_user(input: prepare_user(invalid_user), author: %{id: domain_uuid(:author)}, conn: shared.conn)
 
           refute ~i(create_response.successful)
         end
@@ -247,7 +248,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
         it "returns error for unknown id", validation: true, valid: false do
           %{access_token: access_token} = creator()
-          update_response = update_user(id: Ecto.UUID.generate(), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
+          update_response = update_user(id: domain_uuid(:user), input: prepare_user(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           refute ~i(update_response.successful)
         end
@@ -626,7 +627,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          change_user_author_response = change_user_author(id: Ecto.UUID.generate(), author: %{id: ~i(create_response.result.id)}, access_token: access_token, conn: shared.conn)
+          change_user_author_response = change_user_author(id: domain_uuid(:user), author: %{id: ~i(create_response.result.id)}, access_token: access_token, conn: shared.conn)
 
           refute ~i(change_user_author_response.successful)
         end
@@ -682,7 +683,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          change_user_author_response = change_user_author(id: ~i(create_response.result.id), author: %{id: Ecto.UUID.generate()}, access_token: access_token, conn: shared.conn)
+          change_user_author_response = change_user_author(id: ~i(create_response.result.id), author: %{id: domain_uuid(:author)}, access_token: access_token, conn: shared.conn)
 
           refute ~i(change_user_author_response.successful)
         end
@@ -871,7 +872,7 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
         it "returns error for unknown id", validation: true, valid: false do
           %{access_token: access_token} = creator()
-          delete_response = delete_user(id: Ecto.UUID.generate(), access_token: access_token, conn: shared.conn)
+          delete_response = delete_user(id: domain_uuid(:user), access_token: access_token, conn: shared.conn)
 
           refute ~i(delete_response.successful)
         end

@@ -106,33 +106,11 @@ defmodule Arkenston.Repo do
     audited(:insert, created_by, [changeset, opts])
   end
 
-  @spec audited_insert!(changeset :: changeset, context :: map, opts :: [keyword]) :: any | no_return
-  def audited_insert!(changeset, context \\ %{}, opts \\ []) do
-    case audited_insert(changeset, context, opts) do
-      {:ok, result} ->
-        result
-
-      {:error, changes} ->
-        raise Ecto.InvalidChangesetError, action: :insert, changeset: changes
-    end
-  end
-
   @spec audited_update(changeset :: changeset, context :: map, opts :: [keyword]) :: {:ok, any} | {:error, any}
   def audited_update(changeset, context \\ %{}, opts \\ []) do
     updated_by = get_user(context)
 
     audited(:update, updated_by, [changeset, opts])
-  end
-
-  @spec audited_update!(changeset :: changeset, context :: map, opts :: [keyword]) :: any | no_return
-  def audited_update!(changeset, context \\ %{}, opts \\ []) do
-    case audited_update(changeset, context, opts) do
-      {:ok, result} ->
-        result
-
-      {:error, changes} ->
-        raise Ecto.InvalidChangesetError, action: :update, changeset: changes
-    end
   end
 
   @spec get_user(context :: map) :: user

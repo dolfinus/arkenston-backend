@@ -2,6 +2,7 @@ defmodule Arkenston.Resolver.NodeResolverSpec do
   import Arkenston.Factories.MainFactory
   alias Arkenston.Subject
   alias Arkenston.Repo
+  import Arkenston.Helper.UUID
   import SubjectHelper
   import NodeHelper
   use GraphqlHelper
@@ -55,8 +56,10 @@ defmodule Arkenston.Resolver.NodeResolverSpec do
         end
 
         it "return error for unknown id" do
-          node_response = get_node(id: Ecto.UUID.generate(), conn: shared.conn)
+          node_response = get_node(id: domain_uuid(:user), conn: shared.conn)
+          expect node_response |> to(be_nil())
 
+          node_response = get_node(id: domain_uuid(:author), conn: shared.conn)
           expect node_response |> to(be_nil())
         end
       end

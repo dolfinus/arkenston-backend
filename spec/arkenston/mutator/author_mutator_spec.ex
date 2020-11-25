@@ -3,6 +3,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
   alias Arkenston.Subject
   alias Arkenston.Repo
   alias Arkenston.I18n
+  import Arkenston.Helper.UUID
   import SubjectHelper
   use GraphqlHelper
   import Faker.Internet, only: [slug: 0, email: 0]
@@ -256,7 +257,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
         it "returns error for unknown id", validation: true, valid: false do
           %{access_token: access_token} = creator()
-          update_response = update_author(id: Ecto.UUID.generate(), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: domain_uuid(:author), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
 
           refute ~i(update_response.successful)
         end
@@ -614,7 +615,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
         it "returns error for unknown id", validation: true, valid: false do
           %{access_token: access_token} = creator()
-          delete_response = delete_author(id: Ecto.UUID.generate(), access_token: access_token, conn: shared.conn)
+          delete_response = delete_author(id: domain_uuid(:author), access_token: access_token, conn: shared.conn)
 
           refute ~i(delete_response.successful)
         end
