@@ -1,5 +1,7 @@
 # Arkenston
 
+[![Coverage Status](https://coveralls.io/repos/github/dolfinus/arkenston-backend/badge.svg?branch=master)](https://coveralls.io/github/dolfinus/arkenston-backend?branch=master)
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
