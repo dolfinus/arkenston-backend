@@ -1,7 +1,7 @@
 # Arkenston
 
 [![Build Status](https://travis-ci.com/dolfinus/arkenston-backend.svg?branch=master)](https://travis-ci.com/dolfinus/arkenston-backend)
-[![Coverage Status](https://coveralls.io/repos/github/dolfinus/arkenston-backend/badge.svg?branch=master)](https://coveralls.io/github/dolfinus/arkenston-backend?branch=master)
+[![Coverage Status](https://img.shields.io/codecov/c/gh/dolfinus/arkenston-backend)](https://codecov.io/gh/dolfinus/arkenston-backend)
 
 To start your Phoenix server:
 

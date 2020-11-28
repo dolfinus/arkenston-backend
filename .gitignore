@@ -5,6 +5,7 @@ deps
 !.env.travis
 .bash*
 coverage
+cover
 /public/docs/*
 .fuse*
 erlang-history
