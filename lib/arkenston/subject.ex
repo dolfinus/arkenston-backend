@@ -12,16 +12,23 @@ defmodule Arkenston.Subject do
   defp filter_author(query, opts) do
     opts = opts |> Enum.into(%{})
 
-    new_query = case opts do
-      %{name: name, email: email} ->
-        QueryHelper.handle_filter(query, opts |> Map.merge(%{name: {:lower, name}, email: {:lower, email}}))
-      %{name: name} ->
-        QueryHelper.handle_filter(query, opts |> Map.merge(%{name: {:lower, name}}))
-      %{email: email} ->
-        QueryHelper.handle_filter(query, opts |> Map.merge(%{email: {:lower, email}}))
-      _ ->
-        query
-    end
+    new_query =
+      case opts do
+        %{name: name, email: email} ->
+          QueryHelper.handle_filter(
+            query,
+            opts |> Map.merge(%{name: {:lower, name}, email: {:lower, email}})
+          )
+
+        %{name: name} ->
+          QueryHelper.handle_filter(query, opts |> Map.merge(%{name: {:lower, name}}))
+
+        %{email: email} ->
+          QueryHelper.handle_filter(query, opts |> Map.merge(%{email: {:lower, email}}))
+
+        _ ->
+          query
+      end
 
     new_opts = opts |> Map.drop([:name, :email])
 
@@ -31,17 +38,21 @@ defmodule Arkenston.Subject do
   defp filter_user_by_author(query, opts) do
     opts = opts |> Enum.into(%{})
 
-    {author_filter, _} = filter_author(Author, opts |> Map.take([:name, :email]) |> Map.put(:deleted, nil))
+    {author_filter, _} =
+      filter_author(Author, opts |> Map.take([:name, :email]) |> Map.put(:deleted, nil))
 
-    new_query = case author_filter do
-      value when is_atom(value) ->
-        query
-      filter ->
-        filter = from a in filter,
-                  select: a.id
-        from u in query,
-          join: a in subquery(filter), on: a.id == u.author_id
-    end
+    new_query =
+      case author_filter do
+        value when is_atom(value) ->
+          query
+
+        filter ->
+          filter =
+            from a in filter,
+              select: a.id
+
+          from u in query, join: a in subquery(filter), on: a.id == u.author_id
+      end
 
     new_opts = opts |> Map.drop([:name, :email])
 
@@ -58,7 +69,10 @@ defmodule Arkenston.Subject do
 
   """
 
-  @spec list_users(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: [User.t]
+  @spec list_users(
+          opts :: QueryHelper.query_opts() | list[keyword],
+          context :: QueryHelper.context()
+        ) :: [User.t()]
   def list_users(opts \\ %{}, context \\ %{}) do
     {query, opts} = filter_user_by_author(User, opts)
 
@@ -77,7 +91,10 @@ defmodule Arkenston.Subject do
 
   """
 
-  @spec list_authors(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: [Author.t]
+  @spec list_authors(
+          opts :: QueryHelper.query_opts() | list[keyword],
+          context :: QueryHelper.context()
+        ) :: [Author.t()]
   def list_authors(opts \\ %{}, context \\ %{}) do
     {query, opts} = filter_author(Author, opts)
 
@@ -98,7 +115,10 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_user_by(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: User.t|nil
+  @spec get_user_by(
+          opts :: QueryHelper.query_opts() | list[keyword],
+          context :: QueryHelper.context()
+        ) :: User.t() | nil
   def get_user_by(opts, context \\ %{}) do
     {query, opts} = filter_user_by_author(User, opts)
 
@@ -120,7 +140,10 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_author_by(opts :: QueryHelper.query_opts | list[keyword], context :: QueryHelper.context) :: Author.t|nil
+  @spec get_author_by(
+          opts :: QueryHelper.query_opts() | list[keyword],
+          context :: QueryHelper.context()
+        ) :: Author.t() | nil
   def get_author_by(opts, context \\ %{}) do
     {query, opts} = filter_author(Author, opts)
 
@@ -142,7 +165,7 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_user(id :: User.id, context :: QueryHelper.context) :: User.t|nil
+  @spec get_user(id :: User.id(), context :: QueryHelper.context()) :: User.t() | nil
   def get_user(id, context \\ %{}), do: get_user_by(%{id: id}, context)
 
   @doc """
@@ -157,7 +180,7 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_author(id :: Author.id, context :: QueryHelper.context) :: Author.t|nil
+  @spec get_author(id :: Author.id(), context :: QueryHelper.context()) :: Author.t() | nil
   def get_author(id, context \\ %{}), do: get_author_by(%{id: id}, context)
 
   @doc """
@@ -172,7 +195,7 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_user(attrs :: map, context :: map) :: {:ok, User.t}|{:error, Repo.changeset}
+  @spec create_user(attrs :: map, context :: map) :: {:ok, User.t()} | {:error, Repo.changeset()}
   def create_user(attrs \\ %{}, context \\ %{}) do
     attrs
     |> User.create_changeset()
@@ -191,7 +214,8 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_author(attrs :: map, context :: map) :: {:ok, Author.t}|{:error, Repo.changeset}
+  @spec create_author(attrs :: map, context :: map) ::
+          {:ok, Author.t()} | {:error, Repo.changeset()}
   def create_author(attrs \\ %{}, context \\ %{}) do
     attrs
     |> Author.create_changeset()
@@ -210,7 +234,8 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_user(user :: User.t, attrs :: map, context :: map) :: {:ok, User.t}|{:error, Repo.changeset}
+  @spec update_user(user :: User.t(), attrs :: map, context :: map) ::
+          {:ok, User.t()} | {:error, Repo.changeset()}
   def update_user(%User{} = user, attrs \\ %{}, context \\ %{}) do
     user
     |> User.update_changeset(attrs)
@@ -229,7 +254,8 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_author(author :: Author.t, attrs :: map, context :: map) :: {:ok, Author.t}|{:error, Repo.changeset}
+  @spec update_author(author :: Author.t(), attrs :: map, context :: map) ::
+          {:ok, Author.t()} | {:error, Repo.changeset()}
   def update_author(%Author{} = author, attrs \\ %{}, context \\ %{}) do
     author
     |> Author.update_changeset(attrs)
@@ -248,7 +274,8 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_user(user :: User.t, attrs :: map, context :: map) :: {:ok, User.t}|{:error, Repo.changeset}
+  @spec delete_user(user :: User.t(), attrs :: map, context :: map) ::
+          {:ok, User.t()} | {:error, Repo.changeset()}
   def delete_user(%User{} = user, attrs \\ %{}, context \\ %{}) do
     user
     |> User.delete_changeset(attrs)
@@ -267,7 +294,8 @@ defmodule Arkenston.Subject do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_author(author :: Author.t, attrs :: map, context :: map) :: {:ok, Author.t}|{:error, Repo.changeset}
+  @spec delete_author(author :: Author.t(), attrs :: map, context :: map) ::
+          {:ok, Author.t()} | {:error, Repo.changeset()}
   def delete_author(%Author{} = author, attrs \\ %{}, context \\ %{}) do
     author
     |> Author.delete_changeset(attrs)

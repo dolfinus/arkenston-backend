@@ -11,7 +11,13 @@ defmodule Arkenston.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      preferred_cli_env: [espec: :test, coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
+      preferred_cli_env: [
+        espec: :test,
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
       spec_paths: ["spec"],
       spec_pattern: "*_{factory,spec,helper}.{ex,exs}",
       test_coverage: [
@@ -96,9 +102,10 @@ defmodule Arkenston.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      quality: ["credo", "dialyzer"],
+      quality: ["format", "credo --strict", "dialyzer"],
       "quality.ci": [
-        "credo",
+        "format --check-formatted",
+        "credo --strict",
         "dialyzer --halt-exit-status"
       ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],

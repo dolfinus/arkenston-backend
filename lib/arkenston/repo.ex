@@ -8,13 +8,16 @@ defmodule Arkenston.Repo do
   alias Arkenston.Helper.QueryHelper
   alias Arkenston.Subject.User
 
-  @type user :: User.t | nil
-  @type changeset :: Ecto.Changeset.t
+  @type user :: User.t() | nil
+  @type changeset :: Ecto.Changeset.t()
   @type operation :: atom
 
-  @spec data(ctx :: map) :: Dataloader.Ecto.t
+  @spec data(ctx :: map) :: Dataloader.Ecto.t()
   def data(context) do
-    Dataloader.Ecto.new(__MODULE__, query: &QueryHelper.generate_query/2, default_params: %{context: context})
+    Dataloader.Ecto.new(__MODULE__,
+      query: &QueryHelper.generate_query/2,
+      default_params: %{context: context}
+    )
   end
 
   @spec detect_rollback(callback :: term) :: {:ok, any} | no_return
@@ -22,8 +25,10 @@ defmodule Arkenston.Repo do
     case result do
       {:error, error} ->
         rollback(error)
+
       :error ->
         rollback(:unknown_error)
+
       result ->
         result
     end
@@ -34,9 +39,11 @@ defmodule Arkenston.Repo do
   end
 
   defmacro within_transaction(input) do
-    do_within_transaction(quote do
-      unquote(input).()
-    end)
+    do_within_transaction(
+      quote do
+        unquote(input).()
+      end
+    )
   end
 
   def do_within_transaction(block) do
@@ -52,18 +59,20 @@ defmodule Arkenston.Repo do
   end
 
   defmacro new_transaction(input) do
-    do_new_transaction(quote do
-      unquote(input).()
-    end)
+    do_new_transaction(
+      quote do
+        unquote(input).()
+      end
+    )
   end
 
   def do_new_transaction(input) do
     quote do
       case transaction(fn ->
-        result = unquote(input)
+             result = unquote(input)
 
-        detect_rollback(result)
-      end) do
+             detect_rollback(result)
+           end) do
         {:ok, {:ok, _} = success} ->
           success
 
@@ -99,14 +108,16 @@ defmodule Arkenston.Repo do
     apply(__MODULE__, op, args)
   end
 
-  @spec audited_insert(changeset :: changeset, context :: map, opts :: [keyword]) :: {:ok, any} | {:error, any}
+  @spec audited_insert(changeset :: changeset, context :: map, opts :: [keyword]) ::
+          {:ok, any} | {:error, any}
   def audited_insert(changeset, context \\ %{}, opts \\ []) do
     created_by = get_user(context)
 
     audited(:insert, created_by, [changeset, opts])
   end
 
-  @spec audited_update(changeset :: changeset, context :: map, opts :: [keyword]) :: {:ok, any} | {:error, any}
+  @spec audited_update(changeset :: changeset, context :: map, opts :: [keyword]) ::
+          {:ok, any} | {:error, any}
   def audited_update(changeset, context \\ %{}, opts \\ []) do
     updated_by = get_user(context)
 

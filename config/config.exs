@@ -33,7 +33,13 @@ config :arkenston,
 config :arkenston, Arkenston.Repo,
   pool_size: 10,
   migration_timestamps: [type: :utc_datetime],
-  migration_primary_key: [name: :id, type: :binary_id, autogenerate: false, read_after_writes: true, default: {:fragment, "gen_random_uuid()"}]
+  migration_primary_key: [
+    name: :id,
+    type: :binary_id,
+    autogenerate: false,
+    read_after_writes: true,
+    default: {:fragment, "gen_random_uuid()"}
+  ]
 
 config :arkenston, ArkenstonWeb.Endpoint,
   page_size: 20,
@@ -67,7 +73,8 @@ config :arkenston, Arkenston.Guardian,
   verify_issuer: true,
   secret_key: %{"k" => Mix.env() |> Atom.to_string(), "kty" => "oct"},
   serializer: Arkenston.Guardian,
-  all_permissions: %{ #append-only list, never change order of items
+  # append-only list, never change order of items
+  all_permissions: %{
     user: [
       :create_user,
       :create_moderator,
@@ -115,10 +122,14 @@ config :arkenston, Arkenston.Guardian,
   }
 
 config :guardian, Guardian.DB,
-  repo: Arkenston.Repo, # Add your repository module
-  schema_name: "guardian_tokens", # default
-  token_types: ["refresh", "restore", "signin"], # store all token types if not set
-  sweep_interval: 60 # default: 60 minutes
+  # Add your repository module
+  repo: Arkenston.Repo,
+  # default
+  schema_name: "guardian_tokens",
+  # store all token types if not set
+  token_types: ["refresh", "restore", "signin"],
+  # default: 60 minutes
+  sweep_interval: 60
 
 config :linguist, pluralization_key: :count
 

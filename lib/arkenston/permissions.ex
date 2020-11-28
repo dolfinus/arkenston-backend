@@ -6,20 +6,21 @@ defmodule Arkenston.Permissions do
   alias Arkenston.Permissions.User, as: UserPermissions
   alias Arkenston.Permissions.Author, as: AuthorPermissions
 
-  @type permissions :: %{optional(atom) => [atom] | %{atom => integer()}}
+  @type t :: Guardian.Permissions.input_set()
+  @type permissions_map :: Guardian.Permissions.input_permissions()
 
-  @spec permissions_for(user_or_context :: User.t | :anonymous | Context.t) :: permissions
+  @spec permissions_for(user_or_context :: User.t() | :anonymous | Context.t()) :: permissions_map
   def permissions_for(%User{} = user) do
     %{
       user: UserPermissions.permissions_for(user),
-      author: AuthorPermissions.permissions_for(user),
+      author: AuthorPermissions.permissions_for(user)
     }
   end
 
   def permissions_for(:anonymous) do
     %{
       user: UserPermissions.permissions_for(:anonymous),
-      author: AuthorPermissions.permissions_for(:anonymous),
+      author: AuthorPermissions.permissions_for(:anonymous)
     }
   end
 
@@ -31,30 +32,44 @@ defmodule Arkenston.Permissions do
     permissions_for(:anonymous)
   end
 
-  @all_permissions Application.compile_env(:arkenston, Arkenston.Guardian)[:all_permissions]
+  @all_permissions Application.compile_env(:arkenston, [Arkenston.Guardian, :all_permissions])
 
-  @spec all_permissions() :: permissions
-  def all_permissions() do
+  @spec all_permissions() :: permissions_map
+  def all_permissions do
     @all_permissions
   end
 
-  @spec check_permissions_for(type :: atom, operation :: atom, context :: Context.t, old_entity :: any, new_entity :: any) :: :ok | {:error, %AbsintheErrorPayload.ValidationMessage{}}
-  def check_permissions_for(type, operation, context \\ %{anonymous: true}, old_entity \\ nil, new_entity \\ nil) do
+  @spec check_permissions_for(
+          type :: atom,
+          operation :: atom,
+          context :: Context.t(),
+          old_entity :: any,
+          new_entity :: any
+        ) :: :ok | {:error, %AbsintheErrorPayload.ValidationMessage{}}
+  def check_permissions_for(
+        type,
+        operation,
+        context \\ %{anonymous: true},
+        old_entity \\ nil,
+        new_entity \\ nil
+      ) do
     case type do
       :user ->
         UserPermissions.check_permissions_for(operation, context, old_entity, new_entity)
+
       :author ->
         AuthorPermissions.check_permissions_for(operation, context, old_entity, new_entity)
     end
   end
 
-  @spec get_current_user(context :: Context.t) :: User.t | nil
+  @spec get_current_user(context :: Context.t()) :: User.t() | nil
   def get_current_user(context) do
     case context do
-    %{current_user: user} when not is_nil(user) ->
-      user
-    _ ->
-      nil
+      %{current_user: user} when not is_nil(user) ->
+        user
+
+      _ ->
+        nil
     end
   end
 end

@@ -10,14 +10,11 @@ import Config
 # Configure your database
 config :arkenston, :environment, :dev
 
-config :arkenston, Arkenston.Repo,
-  show_sensitive_data_on_connection_error: true
+config :arkenston, Arkenston.Repo, show_sensitive_data_on_connection_error: true
 
-secret_key_base =
-  System.get_env("SECRET_KEY_BASE") || "mo0gu8Aem0eiv3xe1coh4uch5Ooti6ye"
+secret_key_base = System.get_env("SECRET_KEY_BASE") || "mo0gu8Aem0eiv3xe1coh4uch5Ooti6ye"
 
-config :arkenston, ArkenstonWeb.Endpoint,
-  secret_key_base: secret_key_base
+config :arkenston, ArkenstonWeb.Endpoint, secret_key_base: secret_key_base
 
 config :arkenston, ArkenstonWeb.Endpoint,
   server: true,

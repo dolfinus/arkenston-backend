@@ -6,7 +6,9 @@ defmodule Arkenston.Repo.Migrations.AlterUsers do
 
   def change do
     alter_audit_table :users do
-      add_if_not_exists :author_id, references(:authors_data, type: unquote(@id_type)), null: false
+      add_if_not_exists(:author_id, references(:authors_data, type: unquote(@id_type)),
+        null: false
+      )
     end
 
     execute("""
@@ -27,13 +29,13 @@ defmodule Arkenston.Repo.Migrations.AlterUsers do
     """)
 
     alter_audit_table :users do
-      remove_if_exists :name, :string
-      remove_if_exists :email, :string
+      remove_if_exists(:name, :string)
+      remove_if_exists(:email, :string)
     end
 
     drop_if_exists unique_index(:users_data, :name)
     drop_if_exists unique_index(:users_data, :email)
-    drop_if_exists index(:users_data, [:id, :name,  :role])
+    drop_if_exists index(:users_data, [:id, :name, :role])
     drop_if_exists index(:users_data, [:id, :email, :role])
 
     create unique_index(:users_data, :author_id, where: "deleted IS FALSE")

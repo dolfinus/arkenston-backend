@@ -1,10 +1,10 @@
 defmodule ArkenstonWeb.Schema do
   use Absinthe.Schema
   use ArkenstonWeb.Schema.Types
-  use Absinthe.Relay.Schema, [
+
+  use Absinthe.Relay.Schema,
     flavor: :modern,
     global_id_translator: ArkenstonWeb.Schema.Helpers.IDTranslator
-  ]
 
   alias Arkenston.Repo
 
@@ -21,7 +21,7 @@ defmodule ArkenstonWeb.Schema do
   end
 
   def dataloader(ctx) do
-    Dataloader.new
+    Dataloader.new()
     |> Dataloader.add_source(Repo, Repo.data(ctx))
   end
 
@@ -34,7 +34,7 @@ defmodule ArkenstonWeb.Schema do
   end
 
   def middleware(middleware, _field, %Absinthe.Type.Object{identifier: identifier})
-  when identifier in [:query, :subscription, :mutation] do
+      when identifier in [:query, :subscription, :mutation] do
     [Arkenston.Middleware.HandleFields] ++ middleware
   end
 

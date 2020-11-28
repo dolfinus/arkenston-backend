@@ -2,7 +2,7 @@ defmodule ArkenstonWeb.Schema.Helpers.Pagination do
   alias Arkenston.Helper.QueryHelper
   use ArkenstonWeb.Schema.Helpers.Association
 
-  @default_page_size Application.compile_env(:arkenston, ArkenstonWeb.Endpoint)[:page_size]
+  @default_page_size Application.compile_env(:arkenston, [ArkenstonWeb.Endpoint, :page_size])
 
   defmacro __using__(_opts) do
     current = __MODULE__
@@ -15,17 +15,20 @@ defmodule ArkenstonWeb.Schema.Helpers.Pagination do
   defmacro paginated(name) when is_atom(name) do
     quote do
       arg :first, :page_size
-      arg :last,  :page_size
-      resolve assoc unquote(name), callback: fn result, _parent, args ->
-        QueryHelper.paginate_slice(result, args)
-      end
+      arg :last, :page_size
+
+      resolve assoc unquote(name),
+                callback: fn result, _parent, args ->
+                  QueryHelper.paginate_slice(result, args)
+                end
     end
   end
 
   defmacro paginated(resolver) do
     quote do
       arg :first, :page_size
-      arg :last,  :page_size
+      arg :last, :page_size
+
       resolve fn
         args, context ->
           {:ok, result} = unquote(resolver).(args, context)

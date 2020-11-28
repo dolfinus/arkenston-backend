@@ -4,26 +4,30 @@ defmodule Arkenston.Helper.QueryHelper do
   alias Arkenston.Helper.FieldsHelper
   alias Absinthe.Relay.Connection
 
-  @type query :: Ecto.Query.t
-  @type queryable :: Ecto.Queryable.t | module
+  @type query :: Ecto.Query.t()
+  @type queryable :: Ecto.Queryable.t() | module
   @type context :: map
   @type limit :: pos_integer
   @type offset :: pos_integer
   @type first :: pos_integer
   @type last :: pos_integer
   @type count :: pos_integer
-  @type order :: :desc|:asc
+  @type order :: :desc | :asc
 
-  @type filter_arg :: atom|number|String.t|map
-  @type filter_opt :: %{optional(atom) => filter_arg|{atom, filter_arg}}
-  @type deleted_opt :: %{deleted: boolean|nil}
-  @type order_opt :: %{order: keyword(order)|%{optional(atom) => order}}
-  @type pagination_opt :: %{optional(:first) => first, optional(:last) => last, optional(:count) => count}
-  @type fields_opt :: %{fields: FieldsHelper.fields}
-  @type query_opts :: filter_opt|deleted_opt|order_opt|pagination_opt|fields_opt
+  @type filter_arg :: atom | number | String.t() | map
+  @type filter_opt :: %{optional(atom) => filter_arg | {atom, filter_arg}}
+  @type deleted_opt :: %{deleted: boolean | nil}
+  @type order_opt :: %{order: keyword(order) | %{optional(atom) => order}}
+  @type pagination_opt :: %{
+          optional(:first) => first,
+          optional(:last) => last,
+          optional(:count) => count
+        }
+  @type fields_opt :: %{fields: FieldsHelper.fields()}
+  @type query_opts :: filter_opt | deleted_opt | order_opt | pagination_opt | fields_opt
 
-  @default_page_size Application.compile_env(:arkenston, ArkenstonWeb.Endpoint)[:page_size]
-  @max_page_size Application.compile_env(:arkenston, ArkenstonWeb.Endpoint)[:max_page_size]
+  @default_page_size Application.compile_env(:arkenston, [ArkenstonWeb.Endpoint, :page_size])
+  @max_page_size Application.compile_env(:arkenston, [ArkenstonWeb.Endpoint, :max_page_size])
   @reserved_field_names [:order, :first, :last, :count, :before, :after]
 
   @doc """
@@ -49,7 +53,8 @@ defmodule Arkenston.Helper.QueryHelper do
   """
   @spec filter_deleted(query :: queryable, opts :: query_opts) :: {queryable, query_opts}
   def filter_deleted(query, opts \\ %{}) do
-      new_query = case opts |> Map.fetch(:deleted) do
+    new_query =
+      case opts |> Map.fetch(:deleted) do
         {:ok, deleted} when not is_nil(deleted) ->
           from i in query,
             where: i.deleted == ^deleted
@@ -62,9 +67,9 @@ defmodule Arkenston.Helper.QueryHelper do
             where: i.deleted == false
       end
 
-      new_opts = opts |> Map.delete(:deleted)
+    new_opts = opts |> Map.delete(:deleted)
 
-      {new_query, new_opts}
+    {new_query, new_opts}
   end
 
   @doc """
@@ -101,17 +106,21 @@ defmodule Arkenston.Helper.QueryHelper do
     {query, opts} = filter_deleted(query, opts)
     options = opts |> Enum.to_list()
 
-    options |> Enum.reduce(query, fn (option, query) ->
+    options
+    |> Enum.reduce(query, fn option, query ->
       case option do
         {key, {:lower, value}} ->
           from i in query,
             where: fragment("lower(?)", field(i, ^key)) == fragment("lower(?)", ^value)
+
         {key, value} when is_nil(value) ->
           from i in query,
             where: is_nil(field(i, ^key))
+
         {key, value} ->
           from i in query,
             where: field(i, ^key) == ^value
+
         _ ->
           query
       end
@@ -160,15 +169,20 @@ defmodule Arkenston.Helper.QueryHelper do
       {:error, _}
 
   """
-  @spec get_offset_limit(opts :: query_opts) :: {:ok, offset, limit} | {:error, String.t}
+  @spec get_offset_limit(opts :: query_opts) :: {:ok, offset, limit} | {:error, String.t()}
   def get_offset_limit(opts \\ %{}) do
-    opts = if not Map.has_key?(opts, :first) and not Map.has_key?(opts, :last) do
-      opts |> Map.put(:first, @default_page_size)
-    else
-      opts
-    end
+    opts =
+      if not Map.has_key?(opts, :first) and not Map.has_key?(opts, :last) do
+        opts |> Map.put(:first, @default_page_size)
+      else
+        opts
+      end
 
-    with {:ok, _offset, _limit} = result <- Connection.offset_and_limit_for_query(opts, count: Map.get(opts, :count), max: @max_page_size) do
+    with {:ok, _offset, _limit} = result <-
+           Connection.offset_and_limit_for_query(opts,
+             count: Map.get(opts, :count),
+             max: @max_page_size
+           ) do
       result
     end
   end
@@ -200,9 +214,9 @@ defmodule Arkenston.Helper.QueryHelper do
   @spec handle_pagination(query :: queryable, opts :: query_opts) :: queryable
   def handle_pagination(query, opts \\ %{}) do
     with {:ok, offset, limit} <- get_offset_limit(opts) do
-        query
-        |> limit(^(limit + 1))
-        |> offset(^offset)
+      query
+      |> limit(^(limit + 1))
+      |> offset(^offset)
     end
   end
 
@@ -255,7 +269,8 @@ defmodule Arkenston.Helper.QueryHelper do
         order_by: [desc: column]
 
   """
-  @spec generate_query(query :: queryable, opts :: query_opts|list, context :: context) :: queryable
+  @spec generate_query(query :: queryable, opts :: query_opts | list, context :: context) ::
+          queryable
   def generate_query(query, opts \\ %{}, context \\ %{})
 
   def generate_query(query, opts, context) when is_list(opts) do
@@ -267,13 +282,16 @@ defmodule Arkenston.Helper.QueryHelper do
   end
 
   def generate_query(query, opts, context) do
-    opts = case opts do
-      %{fields: fields} ->
-        fields_map = fields |> Enum.into(%{})
-        opts |> Map.drop([:fields]) |> Map.merge(fields_map)
-      _ ->
-        opts
-    end
+    opts =
+      case opts do
+        %{fields: fields} ->
+          fields_map = fields |> Enum.into(%{})
+          opts |> Map.drop([:fields]) |> Map.merge(fields_map)
+
+        _ ->
+          opts
+      end
+
     filter_opts = Map.drop(opts, @reserved_field_names)
     fields = query |> FieldsHelper.prepare_fields(context)
 

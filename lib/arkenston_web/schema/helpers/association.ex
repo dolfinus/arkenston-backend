@@ -17,7 +17,12 @@ defmodule ArkenstonWeb.Schema.Helpers.Association do
 
         case parent |> Map.get(unquote(name)) do
           %Ecto.Association.NotLoaded{} ->
-            dataloader(Arkenston.Repo, unquote(name), args ++ [use_parent: true, args: %{context: resolution.context}]).(parent, defaults |> Map.merge(opts), resolution)
+            dataloader(
+              Arkenston.Repo,
+              unquote(name),
+              args ++ [use_parent: true, args: %{context: resolution.context}]
+            ).(parent, defaults |> Map.merge(opts), resolution)
+
           loaded ->
             {:ok, loaded}
         end
@@ -30,6 +35,7 @@ defmodule ArkenstonWeb.Schema.Helpers.Association do
   defmacro connect_with_audited(name, args) when is_list(args) do
     non_null = args |> Keyword.get(:non_null, false)
     args = args |> Keyword.drop([:non_null])
+
     if non_null do
       do_connect_with_audited(name, name, quote(do: non_null(unquote(name))), args, do: [])
     else
@@ -67,6 +73,7 @@ defmodule ArkenstonWeb.Schema.Helpers.Association do
   defmacro connect_with(name, args) when is_list(args) do
     non_null = args |> Keyword.get(:non_null, false)
     args = args |> Keyword.drop([:non_null])
+
     if non_null do
       do_connect_with(name, name, quote(do: non_null(unquote(name))), args, do: [])
     else
@@ -113,7 +120,11 @@ defmodule ArkenstonWeb.Schema.Helpers.Association do
 
   defp do_connect_with_field_audited(target, field, target_field, type, args, do: block) do
     quote do
-      connect_with_field unquote(target), unquote(field), unquote(target_field), unquote(type), unquote(args) ++ [defaults: %{deleted: nil}] do
+      connect_with_field unquote(target),
+                         unquote(field),
+                         unquote(target_field),
+                         unquote(type),
+                         unquote(args) ++ [defaults: %{deleted: nil}] do
         unquote(block)
       end
     end
@@ -139,9 +150,16 @@ defmodule ArkenstonWeb.Schema.Helpers.Association do
     quote do
       field unquote(field), unquote(type) do
         unquote(block)
-        resolve assoc(unquote(target), unquote(args) ++ [callback: fn result, _parent, _args ->
-          {:ok, result |> Map.get(unquote(target_field))}
-        end])
+
+        resolve assoc(
+                  unquote(target),
+                  unquote(args) ++
+                    [
+                      callback: fn result, _parent, _args ->
+                        {:ok, result |> Map.get(unquote(target_field))}
+                      end
+                    ]
+                )
       end
     end
   end

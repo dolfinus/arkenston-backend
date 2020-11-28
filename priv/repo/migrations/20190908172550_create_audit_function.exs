@@ -4,6 +4,7 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
 
   def up do
     execute "CREATE EXTENSION IF NOT EXISTS \"pgcrypto\";"
+
     execute "CREATE OR REPLACE FUNCTION generate_uuid(entity_name VARCHAR(4000)) RETURNS UUID AS $func$
     DECLARE
       domain varchar(12);
@@ -17,7 +18,6 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
       RETURN result;
     END;
     $func$ LANGUAGE plpgsql"
-
 
     execute "CREATE OR REPLACE FUNCTION process_audit() RETURNS TRIGGER AS $audit$
       DECLARE

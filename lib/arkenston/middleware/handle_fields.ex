@@ -4,7 +4,8 @@ defmodule Arkenston.Middleware.HandleFields do
   @behaviour Absinthe.Middleware
 
   @type resolution() :: Absinthe.Resolution.t()
-  @type field() :: Absinthe.Blueprint.Document.Field.t() | Absinthe.Blueprint.Document.Fragment.Spread.t()
+  @type field() ::
+          Absinthe.Blueprint.Document.Field.t() | Absinthe.Blueprint.Document.Fragment.Spread.t()
 
   @spec call(resolution(), any()) :: resolution()
   def call(%{context: context} = resolution, _config) do

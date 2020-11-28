@@ -7,12 +7,13 @@ defmodule Arkenston.Permissions.Author do
   alias Arkenston.Repo
   import Indifferent.Sigils
 
-  @spec all_permissions() :: list(atom)
-  def all_permissions() do
-    Permissions.all_permissions()[:author]
+  @spec all_permissions() :: Permissions.t()
+  def all_permissions do
+    Permissions.all_permissions().author
   end
 
-  @spec permissions_for(user_or_role :: User.t | User.role | :anonymous) :: list(atom)
+  @spec permissions_for(user_or_role :: User.t() | User.role() | :anonymous) ::
+          Permissions.t()
   def permissions_for(%User{role: role}) do
     permissions_for(role)
   end
@@ -57,8 +58,19 @@ defmodule Arkenston.Permissions.Author do
     ]
   end
 
-  @spec check_permissions_for(operation :: atom, context :: Context.t, old_entity :: any, new_entity :: any) :: :ok | {:error, %AbsintheErrorPayload.ValidationMessage{}}
-  def check_permissions_for(operation, context \\ %{anonymous: true}, old_entity \\ nil, new_entity \\ nil)
+  @spec check_permissions_for(
+          operation :: atom,
+          context :: Context.t(),
+          old_entity :: any,
+          new_entity :: any
+        ) :: :ok | {:error, %AbsintheErrorPayload.ValidationMessage{}}
+  def check_permissions_for(
+        operation,
+        context \\ %{anonymous: true},
+        old_entity \\ nil,
+        new_entity \\ nil
+      )
+
   def check_permissions_for(:create, context, _, _) do
     actual_permissions = Permissions.permissions_for(context)
     create_permissions = [:create_author]
@@ -74,15 +86,17 @@ defmodule Arkenston.Permissions.Author do
     actual_permissions = Permissions.permissions_for(context)
     author = author |> Repo.preload(:user)
 
-    update_author_permissions = cond do
-      is_nil(author.user) ->
-        [:update_unassigned_author]
-      is_self(context, author) ->
-        [:update_self]
-      true ->
-        [:"update_#{author.user.role}_author"]
-    end
+    update_author_permissions =
+      cond do
+        is_nil(author.user) ->
+          [:update_unassigned_author]
 
+        is_self(context, author) ->
+          [:update_self]
+
+        true ->
+          [:"update_#{author.user.role}_author"]
+      end
 
     if Guardian.any_permissions?(actual_permissions, %{author: update_author_permissions}) do
       :ok
@@ -95,14 +109,17 @@ defmodule Arkenston.Permissions.Author do
     actual_permissions = Permissions.permissions_for(context)
     author = author |> Repo.preload(:user)
 
-    delete_author_permissions = cond do
-      is_nil(author.user) ->
-        [:delete_unassigned_author]
-      is_self(context, author) ->
-        [:delete_self]
-      true ->
-        [:"delete_#{author.user.role}_author"]
-    end
+    delete_author_permissions =
+      cond do
+        is_nil(author.user) ->
+          [:delete_unassigned_author]
+
+        is_self(context, author) ->
+          [:delete_self]
+
+        true ->
+          [:"delete_#{author.user.role}_author"]
+      end
 
     if Guardian.any_permissions?(actual_permissions, %{author: delete_author_permissions}) do
       :ok
@@ -115,6 +132,7 @@ defmodule Arkenston.Permissions.Author do
     case Permissions.get_current_user(context) do
       nil ->
         false
+
       current_user ->
         ~i(current_user.id) == ~i(author.user.id)
     end

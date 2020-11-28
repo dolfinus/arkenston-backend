@@ -10,7 +10,7 @@ defmodule ArkenstonWeb.Schema.Helpers.Revision do
     end
   end
 
-  defmacro audited_object(obj, [do: block]) when is_atom(obj) do
+  defmacro audited_object(obj, do: block) when is_atom(obj) do
     orig_name = obj |> Atom.to_string()
     revision_name = "#{orig_name}_revision" |> String.to_atom()
 
@@ -20,16 +20,19 @@ defmodule ArkenstonWeb.Schema.Helpers.Revision do
         import_fields :node
 
         unquote(block)
-        field :version,    non_null(:integer)
+        field :version, non_null(:integer)
         field :created_at, non_null(:datetime)
         field :updated_at, :datetime
-        field :note,       :string
+        field :note, :string
+
         field :created_by, :user do
           resolve assoc(:created_by)
         end
+
         field :updated_by, :user do
           resolve assoc(:updated_by)
         end
+
         connection field :revisions, node_type: unquote(revision_name) do
           paginated(:revisions)
         end
@@ -43,6 +46,7 @@ defmodule ArkenstonWeb.Schema.Helpers.Revision do
         import_fields :node
 
         unquote(block)
+
         field unquote(obj), non_null(unquote(obj)) do
           resolve assoc(unquote(obj))
         end

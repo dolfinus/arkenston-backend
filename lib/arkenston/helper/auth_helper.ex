@@ -5,7 +5,8 @@ defmodule Arkenston.Helper.AuthHelper do
   alias Arkenston.Subject
   alias Arkenston.Subject.User
 
-  @spec login_with_email_pass(email :: String.t, password :: String.t) :: {:error, String.t} | {:ok, User.t}
+  @spec login_with_email_pass(email :: String.t(), password :: String.t()) ::
+          {:error, String.t()} | {:ok, User.t()}
   def login_with_email_pass(email, password) do
     author = Subject.get_author_by(email: email)
 
@@ -17,7 +18,8 @@ defmodule Arkenston.Helper.AuthHelper do
     end
   end
 
-  @spec login_with_name_pass(name :: String.t, password :: String.t) :: {:error, String.t} | {:ok, User.t}
+  @spec login_with_name_pass(name :: String.t(), password :: String.t()) ::
+          {:error, String.t()} | {:ok, User.t()}
   def login_with_name_pass(name, password) do
     author = Subject.get_author_by(name: name)
 
@@ -31,9 +33,9 @@ defmodule Arkenston.Helper.AuthHelper do
 
   defp login_with_pass(%User{} = user, password) do
     if User.check_password(user, password) do
-        {:ok, user}
+      {:ok, user}
     else
-        {:error, "Incorrect login credentials"}
+      {:error, "Incorrect login credentials"}
     end
   end
 

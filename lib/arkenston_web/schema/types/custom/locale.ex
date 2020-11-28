@@ -9,24 +9,22 @@ defmodule ArkenstonWeb.Schema.Types.Custom.Locale do
     parse(&decode/1)
   end
 
-  @spec decode(Absinthe.Blueprint.Input.String.t()) :: {:ok, String.t} | :error
-  @spec decode(Absinthe.Blueprint.Input.Null.t()) :: {:ok, String.t}
+  @spec decode(Absinthe.Blueprint.Input.String.t()) :: {:ok, String.t()} | :error
+  @spec decode(Absinthe.Blueprint.Input.Null.t()) :: {:ok, String.t()}
   defp decode(%Absinthe.Blueprint.Input.String{value: value}) do
-    try do
-      value = value |> String.to_existing_atom()
+    value = value |> String.to_existing_atom()
 
-      if I18n.locales() |> Enum.member?(value) do
-        {:ok, value |> to_string()}
-      else
-        :error
-      end
-    rescue
-      _ in ArgumentError -> :error
+    if I18n.locales() |> Enum.member?(value) do
+      {:ok, value |> to_string()}
+    else
+      :error
     end
+  rescue
+    _ in ArgumentError -> :error
   end
 
   defp decode(%Absinthe.Blueprint.Input.Null{}) do
-    {:ok, I18n.locale}
+    {:ok, I18n.locale()}
   end
 
   defp decode(_) do

@@ -3,21 +3,23 @@ defmodule ArkenstonWeb.Schema.Query.Author do
   use Absinthe.Relay.Schema.Notation, :modern
   use ArkenstonWeb.Schema.Helpers.Pagination
 
+  alias Arkenston.Resolver.AuthorResolver
+
   object :author_queries do
     connection field :authors, node_type: :author do
-      arg :id,      :uuid4
-      arg :name,    :string
-      arg :email,   :string
+      arg :id, :uuid4
+      arg :name, :string
+      arg :email, :string
       arg :deleted, :boolean
-      paginated &Arkenston.Resolver.AuthorResolver.all/2
+      paginated &AuthorResolver.all/2
     end
 
     field :author, :author do
-      arg :id,      :uuid4
-      arg :name,    :string
-      arg :email,   :string
+      arg :id, :uuid4
+      arg :name, :string
+      arg :email, :string
       arg :deleted, :boolean
-      resolve &Arkenston.Resolver.AuthorResolver.one/2
+      resolve &AuthorResolver.one/2
     end
   end
 end

@@ -10,23 +10,27 @@ defmodule ArkenstonWeb.Schema.Helpers.IDTranslator do
     {:ok, source_id}
   end
 
-  @spec from_global_id(global_id :: binary, schema :: any) :: {:error, binary} | {:ok, binary, binary}
+  @spec from_global_id(global_id :: binary, schema :: any) ::
+          {:error, binary} | {:ok, binary, binary}
   def from_global_id(global_id, _schema) do
     case detect_type(global_id) do
       {:ok, type} ->
         {:ok, type, global_id}
+
       _ ->
         {:error, "Could not extract value from ID `#{inspect(global_id)}`"}
     end
   end
 
   defmemop detect_type(global_id) do
-    types = @possible_types
-    |> Enum.filter(fn type -> UUID.check_uuid(global_id, type) end)
+    types =
+      @possible_types
+      |> Enum.filter(fn type -> UUID.check_uuid(global_id, type) end)
 
     case types do
       [type] ->
         {:ok, type}
+
       _ ->
         :error
     end

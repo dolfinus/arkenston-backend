@@ -1,5 +1,5 @@
 defmodule Arkenston.Helper.UUID do
-  @spec domain_uuid(domain :: binary | atom) :: String.t
+  @spec domain_uuid(domain :: binary | atom) :: String.t()
   def domain_uuid(domain) when is_binary(domain) do
     random_uuid_truncated() <> domain_hash_truncated(domain)
   end
@@ -17,11 +17,11 @@ defmodule Arkenston.Helper.UUID do
     check_uuid(uuid, Atom.to_string(domain))
   end
 
-  defp random_uuid() do
+  defp random_uuid do
     UUID.uuid4()
   end
 
-  defp random_uuid_truncated() do
+  defp random_uuid_truncated do
     random_uuid() |> String.slice(0..23)
   end
 
