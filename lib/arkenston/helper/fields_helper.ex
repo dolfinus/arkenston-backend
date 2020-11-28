@@ -21,11 +21,15 @@ defmodule Arkenston.Helper.FieldsHelper do
             field
             |> to_string()
             |> Macro.underscore()
-            |> String.to_atom()
+            |> String.to_existing_atom()
 
-          field_id = :"#{value}_#{@id_name}"
-
-          new_fields = [field, field_id]
+          new_fields =
+            try do
+              [field, "#{field}_#{@id_name}" |> String.to_existing_atom()]
+            rescue
+              _ ->
+                [field]
+            end
 
           new_fields =
             if Keyword.has_key?(module.__info__(:functions), :__trans__) and

@@ -97,6 +97,7 @@ defmodule Arkenston.Repo do
   end
 
   @spec audited(op :: operation, user :: user, args :: [any]) :: {:ok, any} | {:error, any}
+  # sobelow_skip ["SQL.Query"]
   defp audited(op, %User{} = user, args) do
     transational(fn ->
       query("set local \"arkenston.current_user\" = '#{user.id}';")

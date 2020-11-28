@@ -95,7 +95,7 @@ defmodule Arkenston.Permissions.Author do
           [:update_self]
 
         true ->
-          [:"update_#{author.user.role}_author"]
+          ["update_#{author.user.role}_author" |> String.to_existing_atom()]
       end
 
     if Guardian.any_permissions?(actual_permissions, %{author: update_author_permissions}) do
@@ -118,7 +118,7 @@ defmodule Arkenston.Permissions.Author do
           [:delete_self]
 
         true ->
-          [:"delete_#{author.user.role}_author"]
+          ["delete_#{author.user.role}_author" |> String.to_existing_atom()]
       end
 
     if Guardian.any_permissions?(actual_permissions, %{author: delete_author_permissions}) do

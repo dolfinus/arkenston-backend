@@ -71,6 +71,7 @@ defmodule Arkenston.ReleaseTasks do
   end
 
   @spec run_seeds_for(repo :: Ecto.Repo.t()) :: no_return
+  # sobelow_skip ["RCE.CodeModule"]
   defp run_seeds_for(repo) do
     app = Keyword.get(repo.config(), :otp_app)
 

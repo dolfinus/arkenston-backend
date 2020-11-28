@@ -9,5 +9,6 @@ coverage
 .fuse*
 erlang-history
 .elixir*
+.sobelow
 /priv/plts/*.plt
 /priv/plts/*.plt.hash

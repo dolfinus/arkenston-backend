@@ -73,7 +73,7 @@ defmodule Arkenston.Helper.TranslationHelper do
   end
 
   def translation_locales(object) do
-    keys = translation_container(object) |> Map.keys() |> Enum.map(&String.to_atom/1)
+    keys = translation_container(object) |> Map.keys() |> Enum.map(&String.to_existing_atom/1)
     all_locales = (keys ++ I18n.locales()) |> Enum.uniq()
 
     all_locales

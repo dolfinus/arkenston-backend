@@ -36,6 +36,6 @@ defmodule Arkenston.Middleware.HandleFields do
   end
 
   def handle_field(%{name: name}) do
-    :"#{name}"
+    "#{name}" |> Macro.underscore() |> String.to_existing_atom()
   end
 end

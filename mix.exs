@@ -91,6 +91,7 @@ defmodule Arkenston.MixProject do
       {:corsica, "~> 1.1"},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:sobelow, "~> 0.8", only: [:dev, :test], runtime: false},
       {:git_hooks, "~> 0.5.0", only: [:test, :dev], runtime: false}
     ]
   end
@@ -103,12 +104,13 @@ defmodule Arkenston.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      quality: ["format", "credo --strict", "dialyzer"],
-      "quality.hook.precommit": ["format", "credo --strict"],
+      quality: ["format", "credo --strict", "sobelow --config", "dialyzer"],
+      "quality.hook.precommit": ["format", "credo --strict", "sobelow --config"],
       "quality.hook.prepush": ["dialyzer"],
       "quality.ci": [
         "format --check-formatted",
         "credo --strict",
+        "sobelow --config",
         "dialyzer"
       ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],

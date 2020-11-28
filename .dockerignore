@@ -17,3 +17,4 @@ build.sh*
 .elixir_ls
 *.plt
 *.plt.hash
+.sobelow

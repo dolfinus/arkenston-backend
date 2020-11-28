@@ -168,11 +168,16 @@ defmodule Arkenston.Permissions.User do
     change_role_permissions =
       if is_role_changing do
         [
-          "upgrade_#{old_role}_to_#{new_role}" |> String.to_atom(),
-          "downgrade_#{old_role}_to_#{new_role}" |> String.to_atom()
+          "upgrade_#{old_role}_to_#{new_role}",
+          "downgrade_#{old_role}_to_#{new_role}"
         ]
-        |> Enum.filter(fn permission ->
-          all_permissions() |> Enum.member?(permission)
+        |> Enum.reduce([], fn permission_str, acc ->
+          try do
+            acc ++ [permission_str |> String.to_existing_atom()]
+          rescue
+            ArgumentError ->
+              acc
+          end
         end)
       else
         nil
