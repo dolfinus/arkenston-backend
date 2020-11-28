@@ -44,8 +44,7 @@ defmodule Arkenston.Subject.User do
     belongs_to :author, Author
   end
 
-  @config Application.get_env(:arkenston, :users)
-  @password_length @config[:length][:password]
+  @password_length Application.compile_env(:arkenston, :users)[:length][:password]
 
   @doc false
   @spec create_changeset(attrs :: map) :: Ecto.Changeset.t

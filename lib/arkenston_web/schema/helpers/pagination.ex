@@ -2,7 +2,7 @@ defmodule ArkenstonWeb.Schema.Helpers.Pagination do
   alias Arkenston.Helper.QueryHelper
   use ArkenstonWeb.Schema.Helpers.Association
 
-  @default_page_size Application.get_env(:arkenston, ArkenstonWeb.Endpoint)[:page_size]
+  @default_page_size Application.compile_env(:arkenston, ArkenstonWeb.Endpoint)[:page_size]
 
   defmacro __using__(_opts) do
     current = __MODULE__

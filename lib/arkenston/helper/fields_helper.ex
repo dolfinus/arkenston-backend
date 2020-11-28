@@ -3,7 +3,7 @@ defmodule Arkenston.Helper.FieldsHelper do
 
   alias Arkenston.Helper.QueryHelper
 
-  @id_name Application.get_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:name]
+  @id_name Application.compile_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:name]
 
   @type fields :: [atom|{atom, fields}]
   @type fields_context :: %{fields: fields}

@@ -3,7 +3,7 @@ defmodule Arkenston.ReleaseTasks do
     :arkenston
   ]
 
-  @repos Application.get_env(:arkenston, :ecto_repos, [])
+  @repos Application.compile_env(:arkenston, :ecto_repos, [])
 
   @spec migrate(argv :: list) :: no_return
   def migrate(_argv) do
@@ -46,7 +46,7 @@ defmodule Arkenston.ReleaseTasks do
     Enum.each(@repos, &create_storage_for/1)
   end
 
-  @spec create_storage_for(repo :: Ecto.Repo.t) :: no_return
+  @spec create_storage_for(repo :: Ecto.Repo.t()) :: no_return
   defp create_storage_for(repo) do
     app = Keyword.get(repo.config(), :otp_app)
     IO.puts("Creating storage for #{app}...")
@@ -57,7 +57,7 @@ defmodule Arkenston.ReleaseTasks do
     Enum.each(@repos, &run_migrations_for/1)
   end
 
-  @spec run_migrations_for(repo :: Ecto.Repo.t) :: no_return
+  @spec run_migrations_for(repo :: Ecto.Repo.t()) :: no_return
   defp run_migrations_for(repo) do
     app = Keyword.get(repo.config(), :otp_app)
     IO.puts("Running migrations for #{app}...")
@@ -70,19 +70,20 @@ defmodule Arkenston.ReleaseTasks do
     Enum.each(@repos, &run_seeds_for/1)
   end
 
-  @spec run_seeds_for(repo :: Ecto.Repo.t) :: no_return
+  @spec run_seeds_for(repo :: Ecto.Repo.t()) :: no_return
   defp run_seeds_for(repo) do
     app = Keyword.get(repo.config(), :otp_app)
 
     # Run the seed script if it exists
     seed_script = priv_path_for(repo, "seeds.exs")
+
     if File.exists?(seed_script) do
       IO.puts("Running seed script for #{app}...")
       Code.eval_file(seed_script)
     end
   end
 
-  @spec priv_path_for(repo :: Ecto.Repo.t, filename :: String.t) :: String.t
+  @spec priv_path_for(repo :: Ecto.Repo.t(), filename :: String.t()) :: String.t()
   defp priv_path_for(repo, filename) do
     app = Keyword.get(repo.config(), :otp_app)
 

@@ -15,15 +15,15 @@ defmodule Arkenston.Helper.QueryHelper do
   @type order :: :desc|:asc
 
   @type filter_arg :: atom|number|String.t|map
-  @type filter_opt :: %{optional(atom) => filter_arg|{atom,filter_arg}}
+  @type filter_opt :: %{optional(atom) => filter_arg|{atom, filter_arg}}
   @type deleted_opt :: %{deleted: boolean|nil}
   @type order_opt :: %{order: keyword(order)|%{optional(atom) => order}}
   @type pagination_opt :: %{optional(:first) => first, optional(:last) => last, optional(:count) => count}
   @type fields_opt :: %{fields: FieldsHelper.fields}
   @type query_opts :: filter_opt|deleted_opt|order_opt|pagination_opt|fields_opt
 
-  @default_page_size Application.get_env(:arkenston, ArkenstonWeb.Endpoint)[:page_size]
-  @max_page_size Application.get_env(:arkenston, ArkenstonWeb.Endpoint)[:max_page_size]
+  @default_page_size Application.compile_env(:arkenston, ArkenstonWeb.Endpoint)[:page_size]
+  @max_page_size Application.compile_env(:arkenston, ArkenstonWeb.Endpoint)[:max_page_size]
   @reserved_field_names [:order, :first, :last, :count, :before, :after]
 
   @doc """
@@ -106,7 +106,7 @@ defmodule Arkenston.Helper.QueryHelper do
         {key, {:lower, value}} ->
           from i in query,
             where: fragment("lower(?)", field(i, ^key)) == fragment("lower(?)", ^value)
-        {key, value} when is_nil(value)->
+        {key, value} when is_nil(value) ->
           from i in query,
             where: is_nil(field(i, ^key))
         {key, value} ->

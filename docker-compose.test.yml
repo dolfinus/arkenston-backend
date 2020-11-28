@@ -21,6 +21,7 @@ services:
       - ./mix.exs:/opt/app/mix.exs
       - ./mix.lock:/opt/app/mix.lock
       - ./.iex.exs:/opt/app/.iex.exs
+      - ./.credo.exs:/opt/app/.credo.exs
       - ./.dialyzer_ignore.exs:/opt/app/.dialyzer_ignore.exs
       - ./erlang-history:/opt/app/.cache/erlang-history
     env_file: .env.test

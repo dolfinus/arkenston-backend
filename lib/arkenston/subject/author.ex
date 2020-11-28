@@ -57,9 +57,8 @@ defmodule Arkenston.Subject.Author do
     has_one :user,  User
   end
 
-  @config Application.get_env(:arkenston, :authors)
-  @name_format  @config[:format][:name]
-  @email_format @config[:format][:email]
+  @name_format Application.compile_env(:arkenston, :authors)[:format][:name]
+  @email_format Application.compile_env(:arkenston, :authors)[:format][:email]
 
   @doc false
   @spec create_changeset(attrs :: map) :: Ecto.Changeset.t

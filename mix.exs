@@ -69,21 +69,22 @@ defmodule Arkenston.MixProject do
       {:ecto_enum, "~> 1.4"},
       {:argon2_elixir, "~> 2.3"},
       {:pbkdf2_elixir, "~> 1.2"},
-      {:inflex, "~> 2.0" },
+      {:inflex, "~> 2.0"},
       {:linguist, "~> 0.3"},
       {:ex_cldr, "~> 2.13", override: true},
       {:guardian, "~> 2.1"},
       {:guardian_phoenix, "~> 2.0"},
       {:guardian_db, "~> 2.0"},
       {:indifferent, "~> 0.9"},
-      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:faker, "~> 0.13", only: :test},
       {:ex_machina, "~> 2.4", only: :test},
       {:espec, "~> 1.8", only: :test},
       {:excoveralls, "~> 0.12", only: :test},
       {:uuid, "~> 1.1"},
       {:memoize, "~> 1.3"},
-      {:corsica, "~> 1.1"}
+      {:corsica, "~> 1.1"},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -95,6 +96,11 @@ defmodule Arkenston.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
+      quality: ["credo", "dialyzer"],
+      "quality.ci": [
+        "credo",
+        "dialyzer --halt-exit-status"
+      ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       coverage: ["ecto.reset", "coveralls.travis"],

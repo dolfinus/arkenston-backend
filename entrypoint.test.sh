@@ -21,4 +21,9 @@ else
       ;;
   esac
 fi
-mix dialyzer;
+
+if [ ! -z "$TRAVIS" ]; then
+  mix quality.ci;
+else
+  mix quality;
+fi

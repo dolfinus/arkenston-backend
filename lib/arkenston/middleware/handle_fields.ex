@@ -17,11 +17,16 @@ defmodule Arkenston.Middleware.HandleFields do
   end
 
   @spec handle_field(field() | map()) :: atom() | {atom(), map() | list()}
-  def handle_field(%{name: name, selections: selections}) when (is_list(selections) or is_map(selections)) and length(selections) == 0 do
+  def handle_field(%{name: name, selections: []}) do
     handle_field(%{name: name})
   end
 
-  def handle_field(%{name: name, selections: selections}) when is_list(selections) or is_map(selections) do
+  def handle_field(%{name: name, selections: %{} = selections}) when map_size(selections) == 0 do
+    handle_field(%{name: name})
+  end
+
+  def handle_field(%{name: name, selections: selections})
+      when is_list(selections) or is_map(selections) do
     {handle_field(%{name: name}), Enum.map(selections, &handle_field/1)}
   end
 

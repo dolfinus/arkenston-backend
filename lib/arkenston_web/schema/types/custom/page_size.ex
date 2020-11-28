@@ -1,7 +1,7 @@
 defmodule ArkenstonWeb.Schema.Types.Custom.PageSize do
   use Absinthe.Schema.Notation
 
-  @max_page_size Application.get_env(:arkenston, ArkenstonWeb.Endpoint)[:max_page_size]
+  @max_page_size Application.compile_env(:arkenston, ArkenstonWeb.Endpoint)[:max_page_size]
 
   @desc "Integer which value should be between 1 and #{@max_page_size}"
   scalar :page_size, name: "PageSize" do

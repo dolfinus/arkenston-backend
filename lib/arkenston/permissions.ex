@@ -31,7 +31,7 @@ defmodule Arkenston.Permissions do
     permissions_for(:anonymous)
   end
 
-  @all_permissions Application.get_env(:arkenston, Arkenston.Guardian)[:all_permissions]
+  @all_permissions Application.compile_env(:arkenston, Arkenston.Guardian)[:all_permissions]
 
   @spec all_permissions() :: permissions
   def all_permissions() do

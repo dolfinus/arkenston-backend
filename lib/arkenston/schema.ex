@@ -2,8 +2,8 @@ defmodule Arkenston.Schema do
   use Ecto.Schema
   import Inflex
 
-  @id_name Application.get_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:name]
-  @id_type Application.get_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:type]
+  @id_name Application.compile_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:name]
+  @id_type Application.compile_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:type]
 
   defmacro audited_schema(shm, [do: block]) do
     target = __CALLER__.module
