@@ -32,11 +32,12 @@ defmodule Arkenston.Permissions do
     permissions_for(:anonymous)
   end
 
-  @all_permissions Application.compile_env(:arkenston, [Arkenston.Guardian, :all_permissions])
-
   @spec all_permissions() :: permissions_map
   def all_permissions do
-    @all_permissions
+    %{
+      user: UserPermissions.all_permissions(),
+      author: AuthorPermissions.all_permissions()
+    }
   end
 
   @spec check_permissions_for(

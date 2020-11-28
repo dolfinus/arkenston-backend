@@ -74,7 +74,7 @@ config :arkenston, Arkenston.Guardian,
   secret_key: %{"k" => Mix.env() |> Atom.to_string(), "kty" => "oct"},
   serializer: Arkenston.Guardian,
   # append-only list, never change order of items
-  all_permissions: %{
+  all_permissions: [
     user: [
       :create_user,
       :create_moderator,
@@ -119,7 +119,7 @@ config :arkenston, Arkenston.Guardian,
       :delete_admin_author,
       :delete_self
     ]
-  }
+  ]
 
 config :guardian, Guardian.DB,
   # Add your repository module

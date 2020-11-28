@@ -8,9 +8,15 @@ defmodule Arkenston.Permissions.User do
   alias Arkenston.Context
   import Indifferent.Sigils
 
+  @all_permissions Application.compile_env(:arkenston, [
+                     Arkenston.Guardian,
+                     :all_permissions,
+                     :user
+                   ])
+
   @spec all_permissions() :: Permissions.t()
   def all_permissions do
-    Permissions.all_permissions().user
+    @all_permissions
   end
 
   @spec permissions_for(user_or_role :: User.t() | User.role() | :anonymous) ::
