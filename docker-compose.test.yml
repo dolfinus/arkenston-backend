@@ -20,6 +20,7 @@ services:
       - ./coveralls.json:/opt/app/coveralls.json
       - ./mix.exs:/opt/app/mix.exs
       - ./mix.lock:/opt/app/mix.lock
+      - ./.git:/opt/app/.git
       - ./.iex.exs:/opt/app/.iex.exs
       - ./.credo.exs:/opt/app/.credo.exs
       - ./.formatter.exs:/opt/app/.formatter.exs

@@ -90,7 +90,8 @@ defmodule Arkenston.MixProject do
       {:memoize, "~> 1.3"},
       {:corsica, "~> 1.1"},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:credo, "~> 1.5", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:git_hooks, "~> 0.5.0", only: [:test, :dev], runtime: false}
     ]
   end
 
@@ -103,10 +104,12 @@ defmodule Arkenston.MixProject do
   defp aliases do
     [
       quality: ["format", "credo --strict", "dialyzer"],
+      "quality.hook.precommit": ["format", "credo --strict"],
+      "quality.hook.prepush": ["dialyzer"],
       "quality.ci": [
         "format --check-formatted",
         "credo --strict",
-        "dialyzer --halt-exit-status"
+        "dialyzer"
       ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
