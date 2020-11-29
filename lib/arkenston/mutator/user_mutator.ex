@@ -10,8 +10,14 @@ defmodule Arkenston.Mutator.UserMutator do
 
   def create(_parent, %{input: attrs, author: author_attrs}, %{context: context}) do
     case Repo.transational(fn ->
-           with :ok <- Permissions.check_permissions_for(:user, :create, context, attrs),
-                {:ok, author} <- get_or_create_author(author_attrs, context),
+           with {:ok, author} <- get_or_create_author(author_attrs, context),
+                :ok <-
+                  Permissions.check_permissions_for(
+                    :user,
+                    :create,
+                    context,
+                    attrs |> Map.put(:author, author)
+                  ),
                 {:ok, user} <-
                   Subject.create_user(attrs |> Map.put(:author_id, author.id), context) do
              {:ok, Subject.get_user(user.id)}
@@ -248,7 +254,7 @@ defmodule Arkenston.Mutator.UserMutator do
           :ok
         end
 
-      %{} ->
+      _ ->
         {:error, error}
     end
   end

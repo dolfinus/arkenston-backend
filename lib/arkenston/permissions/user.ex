@@ -2,8 +2,6 @@ defmodule Arkenston.Permissions.User do
   @moduledoc false
   alias Arkenston.Permissions
   alias Arkenston.Guardian
-  alias Arkenston.Repo
-  alias Arkenston.Subject
   alias Arkenston.Subject.User
   alias Arkenston.Context
   import Indifferent.Sigils
@@ -103,16 +101,20 @@ defmodule Arkenston.Permissions.User do
     actual_permissions = Permissions.permissions_for(context)
     current_user = Permissions.get_current_user(context)
 
-    author =
-      Subject.get_author(~i(user.author.id)) || Subject.get_author_by(name: ~i(user.author.name))
-
-    author =
-      unless is_nil(author) do
-        author |> Repo.preload(:created_by)
-      end
-
     is_author_other =
-      ~i(author.created_by.id) == ~i(current_user.id) && !(is_nil(author) && is_nil(current_user))
+      cond do
+        is_nil(current_user) ->
+          false
+
+        is_nil(user.author) ->
+          false
+
+        user.author.created_by_id == current_user.id ->
+          false
+
+        true ->
+          true
+      end
 
     create_permissions =
       if is_author_other do
@@ -239,8 +241,6 @@ defmodule Arkenston.Permissions.User do
 
   def check_permissions_for(:change_author, context, user, _author) do
     actual_permissions = Permissions.permissions_for(context)
-
-    user = user |> Repo.preload(:author)
 
     change_author_permissions =
       unless is_self(context, user) do
