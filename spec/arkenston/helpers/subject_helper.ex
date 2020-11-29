@@ -502,7 +502,7 @@ defmodule SubjectHelper do
       variables: %{email: author.email, password: user.password}
     })
 
-    ~i(auth_response.data.login)
+    ~i(auth_response.data.login) || auth_response
   end
 
   def auth_by_name(user, author, conn \\ build_conn()) do
@@ -510,7 +510,7 @@ defmodule SubjectHelper do
       query: login_mutation(),
       variables: %{name: author.name, password: user.password}
     })
-    ~i(auth_response.data.login)
+    ~i(auth_response.data.login) || auth_response
   end
 
   def exchange(refresh_token, conn \\ build_conn()) do
@@ -518,7 +518,7 @@ defmodule SubjectHelper do
       query: exchange_mutation(),
       variables: %{refresh_token: refresh_token}
     })
-    ~i(exchange_response.data.exchange)
+    ~i(exchange_response.data.exchange) || exchange_response
   end
 
   def logout(refresh_token, conn \\ build_conn()) do
@@ -526,7 +526,7 @@ defmodule SubjectHelper do
       query: logout_mutation(),
       variables: %{refresh_token: refresh_token}
     })
-    ~i(logout_response.data.logout)
+    ~i(logout_response.data.logout) || logout_response
   end
 
   def get_authors(args \\ %{})
@@ -671,7 +671,7 @@ defmodule SubjectHelper do
         })
     end
 
-    ~i(create_response.data.createAuthor)
+    ~i(create_response.data.createAuthor) || create_response
   end
 
   def create_user(args \\ %{})
@@ -700,7 +700,7 @@ defmodule SubjectHelper do
         })
     end
 
-    ~i(create_response.data.createUser)
+    ~i(create_response.data.createUser) || create_response
   end
 
   def update_author(args \\ %{})
@@ -729,7 +729,7 @@ defmodule SubjectHelper do
         })
     end
 
-    ~i(update_response.data.updateAuthor)
+    ~i(update_response.data.updateAuthor) || update_response
   end
 
   def update_user(args \\ %{})
@@ -758,7 +758,7 @@ defmodule SubjectHelper do
         })
     end
 
-    ~i(update_response.data.updateUser)
+    ~i(update_response.data.updateUser) || update_response
   end
 
   def change_user_author(args \\ %{})
@@ -787,7 +787,7 @@ defmodule SubjectHelper do
         })
     end
 
-    ~i(change_user_author_response.data.changeUserAuthor)
+    ~i(change_user_author_response.data.changeUserAuthor) || change_user_author_response
   end
 
   def delete_author(args \\ %{})
@@ -816,7 +816,7 @@ defmodule SubjectHelper do
         })
     end
 
-    ~i(delete_response.data.deleteAuthor)
+    ~i(delete_response.data.deleteAuthor) || delete_response
   end
 
   def delete_user(args \\ %{})
@@ -845,6 +845,6 @@ defmodule SubjectHelper do
         })
     end
 
-    ~i(delete_response.data.deleteUser)
+    ~i(delete_response.data.deleteUser) || delete_response
   end
 end

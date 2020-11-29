@@ -1,4 +1,4 @@
-defmodule Arkenston.Repo.Migrations.AlterUsers do
+defmodule Arkenston.Repo.Migrations.AlterUsersDropNameEmailColumns do
   use Ecto.Migration
   import Arkenston.Repo.Migration
 

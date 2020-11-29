@@ -211,7 +211,7 @@ defmodule Arkenston.Mutator.UserMutator do
     end
   end
 
-  defp get_author(attrs) do
+  defp get_author_raw(attrs) do
     {field, author} =
       case attrs do
         %{id: id} when not is_nil(id) ->
@@ -227,22 +227,58 @@ defmodule Arkenston.Mutator.UserMutator do
           {nil, nil}
       end
 
-    case author do
-      nil ->
-        {:error, %AbsintheErrorPayload.ValidationMessage{field: field, code: :not_found}}
+    if is_nil(author) do
+      {:error, %AbsintheErrorPayload.ValidationMessage{field: field, code: :not_found}}
+    else
+      {:ok, author}
+    end
+  end
 
-      author ->
-        {:ok, author}
+  defp check_author_email(author) do
+    error = %AbsintheErrorPayload.ValidationMessage{field: :"author.email", code: :empty}
+
+    case author do
+      %{email: nil} ->
+        {:error, error}
+
+      %{email: email} when is_binary(email) ->
+        if email |> String.trim() == "" do
+          {:error, error}
+        else
+          :ok
+        end
+
+      %{} ->
+        {:error, error}
+    end
+  end
+
+  defp get_author(attrs) do
+    case get_author_raw(attrs) do
+      {:ok, author} ->
+        case check_author_email(author) do
+          :ok -> {:ok, author}
+          error -> error
+        end
+
+      error ->
+        error
     end
   end
 
   defp get_or_create_author(attrs, context) do
-    case get_author(attrs) do
+    case get_author_raw(attrs) do
       {:ok, author} ->
-        {:ok, author}
+        case check_author_email(author) do
+          :ok -> {:ok, author}
+          error -> error
+        end
 
       {:error, _} ->
-        Subject.create_author(attrs, context)
+        case check_author_email(attrs) do
+          :ok -> Subject.create_author(attrs, context)
+          error -> error
+        end
     end
   end
 end

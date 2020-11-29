@@ -111,6 +111,41 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           refute ~i(create_response.successful)
         end
 
+        it "returns error for empty author name", validation: true, valid: false do
+          user = build(:user)
+          author = build(:author)
+
+          create_response = create_user(input: prepare_user(user), author: prepare_author(author) |> Map.drop([:name]), conn: shared.conn)
+          refute ~i(create_response.successful)
+
+          create_response = create_user(input: prepare_user(user), author: prepare_author(author) |> Map.put(:name, nil), conn: shared.conn)
+          refute ~i(create_response.successful)
+        end
+
+        it "returns error without author email", validation: true, valid: false do
+          user = build(:user)
+          author = build(:author)
+
+          create_response = create_user(input: prepare_user(user), author: prepare_author(author) |> Map.drop([:email]), conn: shared.conn)
+          refute ~i(create_response.successful)
+        end
+
+        it "returns error for nil author email", validation: true, valid: false do
+          user = build(:user)
+          author = build(:author)
+
+          create_response = create_user(input: prepare_user(user), author: prepare_author(author) |> Map.put(:email, nil), conn: shared.conn)
+          refute ~i(create_response.successful)
+        end
+
+        it "returns error for empty author email", validation: true, valid: false do
+          user = build(:user)
+          author = build(:author)
+
+          create_response = create_user(input: prepare_user(user), author: prepare_author(author) |> Map.put(:email, ""), conn: shared.conn)
+          refute ~i(create_response.successful)
+        end
+
         it "returns error for empty password", validation: true, valid: false do
           user = build(:user)
           author = build(:author)
@@ -613,7 +648,6 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           create_user_response = create_user(input: prepare_user(existing_user), author: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
 
           author = build(:author)
-          %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
           change_user_author_response = change_user_author(id: ~i(create_user_response.result.id), author: %{id: ~i(create_response.result.id)}, access_token: access_token, conn: shared.conn)
@@ -640,7 +674,6 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           create_user(input: prepare_user(existing_user), author: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
 
           author = build(:author)
-          %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
           change_user_author_response = change_user_author(name: existing_author.name |> String.upcase(), author: %{id: ~i(create_response.result.id)}, access_token: access_token, conn: shared.conn)
@@ -667,7 +700,6 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           create_user_response = create_user(input: prepare_user(existing_user), author: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
 
           author = build(:author)
-          %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
           change_user_author_response = change_user_author(id: ~i(create_user_response.result.id), author: %{id: ~i(create_response.result.id)}, access_token: access_token, conn: shared.conn)
@@ -697,8 +729,6 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           user = build(:user)
           author = build(:author)
-
-          %{access_token: access_token} = creator()
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
           change_user_author_response = change_user_author(id: ~i(create_response.result.id), author: %{id: ~i(author_response.result.author.id)}, access_token: access_token, conn: shared.conn)
@@ -714,7 +744,6 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           create_user_response = create_user(input: prepare_user(existing_user), author: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
 
           author = build(:author)
-          %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
           change_user_author_response = change_user_author(id: ~i(create_user_response.result.id), author: %{name: author.name |> String.upcase()}, access_token: access_token, conn: shared.conn)
@@ -745,8 +774,6 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           user = build(:user)
           author = build(:author)
-
-          %{access_token: access_token} = creator()
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
           change_user_author_response = change_user_author(id: ~i(create_response.result.id), author: %{name: existing_author.name |> String.upcase()}, access_token: access_token, conn: shared.conn)
@@ -762,7 +789,6 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
           create_user_response = create_user(input: prepare_user(existing_user), author: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
 
           author = build(:author)
-          %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
           change_user_author_response = change_user_author(id: ~i(create_user_response.result.id), author: %{email: author.email |> String.upcase()}, access_token: access_token, conn: shared.conn)
@@ -793,11 +819,24 @@ defmodule Arkenston.Mutator.UserMutatorSpec do
 
           user = build(:user)
           author = build(:author)
-
-          %{access_token: access_token} = creator()
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
           change_user_author_response = change_user_author(id: ~i(create_response.result.id), author: %{email: existing_author.email |> String.upcase()}, access_token: access_token, conn: shared.conn)
+
+          refute ~i(change_user_author_response.successful)
+        end
+
+        it "returns error for author without email", validation: true, valid: false do
+          existing_user = build(:user)
+          existing_author = build(:author)
+
+          %{access_token: access_token} = creator()
+          create_user_response = create_user(input: prepare_user(existing_user), author: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
+
+          author = build(:author)
+          create_response = create_author(input: prepare_author(author) |> Map.put(:email, nil), access_token: access_token, conn: shared.conn)
+
+          change_user_author_response = change_user_author(id: ~i(create_user_response.result.id), author: %{id: ~i(create_response.result.id)}, access_token: access_token, conn: shared.conn)
 
           refute ~i(change_user_author_response.successful)
         end

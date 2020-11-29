@@ -1,4 +1,4 @@
-defmodule Arkenston.Repo.Migrations.AlterAuthors do
+defmodule Arkenston.Repo.Migrations.AlterAuthorsRecreateNameEmailIndexes do
   use Ecto.Migration
 
   def change do

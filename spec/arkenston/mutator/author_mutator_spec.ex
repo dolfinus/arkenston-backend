@@ -115,6 +115,46 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           refute ~i(create_response.successful)
         end
 
+        it "returns error for empty name", validation: true, valid: false do
+          author = build(:author)
+
+          create_response = create_author(input: prepare_author(author) |> Map.drop([:name]), conn: shared.conn)
+          refute ~i(create_response.successful)
+
+          create_response = create_author(input: prepare_author(author) |> Map.put(:name, nil), conn: shared.conn)
+          refute ~i(create_response.successful)
+        end
+
+        it "returns success without email", validation: true, valid: true do
+          %{access_token: access_token} = creator()
+
+          author = build(:author)
+          create_response = create_author(input: prepare_author(author) |> Map.drop([:email]), access_token: access_token, conn: shared.conn)
+
+          IO.inspect(create_response)
+
+          assert ~i(create_response.successful)
+          assert check_user(~i(create_response.result), prepare_author(author) |> Map.put(:email, nil))
+        end
+
+        it "returns success for nil email", validation: true, valid: true do
+          %{access_token: access_token} = creator()
+
+          author = build(:author)
+          create_response = create_author(input: prepare_author(author) |> Map.put(:email, nil), access_token: access_token, conn: shared.conn)
+          assert ~i(create_response.successful)
+          assert check_user(~i(create_response.result), prepare_author(author) |> Map.put(:email, nil))
+        end
+
+        it "returns success for empty email", validation: true, valid: true do
+          %{access_token: access_token} = creator()
+
+          author = build(:author)
+          create_response = create_author(input: prepare_author(author) |> Map.put(:email, ""), access_token: access_token, conn: shared.conn)
+          assert ~i(create_response.successful)
+          assert check_user(~i(create_response.result), prepare_author(author) |> Map.put(:email, nil))
+        end
+
         it "accepts note for revision", audit: true do
           note = sentence()
           author = build(:author)
@@ -338,6 +378,42 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           update_response = update_author(name: author.name, input: %{email: existing_author.email |> String.upcase()}, access_token: access_token, conn: shared.conn)
 
           refute ~i(update_response.successful)
+        end
+
+        it "returns error for empty name", validation: true, valid: false do
+          author = build(:author)
+
+          %{access_token: access_token} = creator()
+          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+          update_response = update_author(email: author.email, input: prepare_author(valid_attrs()) |> Map.put(:name, nil), access_token: access_token, conn: shared.conn)
+          refute ~i(update_response.successful)
+        end
+
+        it "returns success for nil email", validation: true, valid: true do
+          author = build(:author)
+
+          %{access_token: access_token} = creator()
+          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+          update_response = update_author(email: author.email, input: prepare_author(valid_attrs()) |> Map.put(:email, nil), access_token: access_token, conn: shared.conn)
+          assert ~i(update_response.successful)
+
+          expected_user = prepare_author(author) |> Map.merge(valid_attrs()) |> Map.put(:email, nil)
+          assert check_user(~i(update_response.result), expected_user)
+        end
+
+        it "returns success for empty email", validation: true, valid: true do
+          author = build(:author)
+
+          %{access_token: access_token} = creator()
+          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+          update_response = update_author(email: author.email, input: prepare_author(valid_attrs()) |> Map.put(:email, ""), access_token: access_token, conn: shared.conn)
+          assert ~i(update_response.successful)
+
+          expected_user = prepare_author(author) |> Map.merge(valid_attrs()) |> Map.put(:email, nil)
+          assert check_user(~i(update_response.result), expected_user)
         end
 
         it "returns success for current user", validation: true, valid: true do

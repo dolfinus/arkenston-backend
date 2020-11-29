@@ -8,7 +8,7 @@ defmodule ArkenstonWeb.Schema.Types.Object.Author do
   # resolvers
   audited_translated_object :author do
     field :name, non_null(:string)
-    field :email, non_null(:string)
+    field :email, :string
     field :first_name, non_null(:string)
     field :middle_name, non_null(:string)
     field :last_name, non_null(:string)
