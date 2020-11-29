@@ -19,6 +19,7 @@ services:
       - ./spec:/opt/app/spec
       - ./coveralls.json:/opt/app/coveralls.json
       - ./cover:/opt/app/cover
+      - ./graphql:/opt/app/graphql
       - ./mix.exs:/opt/app/mix.exs
       - ./mix.lock:/opt/app/mix.lock
       - ./.git:/opt/app/.git

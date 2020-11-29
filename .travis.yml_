@@ -50,8 +50,7 @@ deploy:
       branch: master
       tags: true
   - provider: release
-    api_key:
-      secure: "QMlrk1A8nvC8QtHyyhB7vXQz+jaZ76Tji7caPCn/aPnXUR/wy7kRo3tkFbqORnVi301hcX3LhDXzrQ3CrSV1lI6Lream8HVZFsjUSKJFAY0apEnnjW/PmvI7E66/l6I5012Hikb+Op1g4wljRnOC7nVeSk9ipB5cg2TBozxjLyhUhrv/EZYbgyHie+mdncRe56zRJCV7TTBCnFgU8aZp1BeKBd+JdbJMvx0fthuKrLy5pZEcT2HDeuoV1E7wwyNt1Uk6dn/TdHVaBfrcmZB8nN+bxvBgU3EusKnEc0xmJ84EyPUGTuebpZ8RHRt6rJXVRB8oEbnUDJVK/ADqPjgH/bt3E5K2+rlndYrMHhDbWFtkn+lhL+vsaNolhOZATNHCV+J+AmeM9YRvn4A9qtNuBkQgnH5+S7PZt8vMHYxdRRMh9MRL34H33sR8NKhjb+dkHQHIWKzWkEf4FUfR+oIepjX/DMoLkKZAwebSi1UAk+SQtkgWo451DQlkP0/jfuucocpK1z9wMzYYZ5pJ3W/IF7QUzJCb/aBDgLsylO7pPdux38j88c31aAKcNeuYeTdvFhuUvKvKfheHhjIBgFC3d0S+KYyU7pCKjqkZq6vx1LLeSGXOa6GFwND/OUm0sqzSmoeOHtHZ62SAPPk91XsTb27QKUq19Ob4JHPUqTvP+CQ="
+    api_key: "GITHUB OAUTH TOKEN"
     file_glob: true
     file:
       - graphql/*.json
@@ -59,5 +58,4 @@ deploy:
     skip_cleanup: true
     overwrite: true
     on:
-      branch: master
       tags: true

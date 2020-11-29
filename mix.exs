@@ -48,7 +48,6 @@ defmodule Arkenston.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "priv/repo/migration.ex", "priv/i18n.ex", "test/support"]
   defp elixirc_paths(_), do: ["lib", "priv/repo/migration.ex", "priv/i18n.ex"]
 
   # Specifies your project dependencies.
@@ -104,8 +103,12 @@ defmodule Arkenston.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
+      "absinthe.schema": [
+        "absinthe.schema.sdl --schema ArkenstonWeb.Schema graphql/schema.graphql",
+        "absinthe.schema.json --schema ArkenstonWeb.Schema --pretty graphql/schema.json"
+      ],
       quality: ["format", "credo --strict", "sobelow --config", "dialyzer"],
-      "quality.hook.precommit": ["format", "credo --strict", "sobelow --config"],
+      "quality.hook.precommit": ["format --check-formatted", "credo --strict", "sobelow --config"],
       "quality.hook.prepush": ["dialyzer"],
       "quality.ci": [
         "format --check-formatted",

@@ -13,3 +13,6 @@ erlang-history
 .sobelow
 /priv/plts/*.plt
 /priv/plts/*.plt.hash
+graphql
+*.dmp
+*.dump

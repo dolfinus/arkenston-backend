@@ -17,5 +17,8 @@ build.sh*
 .elixir_ls
 *.plt
 *.plt.hash
+*.dmp
+*.dump
 .sobelow
 cover
+graphql

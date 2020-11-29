@@ -27,3 +27,5 @@ if [ ! -z "$TRAVIS" ]; then
 else
   mix quality;
 fi
+
+mix absinthe.schema;
