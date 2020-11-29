@@ -131,8 +131,6 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           author = build(:author)
           create_response = create_author(input: prepare_author(author) |> Map.drop([:email]), access_token: access_token, conn: shared.conn)
 
-          IO.inspect(create_response)
-
           assert ~i(create_response.successful)
           assert check_user(~i(create_response.result), prepare_author(author) |> Map.put(:email, nil))
         end

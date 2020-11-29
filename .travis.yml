@@ -12,6 +12,7 @@ env:
     - secure: "WSWuHqfxZ3/CcH0Pe5meOo6rk+Kb7ChsZVLspWQWZa/9N1oDkUFJZ+QSOdjLKj4m3oDvYfZimDXgl+AZSnoLLXpN1fugAV7FMgSdmXmDSx7DUj8wf+mc3NOx/IfLAVEVysTP3W2FS+W3ZOOyDuq9tdtxwXTI14KY0F9xCinfvcmatEepfdHT1dQiZLxAMMxTp2Z3WqoOyGeSbn7PV5fplrB7rIHXgvTCIvt+HPa2aCVa4CRfnyAl9ZLZjkwKUdjw0c13UeMsA7LdB3TnMApn26jEP9vpPdnicYfwSdS2bDI2ksQ/trY5/ZpsRn3jZJOSoUXlgMOloYDvDMvv6FQi9kC1j8xV6kHgYAetUmCUzV9bc4Dg+jUGd6MofAUafhPTgmUzjKNORoxKmXlSpg4Hxpyl/s3SJR6GjFJPKDmceUqhwLFfKOVaRHW2e2tVgK2YQ5xrcpD3OqJJiGToWDx9FreXVj5Lrx3t9l+bUKVBGjl5s0HTNaxeMm+ZWjTsomeIpQmanTrK/Y6AOAOkkjKRC9kl+tsY3806eQJ+4tdv8xa7/vMVrXSj4wWbd/jUjHNgx/XkDff6oeebYJ3wm2UCAQpvn0YS84mlBKO7ppqBfqpzJrt+quaoWaT8UUhAqO1GhKKCCgvrTU9HY1+iPoj4YDdghus3jvTsP43ziGmeHDU=" # DOCKER_PASS
     - REPO=${TRAVIS_REPO_SLUG}
     - COMMIT=${TRAVIS_COMMIT::8}
+    - TAG=${TRAVIS_TAG}
     - DOCKER_COMPOSE_VERSION=1.24.1
 before_install:
   - docker load -i docker_images/images.tar || true
@@ -32,12 +33,18 @@ after_script:
   - docker images
 before_deploy:
   - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-  - docker build -t $REPO:latest -t $REPO:$COMMIT --compress -f Dockerfile.prod .
+  - docker build -t $REPO:$COMMIT --compress -f Dockerfile.prod .
 before_cache:
   - docker system prune -f
   - docker save -o docker_images/images.tar $(docker images -a -q)
 deploy:
-  provider: script
-  script: docker push $REPO:latest && docker push $REPO:$COMMIT
-  on:
-    branch: master
+  - provider: script
+    script: docker tag $REPO:$COMMIT $REPO:latest && docker push $REPO:latest
+    on:
+      branch: master
+      tags: true
+  - provider: script
+    script: docker tag $REPO:$COMMIT $REPO:$TAG && docker push $REPO:$TAG
+    on:
+      branch: master
+      tags: true
