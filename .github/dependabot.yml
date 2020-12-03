@@ -4,6 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    ignore:
+      - dependency-name: "ex_cldr" # TODO: https://github.com/change/linguist/pull/33
     labels:
       - "mix dependencies"
       
