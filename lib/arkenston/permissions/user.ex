@@ -118,9 +118,9 @@ defmodule Arkenston.Permissions.User do
 
     create_permissions =
       if is_author_other do
-        ["create_#{~i(user.role)}_with_existing_author" |> String.to_existing_atom()]
+        ["create_#{user.role}_with_existing_author" |> String.to_existing_atom()]
       else
-        ["create_#{~i(user.role)}" |> String.to_existing_atom()]
+        ["create_#{user.role}" |> String.to_existing_atom()]
       end
 
     if Guardian.any_permissions?(actual_permissions, %{user: create_permissions}) do
@@ -134,7 +134,7 @@ defmodule Arkenston.Permissions.User do
   def check_permissions_for(:update, context, old_user, new_user) do
     actual_permissions = Permissions.permissions_for(context)
 
-    old_role = ~i(old_user.role)
+    old_role = old_user.role
     new_role = ~i(new_user.role)
 
     is_role_changing =
@@ -260,7 +260,7 @@ defmodule Arkenston.Permissions.User do
 
   def check_permissions_for(:delete, context, user, _) do
     actual_permissions = Permissions.permissions_for(context)
-    role = ~i(user.role)
+    role = user.role
 
     delete_user_permissions =
       if is_self(context, user) do
@@ -284,7 +284,7 @@ defmodule Arkenston.Permissions.User do
         false
 
       current_user ->
-        ~i(current_user.id) == ~i(user.id)
+        current_user.id == user.id
     end
   end
 end

@@ -58,6 +58,8 @@ defmodule Arkenston.Subject.Author do
   end
 
   @name_format Application.compile_env(:arkenston, [:authors, :format, :name])
+  @name_length Application.compile_env(:arkenston, [:authors, :length, :name])
+
   @email_format Application.compile_env(:arkenston, [:authors, :format, :email])
 
   @doc false
@@ -71,6 +73,7 @@ defmodule Arkenston.Subject.Author do
     |> put_lowercase_email()
     |> validate_required([:name])
     |> validate_format(:name, @name_format)
+    |> validate_length(:name, min: @name_length)
     |> validate_format(:email, @email_format)
     |> unique_constraint(:name, name: :authors_data_name_index)
     |> unique_constraint(:email, name: :authors_data_email_index)
@@ -87,6 +90,7 @@ defmodule Arkenston.Subject.Author do
     |> put_lowercase_email()
     |> validate_required([:name])
     |> validate_format(:name, @name_format)
+    |> validate_length(:name, min: @name_length)
     |> validate_format(:email, @email_format)
     |> unique_constraint(:name, name: :authors_data_name_index)
     |> unique_constraint(:email, name: :authors_data_email_index)

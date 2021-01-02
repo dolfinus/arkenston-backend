@@ -5,7 +5,6 @@ defmodule Arkenston.Permissions.Author do
   alias Arkenston.Subject.User
   alias Arkenston.Context
   alias Arkenston.Repo
-  import Indifferent.Sigils
 
   @all_permissions Application.compile_env(:arkenston, [
                      Arkenston.Guardian,
@@ -140,7 +139,7 @@ defmodule Arkenston.Permissions.Author do
         false
 
       current_user ->
-        ~i(current_user.id) == ~i(author.user.id)
+        current_user.id == author.user.id
     end
   end
 end
