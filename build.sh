@@ -13,8 +13,8 @@ fi
 
 if [[ "x$COMMAND" == "x" ]]
 then
-  COMMAND="up -d --build"
+  COMMAND="up --build"
 fi
 
-docker build -t dolfinus/arkenston-backend:base  -f Dockerfile.base .
-docker-compose -f "docker-compose.$ENV.yml" $COMMAND
+docker build -t dolfinus/arkenston-backend:base -f Dockerfile.base .
+docker-compose -p "arkenston-${ENV}" -f "docker-compose.$ENV.yml" $COMMAND
