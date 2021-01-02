@@ -4,5 +4,6 @@ defmodule ArkenstonWeb.Schema.Types.Interface do
   import_types ArkenstonWeb.Schema.Types.Interface.Revision
   import_types ArkenstonWeb.Schema.Types.Interface.WithAccessToken
   import_types ArkenstonWeb.Schema.Types.Interface.WithRefreshToken
+  import_types ArkenstonWeb.Schema.Types.Interface.WithUser
   import_types ArkenstonWeb.Schema.Types.Interface.WithRevision
 end

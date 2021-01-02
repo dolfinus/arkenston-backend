@@ -12,18 +12,10 @@ defmodule Arkenston.Helper.TranslationHelper do
     end
   end
 
-  defp atomize(input) when is_atom(input) do
-    input
-  end
-
-  defp atomize(input) do
-    input |> String.to_existing_atom()
-  end
-
   def translate_field(object, field, locale \\ nil) do
     case translation_container(object) do
       value when map_size(value) > 0 ->
-        Translator.translate(object, field, locale || I18n.locale())
+        Translator.translate(object, field, locale)
 
       _ ->
         nil
@@ -73,8 +65,13 @@ defmodule Arkenston.Helper.TranslationHelper do
   end
 
   def translation_locales(object) do
-    keys = translation_container(object) |> Map.keys() |> Enum.map(&String.to_existing_atom/1)
-    all_locales = (keys ++ I18n.locales()) |> Enum.uniq()
+    keys = translation_container(object) |> Map.keys()
+
+    all_locales =
+      (keys ++ I18n.all_locales())
+      |> Enum.map(&to_string/1)
+      |> Enum.map(&String.to_existing_atom/1)
+      |> Enum.uniq()
 
     all_locales
   end
@@ -82,7 +79,7 @@ defmodule Arkenston.Helper.TranslationHelper do
   defp shrink_translation(translation) do
     translation
     |> Enum.reduce(%{}, fn {key, value}, trans ->
-      key = atomize(key)
+      key = I18n.normalize_atom(key)
       value = nvl_field(value)
 
       unless byte_size(value) == 0 do
@@ -136,7 +133,7 @@ defmodule Arkenston.Helper.TranslationHelper do
       translation =
         translation
         |> Enum.map(fn {key, value} ->
-          key = atomize(key)
+          key = I18n.normalize_atom(key)
           value = nvl_field(value)
 
           {key, value}
@@ -157,7 +154,7 @@ defmodule Arkenston.Helper.TranslationHelper do
       translation =
         fields
         |> Enum.map(fn field ->
-          field = atomize(field)
+          field = I18n.normalize_atom(field)
           value = translate_field(object, field, locale)
 
           {field, value}
@@ -179,7 +176,7 @@ defmodule Arkenston.Helper.TranslationHelper do
       translation =
         translation
         |> Enum.map(fn {key, value} ->
-          key = atomize(key)
+          key = I18n.normalize_atom(key)
           value = nvl_field(value)
 
           {key, value}
@@ -191,16 +188,16 @@ defmodule Arkenston.Helper.TranslationHelper do
     end)
   end
 
-  def translations_from_list(input) do
+  def translations_from_list(input, default_locale) do
     input
     |> Enum.reduce(%{}, fn translation, acc ->
-      {locale, translation} = translation |> Map.pop(:locale, I18n.locale())
-      locale = atomize(locale)
+      {locale, translation} = translation |> Map.pop(:locale, default_locale)
+      locale = I18n.normalize_atom(locale)
 
       translation =
         translation
         |> Enum.map(fn {key, value} ->
-          key = atomize(key)
+          key = I18n.normalize_atom(key)
           value = nvl_field(value)
 
           {key, value}
@@ -211,11 +208,11 @@ defmodule Arkenston.Helper.TranslationHelper do
     end)
   end
 
-  def merge_translations(input1, input2) do
+  def merge_translations(input1, input2, default_locale) do
     input1 =
       translations_map(
         if is_list(input1) do
-          translations_from_list(input1)
+          translations_from_list(input1, default_locale)
         else
           input1
         end
@@ -224,7 +221,7 @@ defmodule Arkenston.Helper.TranslationHelper do
     input2 =
       translations_map(
         if is_list(input2) do
-          translations_from_list(input2)
+          translations_from_list(input2, default_locale)
         else
           input2
         end
@@ -237,8 +234,9 @@ defmodule Arkenston.Helper.TranslationHelper do
     quote do
       alias Arkenston.Helper.TranslationHelper
 
-      def create_translations(attrs) do
+      def create_translations(attrs, context \\ %{}) do
         new_translations = attrs |> Map.get(:translations) || %{}
+        default_locale = I18n.get_default_locale(context)
 
         virtual_fields = TranslationHelper.translation_fields(__MODULE__)
         virtual_fields_changes = attrs |> Map.take(virtual_fields)
@@ -246,17 +244,22 @@ defmodule Arkenston.Helper.TranslationHelper do
         attrs = attrs |> Map.drop(virtual_fields)
 
         translations =
-          TranslationHelper.merge_translations(new_translations, %{
-            I18n.locale() => virtual_fields_changes
-          })
+          TranslationHelper.merge_translations(
+            new_translations,
+            %{
+              default_locale => virtual_fields_changes
+            },
+            default_locale
+          )
 
         attrs
         |> Map.drop(virtual_fields)
         |> Map.put(:translations, TranslationHelper.shrink_translations_map(translations))
       end
 
-      def update_translations(changeset, attrs) do
+      def update_translations(changeset, attrs, context \\ %{}) do
         virtual_fields = TranslationHelper.translation_fields(__MODULE__)
+        default_locale = I18n.get_default_locale(context)
 
         translations =
           case Map.fetch(attrs, :translations) do
@@ -265,9 +268,13 @@ defmodule Arkenston.Helper.TranslationHelper do
 
               virtual_fields_changes = attrs |> Map.take(virtual_fields)
 
-              TranslationHelper.merge_translations(new_translations, %{
-                I18n.locale() => virtual_fields_changes
-              })
+              TranslationHelper.merge_translations(
+                new_translations,
+                %{
+                  default_locale => virtual_fields_changes
+                },
+                default_locale
+              )
 
             :error ->
               old_translations = changeset.translations || %{}
@@ -275,9 +282,13 @@ defmodule Arkenston.Helper.TranslationHelper do
               virtual_fields = TranslationHelper.translation_fields(__MODULE__)
               virtual_fields_changes = attrs |> Map.take(virtual_fields)
 
-              TranslationHelper.merge_translations(old_translations, %{
-                I18n.locale() => virtual_fields_changes
-              })
+              TranslationHelper.merge_translations(
+                old_translations,
+                %{
+                  default_locale => virtual_fields_changes
+                },
+                default_locale
+              )
           end
 
         attrs

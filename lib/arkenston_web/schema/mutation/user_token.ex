@@ -1,11 +1,11 @@
 defmodule ArkenstonWeb.Schema.Mutation.UserToken do
   use Absinthe.Schema.Notation
-  import AbsintheErrorPayload.Payload
+  import Arkenston.Middleware.HandleErrors
 
   alias Arkenston.Mutator.UserTokenMutator
 
   object :user_token_mutations do
-    field :login, :user_token_payload do
+    field :login, :user_token do
       arg :email, :string
       arg :name, :string
       arg :password, non_null(:string)
@@ -14,13 +14,13 @@ defmodule ArkenstonWeb.Schema.Mutation.UserToken do
       middleware &build_payload/2
     end
 
-    field :exchange, :user_access_token_payload do
+    field :exchange_token, :user_access_token do
       arg :refresh_token, :string
-      resolve &UserTokenMutator.exchange/2
+      resolve &UserTokenMutator.exchange_token/2
       middleware &build_payload/2
     end
 
-    field :logout, :boolean_payload do
+    field :logout, :user_logout do
       arg :refresh_token, :string
       resolve &UserTokenMutator.logout/2
       middleware &build_payload/2

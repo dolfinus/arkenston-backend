@@ -15,9 +15,10 @@ defmodule ArkenstonWeb.Schema.Helpers.Translation do
   defmacro translate(field, args \\ []) do
     quote do
       field unquote(field), non_null(:string), unquote_splicing(args) do
-        arg :locale, :locale, default_value: I18n.locale()
+        arg :locale, :locale, default_value: nil
 
-        resolve fn parent, %{locale: locale}, _context ->
+        resolve fn parent, args, %{context: context} ->
+          locale = args |> Map.get(:locale, I18n.get_default_locale(context))
           {:ok, TranslationHelper.translate_field(parent, unquote(field), locale)}
         end
       end

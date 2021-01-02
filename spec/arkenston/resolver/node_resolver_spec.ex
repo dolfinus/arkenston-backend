@@ -31,7 +31,7 @@ defmodule Arkenston.Resolver.NodeResolverSpec do
           author = build(:author)
 
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
-          created_user = ~i(create_response.result)
+          created_user = ~i(create_response.data.createUser)
 
           node_response = get_node(id: ~i(created_user.id), access_token: access_token, conn: shared.conn)
 
@@ -46,7 +46,7 @@ defmodule Arkenston.Resolver.NodeResolverSpec do
           author = build(:author)
 
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-          created_author = ~i(create_response.result)
+          created_author = ~i(create_response.data.createAuthor)
 
           node_response = get_node(id: ~i(created_author.id), access_token: access_token, conn: shared.conn)
 

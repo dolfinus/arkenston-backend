@@ -89,14 +89,7 @@ defmodule Arkenston.Permissions.User do
           context :: Context.t(),
           old_entity :: any,
           new_entity :: any
-        ) :: :ok | {:error, %AbsintheErrorPayload.ValidationMessage{}}
-  def check_permissions_for(
-        operation,
-        context \\ %{anonymous: true},
-        old_entity \\ nil,
-        new_entity \\ nil
-      )
-
+        ) :: :ok | {:error, %Arkenston.Payload.ValidationMessage{}}
   def check_permissions_for(:create, context, user, _) do
     actual_permissions = Permissions.permissions_for(context)
     current_user = Permissions.get_current_user(context)
@@ -126,8 +119,7 @@ defmodule Arkenston.Permissions.User do
     if Guardian.any_permissions?(actual_permissions, %{user: create_permissions}) do
       :ok
     else
-      {:error,
-       %AbsintheErrorPayload.ValidationMessage{field: :role, code: :not_enough_permissions}}
+      {:error, %Arkenston.Payload.ValidationMessage{field: :role, code: :permissions}}
     end
   end
 
@@ -219,22 +211,13 @@ defmodule Arkenston.Permissions.User do
         do: true,
         else: Guardian.any_permissions?(actual_permissions, %{user: change_password_permissions})
 
-    unless update_user_permissions_valid do
-      {:error, %AbsintheErrorPayload.ValidationMessage{code: :not_enough_permissions}}
+    unless change_role_permissions_valid do
+      {:error, %Arkenston.Payload.ValidationMessage{field: :role, code: :permissions}}
     else
-      unless change_role_permissions_valid do
-        {:error,
-         %AbsintheErrorPayload.ValidationMessage{field: :role, code: :not_enough_permissions}}
+      if change_password_permissions_valid and update_user_permissions_valid do
+        :ok
       else
-        unless change_password_permissions_valid do
-          {:error,
-           %AbsintheErrorPayload.ValidationMessage{
-             field: :password,
-             code: :not_enough_permissions
-           }}
-        else
-          :ok
-        end
+        {:error, %Arkenston.Payload.ValidationMessage{code: :permissions}}
       end
     end
   end
@@ -242,39 +225,40 @@ defmodule Arkenston.Permissions.User do
   def check_permissions_for(:change_author, context, user, _author) do
     actual_permissions = Permissions.permissions_for(context)
 
-    change_author_permissions =
+    {change_author_permissions, field, options} =
       unless is_self(context, user) do
-        [
-          "change_#{user.role}_author" |> String.to_existing_atom()
-        ]
+        {[
+           "change_#{user.role}_author" |> String.to_existing_atom()
+         ], :role, [role: {:enum, user.role}]}
       else
-        [:change_self_author]
+        {[:change_self_author], nil, []}
       end
 
     if Guardian.any_permissions?(actual_permissions, %{user: change_author_permissions}) do
       :ok
     else
-      {:error, %AbsintheErrorPayload.ValidationMessage{code: :not_enough_permissions}}
+      {:error,
+       %Arkenston.Payload.ValidationMessage{field: field, code: :permissions, options: options}}
     end
   end
 
   def check_permissions_for(:delete, context, user, _) do
     actual_permissions = Permissions.permissions_for(context)
-    role = user.role
 
-    delete_user_permissions =
+    {delete_user_permissions, field, options} =
       if is_self(context, user) do
-        [:delete_self]
+        {[:delete_self], nil, []}
       else
-        [
-          "delete_#{role}" |> String.to_existing_atom()
-        ]
+        {[
+           "delete_#{user.role}" |> String.to_existing_atom()
+         ], :role, [role: {:enum, user.role}]}
       end
 
     if Guardian.any_permissions?(actual_permissions, %{user: delete_user_permissions}) do
       :ok
     else
-      {:error, %AbsintheErrorPayload.ValidationMessage{code: :not_enough_permissions}}
+      {:error,
+       %Arkenston.Payload.ValidationMessage{field: field, code: :permissions, options: options}}
     end
   end
 

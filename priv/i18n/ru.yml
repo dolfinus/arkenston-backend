@@ -1,3 +1,109 @@
+operation:
+  create:
+    infinitive: создать
+    nominative: создание
+    genitive: создания
+  update:
+    infinitive: обновить
+    nominative: обновление
+    genitive: обновления
+  change:
+    infinitive: изменить
+    nominative: изменение
+    genitive: изменения
+  delete:
+    infinitive: удалить
+    nominative: удаление
+    genitive: удаления
+entity:
+  user: &user
+    nominative: пользователь
+    genitive: пользователя
+    instrumental: пользователем
+  author:
+    nominative: автор
+    genitive: автора
+    instrumental: автором
+  user_author:
+    nominative: привязка пользователя к автору
+    genitive: привязки пользователя к автору
+    instrumental: привязкой пользователя к автору
+  token:
+    nominative: токен
+    genitive: токена
+    instrumental: токеном
+field:
+  author: &name
+    name:
+      nominative: имя %{entity.genitive}
+      genitive: имени %{entity.genitive}
+      instrumental: именем
+    email:
+      nominative: email %{entity.genitive}
+      genitive: email %{entity.genitive}
+      instrumental: email
+  user: *name
+  name:
+    nominative: название
+    genitive: названия
+    instrumental: названием
+  email: email
+  password:
+    nominative: пароль
+    genitive: пароля
+    instrumental: паролем
+  role:
+    nominative: роль
+    genitive: роли
+    instrumental: ролью
+    admin:
+      nominative: администратор
+      genitive: администратора
+      instrumental: администратором
+    moderator:
+      nominative: модератор
+      genitive: модератора
+      instrumental: модератором
+    user: *user
+  first_name:
+    nominative: имя
+    genitive: имени
+    instrumental: именем
+  last_name:
+    nominative: фамилия
+    genitive: фамилии
+    instrumental: фамилией
+  middle_name:
+    nominative: отчество
+    genitive: отчества
+    instrumental: отчеством
+  refresh_token:
+    nominative: токен обновления
+    genitive: токена обновления
+    instrumental: токеном обновления
+  access_token:
+    nominative: токен доступа
+    genitive: токена доступа
+    instrumental: токеном доступа
+error:
+  missing: "%{entity} не найден"
+  permissions: Недостаточно прав для %{operation.genitive}
+  credentials: Неправильные данные для входа
+  invalid_type: "Некорректный тип %{entity.genitive}"
+  expired: "Время действия %{entity.genitive} истекло"
+  revoked: "%{entity} был отозван"
+  field:
+    missing: "%{entity} с указанным %{field.instrumental} не найден"
+    invalid: "Некорректное значение %{value} %{field.genitive}"
+    unique: "%{entity} с аналогичным %{field.instrumental} %{value} уже существует"
+    permissions: Недостаточно прав для %{operation.genitive} с %{field.instrumental} %{value.genitive}
+    min:
+      one: "Длина %{field.genitive} должна составлять минимум 1 символ"
+      few: "Длина %{field.genitive} должна составлять минимум %{count} символа"
+      many: "Длина %{field.genitive} должна составлять минимум %{count} символов"
+      other: "Длина %{field.genitive} должна составлять минимум %{count} символов"
+    format: "%{field} %{value} не соответствует формату"
+    required: "%{field} не может быть пустым"
 default:
   authors:
     admin:

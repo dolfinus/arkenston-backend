@@ -12,44 +12,28 @@ defmodule SubjectHelper do
     """
     mutation ($name: String, $email: String, $password: String!){
       login(name: $name, email: $email, password: $password) {
-        successful
-        result {
-          user {
-            id
-            name
-            email
-          }
-          access_token
-          refresh_token
+        user {
+          id
+          name
+          email
         }
-        messages {
-          message
-          code
-          field
-        }
+        access_token
+        refresh_token
       }
     }
     """
   end
 
-  def exchange_mutation() do
+  def exchange_token_mutation() do
     """
     mutation ($refresh_token: String!){
-      exchange(refresh_token: $refresh_token) {
-        successful
-        result {
-          user {
-            id
-            name
-            email
-          }
-          access_token
+      exchangeToken(refresh_token: $refresh_token) {
+        user {
+          id
+          name
+          email
         }
-        messages {
-          message
-          code
-          field
-        }
+        access_token
       }
     }
     """
@@ -59,11 +43,8 @@ defmodule SubjectHelper do
     """
     mutation ($refresh_token: String!){
       logout(refresh_token: $refresh_token) {
-        successful
-        messages {
-          message
-          code
-          field
+        user {
+          id
         }
       }
     }
@@ -210,35 +191,27 @@ defmodule SubjectHelper do
     """
     mutation ($input: CreateAuthorInput!){
       createAuthor(input: $input) {
-        successful
-        result {
-          id
-          name
-          email
+        id
+        name
+        email
+        first_name
+        last_name
+        middle_name
+        translations {
+          locale
           first_name
           last_name
           middle_name
-          translations {
-            locale
-            first_name
-            last_name
-            middle_name
-          }
-          version
-          note
-          created_at
-          created_by {
-            id
-          }
-          updated_at
-          updated_by {
-            id
-          }
         }
-        messages {
-          message
-          code
-          field
+        version
+        note
+        created_at
+        created_by {
+          id
+        }
+        updated_at
+        updated_by {
+          id
         }
       }
     }
@@ -249,32 +222,24 @@ defmodule SubjectHelper do
     """
     mutation ($input: CreateUserInput!, $author: CreateUserAuthorInput!){
       createUser(input: $input, author: $author) {
-        successful
-        result {
+        id
+        name
+        email
+        role
+        version
+        note
+        author {
           id
           name
           email
-          role
-          version
-          note
-          author {
-            id
-            name
-            email
-          }
-          created_at
-          created_by {
-            id
-          }
-          updated_at
-          updated_by {
-            id
-          }
         }
-        messages {
-          message
-          code
-          field
+        created_at
+        created_by {
+          id
+        }
+        updated_at
+        updated_by {
+          id
         }
       }
     }
@@ -285,35 +250,27 @@ defmodule SubjectHelper do
     """
     mutation ($id: UUID4, $name: String, $email: String, $input: UpdateAuthorInput!){
       updateAuthor(id: $id, name: $name, email: $email, input: $input) {
-        successful
-        result {
-          id
-          name
-          email
+        id
+        name
+        email
+        first_name
+        last_name
+        middle_name
+        translations {
+          locale
           first_name
           last_name
           middle_name
-          translations {
-            locale
-            first_name
-            last_name
-            middle_name
-          }
-          version
-          note
-          created_at
-          created_by {
-            id
-          }
-          updated_at
-          updated_by {
-            id
-          }
         }
-        messages {
-          message
-          code
-          field
+        version
+        note
+        created_at
+        created_by {
+          id
+        }
+        updated_at
+        updated_by {
+          id
         }
       }
     }
@@ -324,32 +281,24 @@ defmodule SubjectHelper do
     """
     mutation ($id: UUID4, $name: String, $email: String, $input: UpdateUserInput!){
       updateUser(id: $id, name: $name, email: $email, input: $input) {
-        successful
-        result {
+        id
+        name
+        email
+        role
+        version
+        note
+        author {
           id
           name
           email
-          role
-          version
-          note
-          author {
-            id
-            name
-            email
-          }
-          created_at
-          created_by {
-            id
-          }
-          updated_at
-          updated_by {
-            id
-          }
         }
-        messages {
-          message
-          code
-          field
+        created_at
+        created_by {
+          id
+        }
+        updated_at
+        updated_by {
+          id
         }
       }
     }
@@ -360,32 +309,24 @@ defmodule SubjectHelper do
     """
     mutation ($id: UUID4, $name: String, $email: String, $author: ChangeUserAuthorInput!){
       changeUserAuthor(id: $id, name: $name, email: $email, author: $author) {
-        successful
-        result {
+        id
+        name
+        email
+        role
+        version
+        note
+        author {
           id
           name
           email
-          role
-          version
-          note
-          author {
-            id
-            name
-            email
-          }
-          created_at
-          created_by {
-            id
-          }
-          updated_at
-          updated_by {
-            id
-          }
         }
-        messages {
-          message
-          code
-          field
+        created_at
+        created_by {
+          id
+        }
+        updated_at
+        updated_by {
+          id
         }
       }
     }
@@ -396,12 +337,7 @@ defmodule SubjectHelper do
     """
     mutation ($id: UUID4, $name: String, $email: String, $input: DeleteAuthorInput){
       deleteAuthor(id: $id, name: $name, email: $email, input: $input) {
-        successful
-        messages {
-          message
-          code
-          field
-        }
+        id
       }
     }
     """
@@ -411,12 +347,7 @@ defmodule SubjectHelper do
     """
     mutation ($id: UUID4, $name: String, $email: String, $input: DeleteUserInput){
       deleteUser(id: $id, name: $name, email: $email, input: $input) {
-        successful
-        messages {
-          message
-          code
-          field
-        }
+        id
       }
     }
     """
@@ -493,40 +424,55 @@ defmodule SubjectHelper do
 
   def auth(user, author, conn \\ build_conn()) do
     response = auth_by_email(user, author, conn)
-    ~i(response.result.access_token)
+    ~i(response.data.login.access_token)
   end
 
-  def auth_by_email(user, author, conn \\ build_conn()) do
-    auth_response = make_query(conn, %{
-      query: login_mutation(),
-      variables: %{email: author.email, password: user.password}
-    })
-
-    ~i(auth_response.data.login) || auth_response
+  def auth_by_email(user, author, conn \\ build_conn(), locale \\ nil) do
+    make_query(
+      conn,
+      %{
+        query: login_mutation(),
+        variables: %{email: author.email, password: user.password}
+      },
+      nil,
+      locale
+    )
   end
 
-  def auth_by_name(user, author, conn \\ build_conn()) do
-    auth_response = make_query(conn, %{
-      query: login_mutation(),
-      variables: %{name: author.name, password: user.password}
-    })
-    ~i(auth_response.data.login) || auth_response
+  def auth_by_name(user, author, conn \\ build_conn(), locale \\ nil) do
+    make_query(
+      conn,
+      %{
+        query: login_mutation(),
+        variables: %{name: author.name, password: user.password}
+      },
+      nil,
+      locale
+    )
   end
 
-  def exchange(refresh_token, conn \\ build_conn()) do
-    exchange_response = make_query(conn, %{
-      query: exchange_mutation(),
-      variables: %{refresh_token: refresh_token}
-    })
-    ~i(exchange_response.data.exchange) || exchange_response
+  def exchange_token(refresh_token, conn \\ build_conn(), locale \\ nil) do
+    make_query(
+      conn,
+      %{
+        query: exchange_token_mutation(),
+        variables: %{refresh_token: refresh_token}
+      },
+      nil,
+      locale
+    )
   end
 
-  def logout(refresh_token, conn \\ build_conn()) do
-    logout_response = make_query(conn, %{
-      query: logout_mutation(),
-      variables: %{refresh_token: refresh_token}
-    })
-    ~i(logout_response.data.logout) || logout_response
+  def logout(refresh_token, conn \\ build_conn(), locale \\ nil) do
+    make_query(
+      conn,
+      %{
+        query: logout_mutation(),
+        variables: %{refresh_token: refresh_token}
+      },
+      nil,
+      locale
+    )
   end
 
   def get_authors(args \\ %{})
@@ -537,25 +483,17 @@ defmodule SubjectHelper do
   end
 
   def get_authors(args) when is_map(args) do
-    %{conn: conn} = args
-    input = args |> Map.drop([:conn, :access_token])
+    {conn, args} = args |> Map.pop(:conn)
+    {access_token, args} = args |> Map.pop(:access_token)
+    {locale, args} = args |> Map.pop(:locale)
 
-    get_all_response = case args do
-      %{access_token: token} when not is_nil(token) ->
-        make_query(conn, %{
-            query: get_authors_query(),
-            variables: input
-          },
-          token
-        )
-      _ ->
-        make_query(conn, %{
-          query: get_authors_query(),
-          variables: input
-        })
-    end
-
-    get_all_response
+    make_query(conn, %{
+        query: get_authors_query(),
+        variables: args
+      },
+      access_token,
+      locale
+    )
   end
 
   def get_users(args \\ %{})
@@ -566,25 +504,17 @@ defmodule SubjectHelper do
   end
 
   def get_users(args) when is_map(args) do
-    %{conn: conn} = args
-    input = args |> Map.drop([:conn, :access_token])
+    {conn, args} = args |> Map.pop(:conn)
+    {access_token, args} = args |> Map.pop(:access_token)
+    {locale, args} = args |> Map.pop(:locale)
 
-    get_all_response = case args do
-      %{access_token: token} when not is_nil(token) ->
-        make_query(conn, %{
-            query: get_users_query(),
-            variables: input
-          },
-          token
-        )
-      _ ->
-        make_query(conn, %{
-          query: get_users_query(),
-          variables: input
-        })
-    end
-
-    get_all_response
+    make_query(conn, %{
+        query: get_users_query(),
+        variables: args
+      },
+      access_token,
+      locale
+    )
   end
 
   def get_author(args \\ %{})
@@ -595,25 +525,17 @@ defmodule SubjectHelper do
   end
 
   def get_author(args) when is_map(args) do
-    %{conn: conn} = args
-    input = args |> Map.drop([:conn, :access_token])
+    {conn, args} = args |> Map.pop(:conn)
+    {access_token, args} = args |> Map.pop(:access_token)
+    {locale, args} = args |> Map.pop(:locale)
 
-    get_one_response = case args do
-      %{access_token: token} when not is_nil(token) ->
-        make_query(conn, %{
-            query: get_author_query(),
-            variables: input
-          },
-          token
-        )
-      _ ->
-        make_query(conn, %{
-          query: get_author_query(),
-          variables: input
-        })
-    end
-
-    get_one_response
+    make_query(conn, %{
+        query: get_author_query(),
+        variables: args
+      },
+      access_token,
+      locale
+    )
   end
 
   def get_user(args \\ %{})
@@ -624,25 +546,17 @@ defmodule SubjectHelper do
   end
 
   def get_user(args) when is_map(args) do
-    %{conn: conn} = args
-    input = args |> Map.drop([:conn, :access_token])
+    {conn, args} = args |> Map.pop(:conn)
+    {access_token, args} = args |> Map.pop(:access_token)
+    {locale, args} = args |> Map.pop(:locale)
 
-    get_one_response = case args do
-      %{access_token: token} when not is_nil(token) ->
-        make_query(conn, %{
-            query: get_user_query(),
-            variables: input
-          },
-          token
-        )
-      _ ->
-        make_query(conn, %{
-          query: get_user_query(),
-          variables: input
-        })
-    end
-
-    get_one_response
+    make_query(conn, %{
+        query: get_user_query(),
+        variables: args
+      },
+      access_token,
+      locale
+    )
   end
 
   def create_author(args \\ %{})
@@ -653,25 +567,17 @@ defmodule SubjectHelper do
   end
 
   def create_author(args) when is_map(args) do
-    %{conn: conn} = args
-    input = args |> Map.drop([:conn, :access_token])
+    {conn, args} = args |> Map.pop(:conn)
+    {access_token, args} = args |> Map.pop(:access_token)
+    {locale, args} = args |> Map.pop(:locale)
 
-    create_response = case args do
-      %{access_token: token} when not is_nil(token) ->
-        make_query(conn, %{
-            query: create_author_mutation(),
-            variables: input
-          },
-          token
-        )
-      _ ->
-        make_query(conn, %{
-          query: create_author_mutation(),
-          variables: input
-        })
-    end
-
-    ~i(create_response.data.createAuthor) || create_response
+    make_query(conn, %{
+        query: create_author_mutation(),
+        variables: args
+      },
+      access_token,
+      locale
+    )
   end
 
   def create_user(args \\ %{})
@@ -682,25 +588,17 @@ defmodule SubjectHelper do
   end
 
   def create_user(args) when is_map(args) do
-    %{conn: conn} = args
-    input = args |> Map.drop([:conn, :access_token])
+    {conn, args} = args |> Map.pop(:conn)
+    {access_token, args} = args |> Map.pop(:access_token)
+    {locale, args} = args |> Map.pop(:locale)
 
-    create_response = case args do
-      %{access_token: token} when not is_nil(token) ->
-        make_query(conn, %{
-            query: create_user_mutation(),
-            variables: input
-          },
-          token
-        )
-      _ ->
-        make_query(conn, %{
-          query: create_user_mutation(),
-          variables: input
-        })
-    end
-
-    ~i(create_response.data.createUser) || create_response
+    make_query(conn, %{
+        query: create_user_mutation(),
+        variables: args
+      },
+      access_token,
+      locale
+    )
   end
 
   def update_author(args \\ %{})
@@ -711,25 +609,17 @@ defmodule SubjectHelper do
   end
 
   def update_author(args) when is_map(args) do
-    %{conn: conn} = args
-    input = args |> Map.drop([:conn, :access_token])
+    {conn, args} = args |> Map.pop(:conn)
+    {access_token, args} = args |> Map.pop(:access_token)
+    {locale, args} = args |> Map.pop(:locale)
 
-    update_response = case args do
-      %{access_token: token} when not is_nil(token) ->
-        make_query(conn, %{
-            query: update_author_mutation(),
-            variables: input
-          },
-          token
-        )
-      _ ->
-        make_query(conn, %{
-          query: update_author_mutation(),
-          variables: input
-        })
-    end
-
-    ~i(update_response.data.updateAuthor) || update_response
+    make_query(conn, %{
+        query: update_author_mutation(),
+        variables: args
+      },
+      access_token,
+      locale
+    )
   end
 
   def update_user(args \\ %{})
@@ -740,25 +630,17 @@ defmodule SubjectHelper do
   end
 
   def update_user(args) when is_map(args) do
-    %{conn: conn} = args
-    input = args |> Map.drop([:conn, :access_token])
+    {conn, args} = args |> Map.pop(:conn)
+    {access_token, args} = args |> Map.pop(:access_token)
+    {locale, args} = args |> Map.pop(:locale)
 
-    update_response = case args do
-      %{access_token: token} when not is_nil(token) ->
-        make_query(conn, %{
-            query: update_user_mutation(),
-            variables: input
-          },
-          token
-        )
-      _ ->
-        make_query(conn, %{
-          query: update_user_mutation(),
-          variables: input
-        })
-    end
-
-    ~i(update_response.data.updateUser) || update_response
+    make_query(conn, %{
+        query: update_user_mutation(),
+        variables: args
+      },
+      access_token,
+      locale
+    )
   end
 
   def change_user_author(args \\ %{})
@@ -769,25 +651,17 @@ defmodule SubjectHelper do
   end
 
   def change_user_author(args) when is_map(args) do
-    %{conn: conn} = args
-    input = args |> Map.drop([:conn, :access_token])
+    {conn, args} = args |> Map.pop(:conn)
+    {access_token, args} = args |> Map.pop(:access_token)
+    {locale, args} = args |> Map.pop(:locale)
 
-    change_user_author_response = case args do
-      %{access_token: token} when not is_nil(token) ->
-        make_query(conn, %{
-            query: change_user_author_mutation(),
-            variables: input
-          },
-          token
-        )
-      _ ->
-        make_query(conn, %{
-          query: change_user_author_mutation(),
-          variables: input
-        })
-    end
-
-    ~i(change_user_author_response.data.changeUserAuthor) || change_user_author_response
+    make_query(conn, %{
+        query: change_user_author_mutation(),
+        variables: args
+      },
+      access_token,
+      locale
+    )
   end
 
   def delete_author(args \\ %{})
@@ -798,25 +672,17 @@ defmodule SubjectHelper do
   end
 
   def delete_author(args) when is_map(args) do
-    %{conn: conn} = args
-    input = args |> Map.drop([:conn, :access_token])
+    {conn, args} = args |> Map.pop(:conn)
+    {access_token, args} = args |> Map.pop(:access_token)
+    {locale, args} = args |> Map.pop(:locale)
 
-    delete_response = case args do
-      %{access_token: token} when not is_nil(token) ->
-        make_query(conn, %{
-            query: delete_author_mutation(),
-            variables: input
-          },
-          token
-        )
-      _ ->
-        make_query(conn, %{
-          query: delete_author_mutation(),
-          variables: input
-        })
-    end
-
-    ~i(delete_response.data.deleteAuthor) || delete_response
+    make_query(conn, %{
+        query: delete_author_mutation(),
+        variables: args
+      },
+      access_token,
+      locale
+    )
   end
 
   def delete_user(args \\ %{})
@@ -827,24 +693,16 @@ defmodule SubjectHelper do
   end
 
   def delete_user(args) when is_map(args) do
-    %{conn: conn} = args
-    input = args |> Map.drop([:conn, :access_token])
+    {conn, args} = args |> Map.pop(:conn)
+    {access_token, args} = args |> Map.pop(:access_token)
+    {locale, args} = args |> Map.pop(:locale)
 
-    delete_response = case args do
-      %{access_token: token} when not is_nil(token) ->
-        make_query(conn, %{
-            query: delete_user_mutation(),
-            variables: input
-          },
-          token
-        )
-      _ ->
-        make_query(conn, %{
-          query: delete_user_mutation(),
-          variables: input
-        })
-    end
-
-    ~i(delete_response.data.deleteUser) || delete_response
+    make_query(conn, %{
+        query: delete_user_mutation(),
+        variables: args
+      },
+      access_token,
+      locale
+    )
   end
 end

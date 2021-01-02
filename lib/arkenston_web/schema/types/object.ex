@@ -6,4 +6,5 @@ defmodule ArkenstonWeb.Schema.Types.Object do
   import_types ArkenstonWeb.Schema.Types.Object.User
   import_types ArkenstonWeb.Schema.Types.Object.UserAccessToken
   import_types ArkenstonWeb.Schema.Types.Object.UserToken
+  import_types ArkenstonWeb.Schema.Types.Object.UserLogout
 end

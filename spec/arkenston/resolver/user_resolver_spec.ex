@@ -30,7 +30,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_users = (inserted_users ++ [creator]) |> Enum.map(&handle_user/1)
@@ -49,7 +49,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user_id = ~i(inserted_users[0].id)
@@ -70,7 +70,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user = ~i(inserted_users[0]) |> handle_user()
@@ -90,7 +90,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user_author_id = ~i(inserted_users[0].author.id)
@@ -116,7 +116,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user = ~i(inserted_users[0]) |> handle_user()
@@ -136,7 +136,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user_author_id = ~i(inserted_users[0].author.id)
@@ -162,7 +162,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user_author_id = ~i(inserted_users[0].author.id)
@@ -197,7 +197,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
               author = build(:author)
               create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-              ~i(create_response.result)
+              ~i(create_response.data.createUser)
             end)
 
             inserted_users = if unquote(role) == :admin do
@@ -222,7 +222,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user_id = ~i(inserted_users[0].id)
@@ -245,7 +245,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user_id = ~i(inserted_users[0].id)
@@ -270,7 +270,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user_id = ~i(inserted_users[0].id)
@@ -291,7 +291,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user = ~i(inserted_users[0]) |> handle_user()
@@ -311,7 +311,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user_author_id = ~i(inserted_users[0].author.id)
@@ -337,7 +337,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user = ~i(inserted_users[0]) |> handle_user()
@@ -357,7 +357,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user_author_id = ~i(inserted_users[0].author.id)
@@ -383,7 +383,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           user = ~i(users[0])
@@ -413,7 +413,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user_id = ~i(inserted_users[0].id)
@@ -438,7 +438,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user_id = ~i(inserted_users[0].id)
@@ -460,7 +460,7 @@ defmodule Arkenston.Resolver.UserResolverSpec do
             author = build(:author)
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createUser)
           end)
 
           inserted_user_id = ~i(inserted_users[0].id)

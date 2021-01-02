@@ -35,11 +35,11 @@ defmodule Arkenston.Helper.AuthHelper do
     if User.check_password(user, password) do
       {:ok, user}
     else
-      {:error, "Incorrect login credentials"}
+      {:error, :credentials}
     end
   end
 
   defp login_with_pass(_user, _password) do
-    {:error, "User not found"}
+    {:error, :missing}
   end
 end

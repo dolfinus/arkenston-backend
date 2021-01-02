@@ -1,18 +1,18 @@
 defmodule ArkenstonWeb.Schema.Mutation.User do
   use Absinthe.Schema.Notation
-  import AbsintheErrorPayload.Payload
+  import Arkenston.Middleware.HandleErrors
 
   alias Arkenston.Mutator.UserMutator
 
   object :user_mutations do
-    field :create_user, :user_payload do
+    field :create_user, :user do
       arg :input, non_null(:create_user_input)
       arg :author, non_null(:create_user_author_input)
       resolve &UserMutator.create/3
       middleware &build_payload/2
     end
 
-    field :update_user, :user_payload do
+    field :update_user, :user do
       arg :id, :uuid4
       arg :name, :string
       arg :email, :string
@@ -21,7 +21,7 @@ defmodule ArkenstonWeb.Schema.Mutation.User do
       middleware &build_payload/2
     end
 
-    field :change_user_author, :user_payload do
+    field :change_user_author, :user do
       arg :id, :uuid4
       arg :name, :string
       arg :email, :string
@@ -30,7 +30,7 @@ defmodule ArkenstonWeb.Schema.Mutation.User do
       middleware &build_payload/2
     end
 
-    field :delete_user, :boolean_payload do
+    field :delete_user, :user do
       arg :id, :uuid4
       arg :name, :string
       arg :email, :string

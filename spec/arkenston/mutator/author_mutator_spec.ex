@@ -21,7 +21,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
   end
 
   let :translation_with_default_locale do
-    %{locale: I18n.locale, first_name: first_name(), last_name: last_name(), middle_name: first_name()}
+    %{locale: I18n.default_locale(), first_name: first_name(), last_name: last_name(), middle_name: first_name()}
   end
 
   let :translation_with_custom_locale do
@@ -85,45 +85,115 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          assert ~i(create_response.successful)
-          assert check_user(~i(create_response.result), prepare_author(author))
+          expect ~i(create_response.errors) |> to(be_nil())
+          assert check_author(~i(create_response.data.createAuthor), prepare_author(author))
         end
 
-        it "returns error for already used name", validation: true, valid: false do
-          %{access_token: access_token} = creator()
+        [
+          en: "Author with the same name %{name} is already exist",
+          ru: "Автор с аналогичным именем %{name} уже существует"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for already used name (#{locale})", validation: true, valid: false, locale: locale do
+            %{access_token: access_token} = creator()
 
-          existing_author = build(:author)
-          create_author(input: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
+            existing_author = build(:author)
+            create_author(input: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
 
-          invalid_author = build(:author, name: existing_author.name |> String.upcase())
+            invalid_author = build(:author, name: existing_author.name |> String.upcase())
 
-          create_response = create_author(input: prepare_author(invalid_author), access_token: access_token, conn: shared.conn)
+            create_response = create_author(input: prepare_author(invalid_author), access_token: access_token, conn: shared.conn, locale: unquote(locale))
 
-          refute ~i(create_response.successful)
-        end
+            expect ~i(create_response.errors) |> not_to(be_empty())
+            expect ~i(create_response.errors[0].operation) |> to(eq("createAuthor"))
+            expect ~i(create_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(create_response.errors[0].code) |> to(eq("unique"))
+            expect ~i(create_response.errors[0].field) |> to(eq("name"))
+            expect ~i(create_response.errors[0].message) |> to(eq(unquote(msg) |> String.replace("%{name}", String.downcase(invalid_author.name))))
+          end
+        end)
 
-        it "returns error for already used email", validation: true, valid: false do
-          %{access_token: access_token} = creator()
+        [
+          en: "Author with the same email %{email} is already exist",
+          ru: "Автор с аналогичным email %{email} уже существует"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for already used email (#{locale})", validation: true, valid: false, locale: locale do
+            %{access_token: access_token} = creator()
 
-          existing_author = build(:author)
-          create_author(input: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
+            existing_author = build(:author)
+            create_author(input: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
 
-          invalid_author = build(:author, email: existing_author.email |> String.upcase())
+            invalid_author = build(:author, email: existing_author.email |> String.upcase())
 
-          create_response = create_author(input: prepare_author(invalid_author), access_token: access_token, conn: shared.conn)
+            create_response = create_author(input: prepare_author(invalid_author), access_token: access_token, conn: shared.conn, locale: unquote(locale))
 
-          refute ~i(create_response.successful)
-        end
+            expect ~i(create_response.errors) |> not_to(be_empty())
+            expect ~i(create_response.errors[0].operation) |> to(eq("createAuthor"))
+            expect ~i(create_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(create_response.errors[0].code) |> to(eq("unique"))
+            expect ~i(create_response.errors[0].field) |> to(eq("email"))
+            expect ~i(create_response.errors[0].message) |> to(eq(unquote(msg) |> String.replace("%{email}", String.downcase(invalid_author.email))))
+          end
+        end)
 
         it "returns error for empty name", validation: true, valid: false do
           author = build(:author)
 
           create_response = create_author(input: prepare_author(author) |> Map.drop([:name]), conn: shared.conn)
-          refute ~i(create_response.successful)
+          expect ~i(create_response.errors) |> not_to(be_empty())
+          expect ~i(create_response.errors[0].operation) |> to(be_nil())
 
           create_response = create_author(input: prepare_author(author) |> Map.put(:name, nil), conn: shared.conn)
-          refute ~i(create_response.successful)
+
+          expect ~i(create_response.errors) |> not_to(be_empty())
+          expect ~i(create_response.errors[0].operation) |> to(be_nil())
         end
+
+        [
+          en: "Author name should be at least 3 characters long",
+          ru: "Длина имени автора должна составлять минимум 3 символа"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for too short name (#{locale})", validation: true, valid: false, locale: locale do
+            %{access_token: access_token} = creator()
+
+            author = build(:author)
+            create_response = create_author(input: prepare_author(author) |> Map.put(:name, characters(1) |> to_string()), access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(create_response.errors) |> not_to(be_empty())
+            expect ~i(create_response.errors[0].operation) |> to(eq("createAuthor"))
+            expect ~i(create_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(create_response.errors[0].code) |> to(eq("min"))
+            expect ~i(create_response.errors[0].field) |> to(eq("name"))
+            expect ~i(create_response.errors[0].message) |> to(eq(unquote(msg)))
+
+            create_response = create_author(input: prepare_author(author) |> Map.put(:name, characters(2) |> to_string()), access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(create_response.errors) |> not_to(be_empty())
+            expect ~i(create_response.errors[0].operation) |> to(eq("createAuthor"))
+            expect ~i(create_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(create_response.errors[0].code) |> to(eq("min"))
+            expect ~i(create_response.errors[0].field) |> to(eq("name"))
+            expect ~i(create_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
+
+        [
+          en: "Author name %{name} has invalid format",
+          ru: "Имя автора %{name} не соответствует формату"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for invalid name (#{locale})", validation: true, valid: false, locale: locale do
+            %{access_token: access_token} = creator()
+
+            author = build(:author, name: "оШиБкА")
+            create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(create_response.errors) |> not_to(be_empty())
+            expect ~i(create_response.errors[0].operation) |> to(eq("createAuthor"))
+            expect ~i(create_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(create_response.errors[0].code) |> to(eq("format"))
+            expect ~i(create_response.errors[0].field) |> to(eq("name"))
+            expect ~i(create_response.errors[0].message) |> to(eq(unquote(msg) |> String.replace("%{name}", String.downcase(author.name))))
+          end
+        end)
 
         it "returns success without email", validation: true, valid: true do
           %{access_token: access_token} = creator()
@@ -131,27 +201,38 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           author = build(:author)
           create_response = create_author(input: prepare_author(author) |> Map.drop([:email]), access_token: access_token, conn: shared.conn)
 
-          assert ~i(create_response.successful)
-          assert check_user(~i(create_response.result), prepare_author(author) |> Map.put(:email, nil))
-        end
-
-        it "returns success for nil email", validation: true, valid: true do
-          %{access_token: access_token} = creator()
+          expect ~i(create_response.errors) |> to(be_nil())
+          assert check_author(~i(create_response.data.createAuthor), prepare_author(author) |> Map.put(:email, nil))
 
           author = build(:author)
           create_response = create_author(input: prepare_author(author) |> Map.put(:email, nil), access_token: access_token, conn: shared.conn)
-          assert ~i(create_response.successful)
-          assert check_user(~i(create_response.result), prepare_author(author) |> Map.put(:email, nil))
-        end
-
-        it "returns success for empty email", validation: true, valid: true do
-          %{access_token: access_token} = creator()
+          expect ~i(create_response.errors) |> to(be_nil())
+          assert check_author(~i(create_response.data.createAuthor), prepare_author(author) |> Map.put(:email, nil))
 
           author = build(:author)
           create_response = create_author(input: prepare_author(author) |> Map.put(:email, ""), access_token: access_token, conn: shared.conn)
-          assert ~i(create_response.successful)
-          assert check_user(~i(create_response.result), prepare_author(author) |> Map.put(:email, nil))
+          expect ~i(create_response.errors) |> to(be_nil())
+          assert check_author(~i(create_response.data.createAuthor), prepare_author(author) |> Map.put(:email, nil))
         end
+
+        [
+          en: "Author email %{email} has invalid format",
+          ru: "Email автора %{email} не соответствует формату"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for invalid email (#{locale})", validation: true, valid: false, locale: locale do
+            %{access_token: access_token} = creator()
+
+            author = build(:author, email: word() |> String.upcase())
+            create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(create_response.errors) |> not_to(be_empty())
+            expect ~i(create_response.errors[0].operation) |> to(eq("createAuthor"))
+            expect ~i(create_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(create_response.errors[0].code) |> to(eq("format"))
+            expect ~i(create_response.errors[0].field) |> to(eq("email"))
+            expect ~i(create_response.errors[0].message) |> to(eq(unquote(msg) |> String.replace("%{email}", String.downcase(author.email))))
+          end
+        end)
 
         it "accepts note for revision", audit: true do
           note = sentence()
@@ -159,7 +240,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author) |> Map.merge(%{note: note}), access_token: access_token, conn: shared.conn)
-          expect ~i(create_response.result.note) |> to(eq(note))
+          expect ~i(create_response.data.createAuthor.note) |> to(eq(note))
         end
 
         it "sets revision version to 1", audit: true do
@@ -168,7 +249,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          expect ~i(create_response.result.version) |> to(eq(1))
+          expect ~i(create_response.data.createAuthor.version) |> to(eq(1))
         end
 
         it "sets created_by to non-nil if context is not empty", audit: true do
@@ -177,16 +258,26 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token, id: creator_id} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          expect ~i(create_response.result.created_by.id) |> to(eq(creator_id))
+          expect ~i(create_response.data.createAuthor.created_by.id) |> to(eq(creator_id))
         end
 
-        it "returns error for anonymous user", validation: true, valid: false do
-          author = build(:author)
+        [
+          en: "Not enough permissions to create author",
+          ru: "Недостаточно прав для создания автора"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for anonymous user (#{locale})", validation: true, valid: false, locale: locale do
+            author = build(:author)
 
-          create_response = create_author(input: prepare_author(author), conn: shared.conn)
+            create_response = create_author(input: prepare_author(author), conn: shared.conn, locale: unquote(locale))
 
-          refute ~i(create_response.successful)
-        end
+            expect ~i(create_response.errors) |> not_to(be_empty())
+            expect ~i(create_response.errors[0].operation) |> to(eq("createAuthor"))
+            expect ~i(create_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(create_response.errors[0].code) |> to(eq("permissions"))
+            expect ~i(create_response.errors[0].field) |> to(be_nil())
+            expect ~i(create_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
 
         it "sets created_by to nil if context is empty", audit: true, role: :anonymous do
           user = build(:user)
@@ -194,9 +285,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           create_response = create_user(input: prepare_user(user), author: prepare_author(author), conn: shared.conn)
 
-          get_one_response = get_author(id: ~i(create_response.result.author.id), conn: shared.conn)
-
-          expect ~i(get_one_response.result.created_by) |> to(be_nil())
+          expect ~i(create_response.data.createAuthor.created_by) |> to(be_nil())
         end
 
         it "saves translated fields", audit: true do
@@ -205,13 +294,13 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          expect ~i(create_response.result.first_name)  |> to(eq(translation().first_name))
-          expect ~i(create_response.result.last_name)   |> to(eq(translation().last_name))
-          expect ~i(create_response.result.middle_name) |> to(eq(translation().middle_name))
+          expect ~i(create_response.data.createAuthor.first_name)  |> to(eq(translation().first_name))
+          expect ~i(create_response.data.createAuthor.last_name)   |> to(eq(translation().last_name))
+          expect ~i(create_response.data.createAuthor.middle_name) |> to(eq(translation().middle_name))
 
-          translations = ~i(create_response.result.translations)
+          translations = ~i(create_response.data.createAuthor.translations)
 
-          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == I18n.locale end) |> Enum.at(0)
+          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == I18n.default_locale() end) |> Enum.at(0)
 
           expect ~i(default_translation.first_name)  |> to(eq(translation().first_name))
           expect ~i(default_translation.last_name)   |> to(eq(translation().last_name))
@@ -228,11 +317,11 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          expect ~i(create_response.result.first_name)  |> to(eq(default.first_name))
-          expect ~i(create_response.result.last_name)   |> to(eq(default.last_name))
-          expect ~i(create_response.result.middle_name) |> to(eq(default.middle_name))
+          expect ~i(create_response.data.createAuthor.first_name)  |> to(eq(default.first_name))
+          expect ~i(create_response.data.createAuthor.last_name)   |> to(eq(default.last_name))
+          expect ~i(create_response.data.createAuthor.middle_name) |> to(eq(default.middle_name))
 
-          translations = ~i(create_response.result.translations)
+          translations = ~i(create_response.data.createAuthor.translations)
 
           default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == default.locale end) |> Enum.at(0)
           custom_translation  = translations |> Enum.filter(fn item -> ~i(item.locale) == custom.locale  end) |> Enum.at(0)
@@ -253,7 +342,8 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          refute ~i(create_response.success)
+          expect ~i(create_response.errors) |> not_to(be_empty())
+          expect ~i(create_response.errors[0].operation) |> to(be_nil())
         end
 
         it "sets created_at", audit: true do
@@ -262,7 +352,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          expect ~i(create_response.result.created_at) |> not_to(be_nil())
+          expect ~i(create_response.data.createAuthor.created_at) |> not_to(be_nil())
         end
 
         [:user, :moderator, :admin]
@@ -273,7 +363,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
               %{access_token: access_token} = unquote(:"creator_#{role}")()
               create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-              assert ~i(create_response.successful)
+              expect ~i(create_response.errors) |> to(be_nil())
             end
         end)
       end
@@ -285,19 +375,12 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_author(id: ~i(create_response.result.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
 
-          assert ~i(update_response.successful)
+          expect ~i(update_response.errors) |> to(be_nil())
 
-          expected_user = prepare_author(author) |> Map.merge(valid_attrs())
-          assert check_user(~i(update_response.result), expected_user)
-        end
-
-        it "returns error for unknown id", validation: true, valid: false do
-          %{access_token: access_token} = creator()
-          update_response = update_author(id: domain_uuid(:author), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
-
-          refute ~i(update_response.successful)
+          expected_author = prepare_author(author) |> Map.merge(valid_attrs())
+          assert check_author(~i(update_response.data.updateAuthor), expected_author)
         end
 
         it "returns success for valid name", validation: true, valid: true do
@@ -306,37 +389,12 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_author(id: ~i(create_response.result.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
 
-          assert ~i(update_response.successful)
+          expect ~i(update_response.errors) |> to(be_nil())
 
-          expected_user = prepare_author(author) |> Map.merge(valid_attrs())
-          assert check_user(~i(update_response.result), expected_user)
-        end
-
-        it "returns error for existing name", validation: true, valid: false do
-          author = build(:author)
-
-          %{access_token: access_token} = creator()
-
-          existing_author = build(:author)
-          create_author(input: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
-
-          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-
-          update_response = update_author(name: author.name, input: %{name: existing_author.name |> String.upcase()}, access_token: access_token, conn: shared.conn)
-
-          refute ~i(update_response.successful)
-        end
-
-        it "returns error for unknown name", validation: true, valid: true do
-          author = build(:author)
-
-          %{access_token: access_token} = creator()
-
-          update_response = update_author(name: author.name, input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
-
-          refute ~i(update_response.successful)
+          expected_author = prepare_author(author) |> Map.merge(valid_attrs())
+          assert check_author(~i(update_response.data.updateAuthor), expected_author)
         end
 
         it "returns success for valid email", validation: true, valid: true do
@@ -347,71 +405,10 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           update_response = update_author(email: author.email, input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
 
-          assert ~i(update_response.successful)
+          expect ~i(update_response.errors) |> to(be_nil())
 
-          expected_user = prepare_author(author) |> Map.merge(valid_attrs())
-          assert check_user(~i(update_response.result), expected_user)
-        end
-
-        it "returns error for unknown email", validation: true, valid: true do
-          author = build(:author)
-
-          %{access_token: access_token} = creator()
-
-          update_response = update_author(email: author.email, input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
-
-          refute ~i(update_response.successful)
-        end
-
-        it "returns error for existing email", validation: true, valid: false do
-          author = build(:author)
-
-          %{access_token: access_token} = creator()
-
-          existing_author = build(:author)
-          create_author(input: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
-
-          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-
-          update_response = update_author(name: author.name, input: %{email: existing_author.email |> String.upcase()}, access_token: access_token, conn: shared.conn)
-
-          refute ~i(update_response.successful)
-        end
-
-        it "returns error for empty name", validation: true, valid: false do
-          author = build(:author)
-
-          %{access_token: access_token} = creator()
-          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-
-          update_response = update_author(email: author.email, input: prepare_author(valid_attrs()) |> Map.put(:name, nil), access_token: access_token, conn: shared.conn)
-          refute ~i(update_response.successful)
-        end
-
-        it "returns success for nil email", validation: true, valid: true do
-          author = build(:author)
-
-          %{access_token: access_token} = creator()
-          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-
-          update_response = update_author(email: author.email, input: prepare_author(valid_attrs()) |> Map.put(:email, nil), access_token: access_token, conn: shared.conn)
-          assert ~i(update_response.successful)
-
-          expected_user = prepare_author(author) |> Map.merge(valid_attrs()) |> Map.put(:email, nil)
-          assert check_user(~i(update_response.result), expected_user)
-        end
-
-        it "returns success for empty email", validation: true, valid: true do
-          author = build(:author)
-
-          %{access_token: access_token} = creator()
-          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-
-          update_response = update_author(email: author.email, input: prepare_author(valid_attrs()) |> Map.put(:email, ""), access_token: access_token, conn: shared.conn)
-          assert ~i(update_response.successful)
-
-          expected_user = prepare_author(author) |> Map.merge(valid_attrs()) |> Map.put(:email, nil)
-          assert check_user(~i(update_response.result), expected_user)
+          expected_author = prepare_author(author) |> Map.merge(valid_attrs())
+          assert check_author(~i(update_response.data.updateAuthor), expected_author)
         end
 
         it "returns success for current user", validation: true, valid: true do
@@ -424,33 +421,290 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           access_token = auth(user, author, shared.conn)
           update_response = update_author(input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
 
-          assert ~i(update_response.successful)
-          expected_user = prepare_author(author) |> Map.merge(valid_attrs())
-          assert check_user(~i(update_response.result), expected_user)
+          expect ~i(update_response.errors) |> to(be_nil())
+          expected_author = prepare_author(author) |> Map.merge(valid_attrs())
+          assert check_author(~i(update_response.data.updateAuthor), expected_author)
         end
 
-        it "returns error for anonymous user", validation: true, valid: false do
-          author = build(:author)
+        [
+          en: "Cannot find author with specified id",
+          ru: "Автор с указанным id не найден"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for unknown id (#{locale})", validation: true, valid: false, locale: locale do
+            %{access_token: access_token} = creator()
+            update_response = update_author(id: domain_uuid(:author), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn, locale: unquote(locale))
 
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("missing"))
+            expect ~i(update_response.errors[0].field) |> to(eq("id"))
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
+
+        [
+          en: "Cannot find author with specified name",
+          ru: "Автор с указанным именем не найден"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for unknown name (#{locale})", validation: true, valid: true, locale: locale do
+            author = build(:author)
+
+            %{access_token: access_token} = creator()
+
+            update_response = update_author(name: author.name, input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("missing"))
+            expect ~i(update_response.errors[0].field) |> to(eq("name"))
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
+
+        [
+          en: "Cannot find author with specified email",
+          ru: "Автор с указанным email не найден"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for unknown email (#{locale})", validation: true, valid: true, locale: locale do
+            author = build(:author)
+
+            %{access_token: access_token} = creator()
+
+            update_response = update_author(email: author.email, input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("missing"))
+            expect ~i(update_response.errors[0].field) |> to(eq("email"))
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
+
+        [
+          en: "Author with the same name %{name} is already exist",
+          ru: "Автор с аналогичным именем %{name} уже существует"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for existing name (#{locale})", validation: true, valid: false, locale: locale do
+            author = build(:author)
+
+            %{access_token: access_token} = creator()
+
+            existing_author = build(:author)
+            create_author(input: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
+
+            create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            update_response = update_author(name: author.name, input: %{name: existing_author.name |> String.upcase()}, access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("unique"))
+            expect ~i(update_response.errors[0].field) |> to(eq("name"))
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg) |> String.replace("%{name}", String.downcase(existing_author.name))))
+          end
+        end)
+
+        [
+          en: "Author with the same email %{email} is already exist",
+          ru: "Автор с аналогичным email %{email} уже существует"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for existing email (#{locale})", validation: true, valid: false, locale: locale do
+            author = build(:author)
+
+            %{access_token: access_token} = creator()
+
+            existing_author = build(:author)
+            create_author(input: prepare_author(existing_author), access_token: access_token, conn: shared.conn)
+
+            create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            update_response = update_author(name: author.name, input: %{email: existing_author.email |> String.upcase()}, access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("unique"))
+            expect ~i(update_response.errors[0].field) |> to(eq("email"))
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg) |> String.replace("%{email}", String.downcase(existing_author.email))))
+          end
+        end)
+
+        [
+          en: "Author name cannot be empty",
+          ru: "Имя автора не может быть пустым"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for empty name (#{locale})", validation: true, valid: false, locale: locale do
+            author = build(:author)
+
+            %{access_token: access_token} = creator()
+            create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            update_response = update_author(email: author.email, input: prepare_author(valid_attrs()) |> Map.put(:name, nil), access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("required"))
+            expect ~i(update_response.errors[0].field) |> to(eq("name"))
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg)))
+
+            update_response = update_author(email: author.email, input: prepare_author(valid_attrs()) |> Map.put(:name, ""), access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("required"))
+            expect ~i(update_response.errors[0].field) |> to(eq("name"))
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
+
+        [
+          en: "Author name should be at least 3 characters long",
+          ru: "Длина имени автора должна составлять минимум 3 символа"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for too short name", validation: true, valid: false do
+            author = build(:author)
+
+            %{access_token: access_token} = creator()
+            create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            update_response = update_author(email: author.email, input: prepare_author(valid_attrs()) |> Map.put(:name, characters(1) |> to_string()), access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("min"))
+            expect ~i(update_response.errors[0].field) |> to(eq("name"))
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg)))
+
+            update_response = update_author(email: author.email, input: prepare_author(valid_attrs()) |> Map.put(:name, characters(2) |> to_string()), access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("min"))
+            expect ~i(update_response.errors[0].field) |> to(eq("name"))
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
+
+        [
+          en: "Author name %{name} has invalid format",
+          ru: "Имя автора %{name} не соответствует формату"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for invalid name (#{locale})", validation: true, valid: false, locale: locale do
+            %{access_token: access_token} = creator()
+
+            author = build(:author)
+            create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            name = "оШиБкА"
+            update_response = update_author(name: author.name, input: %{name: name}, access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("format"))
+            expect ~i(update_response.errors[0].field) |> to(eq("name"))
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg) |> String.replace("%{name}", String.downcase(name))))
+          end
+        end)
+
+        it "returns success for nil email", validation: true, valid: true do
           %{access_token: access_token} = creator()
-          create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_author(id: ~i(create_response.result.id), input: prepare_author(valid_attrs()), conn: shared.conn)
-
-          refute ~i(update_response.successful)
-        end
-
-        it "returns error for already deleted author", validation: true, valid: false do
           author = build(:author)
+          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          %{access_token: access_token} = creator()
-          create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-          delete_author(id: ~i(create_response.result.id), access_token: access_token, conn: shared.conn)
+          update_response = update_author(email: author.email, input: prepare_author(valid_attrs()) |> Map.put(:email, nil), access_token: access_token, conn: shared.conn)
+          expect ~i(update_response.errors) |> to(be_nil())
 
-          update_response = update_author(id: ~i(create_response.result.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
-
-          refute ~i(update_response.successful)
+          expected_author = prepare_author(author) |> Map.merge(valid_attrs()) |> Map.put(:email, nil)
+          assert check_author(~i(update_response.data.updateAuthor), expected_author)
         end
+
+        it "returns success for empty email", validation: true, valid: true do
+          %{access_token: access_token} = creator()
+
+          author = build(:author)
+          create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+          update_response = update_author(email: author.email, input: prepare_author(valid_attrs()) |> Map.put(:email, ""), access_token: access_token, conn: shared.conn)
+          expect ~i(update_response.errors) |> to(be_nil())
+
+          expected_author = prepare_author(author) |> Map.merge(valid_attrs()) |> Map.put(:email, nil)
+          assert check_author(~i(update_response.data.updateAuthor), expected_author)
+        end
+
+        [
+          en: "Author email %{email} has invalid format",
+          ru: "Email автора %{email} не соответствует формату"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for invalid email (#{locale})", validation: true, valid: false, locale: locale do
+            %{access_token: access_token} = creator()
+
+            author = build(:author)
+            create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            email = word() |> String.upcase()
+            update_response = update_author(email: author.email, input: %{email: email}, access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("format"))
+            expect ~i(update_response.errors[0].field) |> to(eq("email"))
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg) |> String.replace("%{email}", String.downcase(email))))
+          end
+        end)
+
+        [
+          en: "Not enough permissions to update author",
+          ru: "Недостаточно прав для обновления автора"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for anonymous user (#{locale})", validation: true, valid: false, locale: locale do
+            author = build(:author)
+
+            %{access_token: access_token} = creator()
+            create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: prepare_author(valid_attrs()), conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("permissions"))
+            expect ~i(update_response.errors[0].field) |> to(be_nil())
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
+
+        [
+          en: "Cannot find author with specified id",
+          ru: "Автор с указанным id не найден"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for already deleted author (#{locale})", validation: true, valid: false, locale: locale do
+            author = build(:author)
+
+            %{access_token: access_token} = creator()
+            create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+            delete_author(id: ~i(create_response.data.createAuthor.id), access_token: access_token, conn: shared.conn)
+
+            update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(update_response.errors) |> not_to(be_empty())
+            expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+            expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(update_response.errors[0].code) |> to(eq("missing"))
+            expect ~i(update_response.errors[0].field) |> to(eq("id"))
+            expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
 
         it "accepts note for revision", audit: true do
           author = build(:author)
@@ -459,9 +713,9 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
           note = sentence()
-          update_response = update_author(id: ~i(create_response.result.id), input: %{note: note}, access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: %{note: note}, access_token: access_token, conn: shared.conn)
 
-          expect ~i(update_response.result.note) |> to(eq(note))
+          expect ~i(update_response.data.updateAuthor.note) |> to(eq(note))
         end
 
         it "increments revision version", audit: true do
@@ -469,9 +723,9 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-          update_response = update_author(id: ~i(create_response.result.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
 
-          expect ~i(update_response.result.version) |> to(be(:>, ~i(create_response.result.version)))
+          expect ~i(update_response.data.updateAuthor.version) |> to(be(:>, ~i(create_response.data.createAuthor.version)))
         end
 
         it "sets updated_by to non-nil if context is not empty", audit: true do
@@ -479,9 +733,9 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           %{access_token: access_token, id: updator_id} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-          update_response = update_author(id: ~i(create_response.result.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
 
-          expect ~i(update_response.result.updated_by.id) |> to(eq(updator_id))
+          expect ~i(update_response.data.updateAuthor.updated_by.id) |> to(eq(updator_id))
         end
 
         it "does not touch created_at", audit: true do
@@ -489,9 +743,9 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-          update_response = update_author(id: ~i(create_response.result.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
 
-          expect ~i(update_response.result.created_at) |> to(eq(~i(create_response.result.created_at)))
+          expect ~i(update_response.data.updateAuthor.created_at) |> to(eq(~i(create_response.data.createAuthor.created_at)))
         end
 
         it "touches updated_at", audit: true do
@@ -499,10 +753,10 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-          update_response = update_author(id: ~i(create_response.result.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: prepare_author(valid_attrs()), access_token: access_token, conn: shared.conn)
 
-          expect ~i(create_response.result.updated_at) |> to(be_nil())
-          expect ~i(update_response.result.updated_at) |> not_to(be_nil())
+          expect ~i(create_response.data.createAuthor.updated_at) |> to(be_nil())
+          expect ~i(update_response.data.updateAuthor.updated_at) |> not_to(be_nil())
         end
 
         it "updates translated fields", audit: true do
@@ -511,19 +765,19 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_author(id: ~i(create_response.result.id), input: translation(), access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: translation(), access_token: access_token, conn: shared.conn)
 
-          expect ~i(update_response.result.first_name)  |> not_to(eq(author.first_name))
-          expect ~i(update_response.result.last_name)   |> not_to(eq(author.last_name))
-          expect ~i(update_response.result.middle_name) |> not_to(eq(author.middle_name))
+          expect ~i(update_response.data.updateAuthor.first_name)  |> not_to(eq(author.first_name))
+          expect ~i(update_response.data.updateAuthor.last_name)   |> not_to(eq(author.last_name))
+          expect ~i(update_response.data.updateAuthor.middle_name) |> not_to(eq(author.middle_name))
 
-          expect ~i(update_response.result.first_name)  |> to(eq(translation().first_name))
-          expect ~i(update_response.result.last_name)   |> to(eq(translation().last_name))
-          expect ~i(update_response.result.middle_name) |> to(eq(translation().middle_name))
+          expect ~i(update_response.data.updateAuthor.first_name)  |> to(eq(translation().first_name))
+          expect ~i(update_response.data.updateAuthor.last_name)   |> to(eq(translation().last_name))
+          expect ~i(update_response.data.updateAuthor.middle_name) |> to(eq(translation().middle_name))
 
-          translations = ~i(update_response.result.translations)
+          translations = ~i(update_response.data.updateAuthor.translations)
 
-          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == I18n.locale end) |> Enum.at(0)
+          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == I18n.default_locale() end) |> Enum.at(0)
 
           expect ~i(default_translation.first_name)  |> not_to(eq(author.first_name))
           expect ~i(default_translation.last_name)   |> not_to(eq(author.last_name))
@@ -543,13 +797,13 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_author(id: ~i(create_response.result.id), input: %{translations: [default, custom]}, access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: %{translations: [default, custom]}, access_token: access_token, conn: shared.conn)
 
-          expect ~i(update_response.result.first_name)  |> to(eq(default.first_name))
-          expect ~i(update_response.result.last_name)   |> to(eq(default.last_name))
-          expect ~i(update_response.result.middle_name) |> to(eq(default.middle_name))
+          expect ~i(update_response.data.updateAuthor.first_name)  |> to(eq(default.first_name))
+          expect ~i(update_response.data.updateAuthor.last_name)   |> to(eq(default.last_name))
+          expect ~i(update_response.data.updateAuthor.middle_name) |> to(eq(default.middle_name))
 
-          translations = ~i(update_response.result.translations)
+          translations = ~i(update_response.data.updateAuthor.translations)
 
           default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == default.locale end) |> Enum.at(0)
           custom_translation  = translations |> Enum.filter(fn item -> ~i(item.locale) == custom.locale  end) |> Enum.at(0)
@@ -572,13 +826,13 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author) |> Map.put(:translations, [custom]), access_token: access_token, conn: shared.conn)
 
-          update_response = update_author(id: ~i(create_response.result.id), input: %{translations: [default]}, access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: %{translations: [default]}, access_token: access_token, conn: shared.conn)
 
-          expect ~i(update_response.result.first_name)  |> to(eq(default.first_name))
-          expect ~i(update_response.result.last_name)   |> to(eq(default.last_name))
-          expect ~i(update_response.result.middle_name) |> to(eq(default.middle_name))
+          expect ~i(update_response.data.updateAuthor.first_name)  |> to(eq(default.first_name))
+          expect ~i(update_response.data.updateAuthor.last_name)   |> to(eq(default.last_name))
+          expect ~i(update_response.data.updateAuthor.middle_name) |> to(eq(default.middle_name))
 
-          translations = ~i(update_response.result.translations)
+          translations = ~i(update_response.data.updateAuthor.translations)
 
           default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == default.locale end) |> Enum.at(0)
 
@@ -596,12 +850,12 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_author(id: ~i(create_response.result.id), input: %{translations: []}, access_token: access_token, conn: shared.conn)
+          update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: %{translations: []}, access_token: access_token, conn: shared.conn)
 
-          expect ~i(update_response.result.first_name)   |> to(eq(""))
-          expect ~i(update_response.result.last_name)    |> to(eq(""))
-          expect ~i(update_response.result.middle_name)  |> to(eq(""))
-          expect ~i(update_response.result.translations) |> to(eq([]))
+          expect ~i(update_response.data.updateAuthor.first_name)   |> to(eq(""))
+          expect ~i(update_response.data.updateAuthor.last_name)    |> to(eq(""))
+          expect ~i(update_response.data.updateAuthor.middle_name)  |> to(eq(""))
+          expect ~i(update_response.data.updateAuthor.translations) |> to(eq([]))
         end
 
         it "return error for unknown locale", audit: true do
@@ -610,9 +864,10 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-          update_response = update_user(id: ~i(create_response.result.id), input: %{translations: [translation_with_unknown_locale()]}, access_token: access_token, conn: shared.conn)
+          update_response = update_user(id: ~i(create_response.data.createAuthor.id), input: %{translations: [translation_with_unknown_locale()]}, access_token: access_token, conn: shared.conn)
 
-          refute ~i(update_response.success)
+          expect ~i(update_response.errors) |> not_to(be_empty())
+          expect ~i(update_response.errors[0].operation) |> to(be_nil())
         end
 
         [:user, :moderator, :admin]
@@ -626,9 +881,9 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
             note = word()
             access_token = auth(user, author, shared.conn)
-            update_response = update_author(id: ~i(create_response.result.author.id), input: %{note: note}, access_token: access_token, conn: shared.conn)
+            update_response = update_author(id: ~i(create_response.data.createUser.author.id), input: %{note: note}, access_token: access_token, conn: shared.conn)
 
-            assert ~i(update_response.successful)
+            expect ~i(update_response.errors) |> to(be_nil())
           end
         end)
 
@@ -642,35 +897,45 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
             note = word()
             %{access_token: access_token} = unquote(:"creator_#{user_role}")()
-            update_response = update_author(id: ~i(create_response.result.id), input: %{note: note}, access_token: access_token, conn: shared.conn)
+            update_response = update_author(id: ~i(create_response.data.createAuthor.id), input: %{note: note}, access_token: access_token, conn: shared.conn)
 
-            assert ~i(update_response.successful)
+            expect ~i(update_response.errors) |> to(be_nil())
           end
         end)
 
         [
-          user:      [user: false, moderator: true,  admin: true],
-          moderator: [user: false, moderator: false, admin: true],
-          admin:     [user: false, moderator: false, admin: false],
-        ] |> Enum.each(fn({user_role, cols}) ->
-          cols |> Enum.each(fn({role, is_allowed}) ->
-              it "#{if is_allowed, do: "allows", else: "does not allow"} #{role} to update #{user_role}", permission: true, allow: is_allowed, role: role do
-                user = build(unquote(user_role))
-                author = build(:author)
+          en: "Not enough permissions to update author",
+          ru: "Недостаточно прав для обновления автора"
+        ] |> Enum.each(fn {locale, msg} ->
+          [
+            user:      [user: false, moderator: true,  admin: true],
+            moderator: [user: false, moderator: false, admin: true],
+            admin:     [user: false, moderator: false, admin: false],
+          ] |> Enum.each(fn({user_role, cols}) ->
+            cols |> Enum.each(fn({role, is_allowed}) ->
+                it "#{if is_allowed, do: "allows", else: "does not allow"} #{role} to update #{user_role} (#{locale})", permission: true, allow: is_allowed, role: role, locale: locale do
+                  user = build(unquote(user_role))
+                  author = build(:author)
 
-                %{access_token: access_token} = creator()
-                create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
+                  %{access_token: access_token} = creator()
+                  create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-                name = slug()
-                %{access_token: access_token} = unquote(:"creator_#{role}")()
-                update_response = update_author(id: ~i(create_response.result.author.id), input: %{name: name}, access_token: access_token, conn: shared.conn)
+                  name = slug()
+                  %{access_token: access_token} = unquote(:"creator_#{role}")()
+                  update_response = update_author(id: ~i(create_response.data.createUser.author.id), input: %{name: name}, access_token: access_token, conn: shared.conn, locale: unquote(locale))
 
-                if unquote(is_allowed) do
-                  assert ~i(update_response.successful)
-                else
-                  refute ~i(update_response.successful)
+                  if unquote(is_allowed) do
+                    expect ~i(update_response.errors) |> to(be_nil())
+                  else
+                    expect ~i(update_response.errors) |> not_to(be_empty())
+                    expect ~i(update_response.errors[0].operation) |> to(eq("updateAuthor"))
+                    expect ~i(update_response.errors[0].entity) |> to(eq("author"))
+                    expect ~i(update_response.errors[0].code) |> to(eq("permissions"))
+                    expect ~i(update_response.errors[0].field) |> to(be_nil())
+                    expect ~i(update_response.errors[0].message) |> to(eq(unquote(msg)))
+                  end
                 end
-              end
+            end)
           end)
         end)
       end
@@ -681,17 +946,10 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           %{access_token: access_token} = creator()
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-          delete_response = delete_author(id: ~i(create_response.result.id), access_token: access_token, conn: shared.conn)
+          delete_response = delete_author(id: ~i(create_response.data.createAuthor.id), access_token: access_token, conn: shared.conn)
 
-          assert ~i(delete_response.successful)
-          expect ~i(delete_response.result) |> to(be_nil())
-        end
-
-        it "returns error for unknown id", validation: true, valid: false do
-          %{access_token: access_token} = creator()
-          delete_response = delete_author(id: domain_uuid(:author), access_token: access_token, conn: shared.conn)
-
-          refute ~i(delete_response.successful)
+          expect ~i(delete_response.errors) |> to(be_nil())
+          expect ~i(delete_response.data.deleteAuthor) |> to(be_nil())
         end
 
         it "returns success for valid name", validation: true, valid: true do
@@ -701,17 +959,8 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
           delete_response = delete_author(name: author.name, access_token: access_token, conn: shared.conn)
 
-          assert ~i(delete_response.successful)
-          expect ~i(delete_response.result) |> to(be_nil())
-        end
-
-        it "returns error for unknown name", validation: true, valid: false do
-          author = build(:author)
-
-          %{access_token: access_token} = creator()
-          delete_response = delete_author(name: author.name, access_token: access_token, conn: shared.conn)
-
-          refute ~i(delete_response.successful)
+          expect ~i(delete_response.errors) |> to(be_nil())
+          expect ~i(delete_response.data.deleteAuthor) |> to(be_nil())
         end
 
         it "returns success for valid email", validation: true, valid: true do
@@ -721,17 +970,8 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
           delete_response = delete_author(email: author.email, access_token: access_token, conn: shared.conn)
 
-          assert ~i(delete_response.successful)
-          expect ~i(delete_response.result) |> to(be_nil())
-        end
-
-        it "returns error for unknown email", validation: true, valid: false do
-          author = build(:author)
-
-          %{access_token: access_token} = creator()
-          delete_response = delete_author(email: author.email, access_token: access_token, conn: shared.conn)
-
-          refute ~i(delete_response.successful)
+          expect ~i(delete_response.errors) |> to(be_nil())
+          expect ~i(delete_response.data.deleteAuthor) |> to(be_nil())
         end
 
         it "returns success for current user", validation: true, valid: true, self: true do
@@ -744,18 +984,85 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           access_token = auth(user, author, shared.conn)
           delete_response = delete_author(access_token: access_token, conn: shared.conn)
 
-          assert ~i(delete_response.successful)
-          expect ~i(delete_response.result) |> to(be_nil())
+          expect ~i(delete_response.errors) |> to(be_nil())
+          expect ~i(delete_response.data.deleteAuthor) |> to(be_nil())
         end
 
-        it "returns error for anonymous user", validation: true, valid: false do
-          author = build(:author)
+        [
+          en: "Cannot find author with specified id",
+          ru: "Автор с указанным id не найден"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for unknown id (#{locale})", validation: true, valid: false, locale: locale do
+            %{access_token: access_token} = creator()
+            delete_response = delete_author(id: domain_uuid(:author), access_token: access_token, conn: shared.conn, locale: unquote(locale))
 
-          create_response = create_author(input: prepare_author(author), conn: shared.conn)
-          delete_response = delete_author(id: ~i(create_response.result.id), conn: shared.conn)
+            expect ~i(delete_response.errors) |> not_to(be_empty())
+            expect ~i(delete_response.errors[0].operation) |> to(eq("deleteAuthor"))
+            expect ~i(delete_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(delete_response.errors[0].code) |> to(eq("missing"))
+            expect ~i(delete_response.errors[0].field) |> to(eq("id"))
+            expect ~i(delete_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
 
-          refute ~i(delete_response.successful)
-        end
+        [
+          en: "Cannot find author with specified name",
+          ru: "Автор с указанным именем не найден"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for unknown name (#{locale})", validation: true, valid: false, locale: locale do
+            author = build(:author)
+
+            %{access_token: access_token} = creator()
+            delete_response = delete_author(name: author.name, access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(delete_response.errors) |> not_to(be_empty())
+            expect ~i(delete_response.errors[0].operation) |> to(eq("deleteAuthor"))
+            expect ~i(delete_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(delete_response.errors[0].code) |> to(eq("missing"))
+            expect ~i(delete_response.errors[0].field) |> to(eq("name"))
+            expect ~i(delete_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
+
+        [
+          en: "Cannot find author with specified email",
+          ru: "Автор с указанным email не найден"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for unknown email (#{locale})", validation: true, valid: false, locale: locale do
+            author = build(:author)
+
+            %{access_token: access_token} = creator()
+            delete_response = delete_author(email: author.email, access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(delete_response.errors) |> not_to(be_empty())
+            expect ~i(delete_response.errors[0].operation) |> to(eq("deleteAuthor"))
+            expect ~i(delete_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(delete_response.errors[0].code) |> to(eq("missing"))
+            expect ~i(delete_response.errors[0].field) |> to(eq("email"))
+            expect ~i(delete_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
+
+        [
+          en: "Not enough permissions to delete author",
+          ru: "Недостаточно прав для удаления автора"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for anonymous user (#{locale})", validation: true, valid: false, locale: locale do
+            author = build(:author)
+
+            %{access_token: access_token} = creator()
+            create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+
+            delete_response = delete_author(id: ~i(create_response.data.createAuthor.id), conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(delete_response.errors) |> not_to(be_empty())
+            expect ~i(delete_response.errors[0].operation) |> to(eq("deleteAuthor"))
+            expect ~i(delete_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(delete_response.errors[0].code) |> to(eq("permissions"))
+            expect ~i(delete_response.errors[0].field) |> to(be_nil())
+            expect ~i(delete_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
 
         it "accepts note for revision", audit: true do
           author = build(:author)
@@ -764,10 +1071,32 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
           create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
           note = sentence()
-          delete_response = delete_author(id: ~i(create_response.result.id), input: %{note: note}, access_token: access_token, conn: shared.conn)
+          delete_response = delete_author(id: ~i(create_response.data.createAuthor.id), input: %{note: note}, access_token: access_token, conn: shared.conn)
 
-          assert ~i(delete_response.successful)
+          expect ~i(delete_response.errors) |> to(be_nil())
         end
+
+        [
+          en: "Cannot find author with specified id",
+          ru: "Автор с указанным id не найден"
+        ] |> Enum.each(fn {locale, msg} ->
+          it "returns error for already deleted author (#{locale})", validation: true, valid: false, locale: locale do
+            author = build(:author)
+
+            %{access_token: access_token} = creator()
+            create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+            delete_author(id: ~i(create_response.data.createAuthor.id), access_token: access_token, conn: shared.conn)
+
+            delete_response = delete_author(id: ~i(create_response.data.createAuthor.id), access_token: access_token, conn: shared.conn, locale: unquote(locale))
+
+            expect ~i(delete_response.errors) |> not_to(be_empty())
+            expect ~i(delete_response.errors[0].operation) |> to(eq("deleteAuthor"))
+            expect ~i(delete_response.errors[0].entity) |> to(eq("author"))
+            expect ~i(delete_response.errors[0].code) |> to(eq("missing"))
+            expect ~i(delete_response.errors[0].field) |> to(eq("id"))
+            expect ~i(delete_response.errors[0].message) |> to(eq(unquote(msg)))
+          end
+        end)
 
         [:user, :moderator, :admin]
         |> Enum.each(fn(user_role) ->
@@ -779,9 +1108,9 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
             create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
             access_token = auth(user, author, shared.conn)
-            delete_response = delete_author(id: ~i(create_response.result.author.id), access_token: access_token, conn: shared.conn)
+            delete_response = delete_author(id: ~i(create_response.data.createUser.author.id), access_token: access_token, conn: shared.conn)
 
-            assert ~i(delete_response.successful)
+            expect ~i(delete_response.errors) |> to(be_nil())
           end
         end)
 
@@ -794,34 +1123,44 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
             %{access_token: access_token} = unquote(:"creator_#{user_role}")()
-            delete_response = delete_author(id: ~i(create_response.result.id), access_token: access_token, conn: shared.conn)
+            delete_response = delete_author(id: ~i(create_response.data.createAuthor.id), access_token: access_token, conn: shared.conn)
 
-            assert ~i(delete_response.successful)
+            expect ~i(delete_response.errors) |> to(be_nil())
           end
         end)
 
         [
-          user:      [user: false, moderator: true,   admin: true],
-          moderator: [user: false, moderator: false,  admin: true],
-          admin:     [user: false, moderator: false,  admin: false],
-        ] |> Enum.each(fn({user_role, cols}) ->
-          cols |> Enum.each(fn({role, is_allowed}) ->
-              it "#{if is_allowed, do: "allows", else: "does not allow"} #{role} to delete #{user_role}", permission: true, allow: is_allowed, role: user_role do
-                user = build(unquote(user_role))
-                author = build(:author)
+          en: "Not enough permissions to delete author",
+          ru: "Недостаточно прав для удаления автора"
+        ] |> Enum.each(fn {locale, msg} ->
+          [
+            user:      [user: false, moderator: true,   admin: true],
+            moderator: [user: false, moderator: false,  admin: true],
+            admin:     [user: false, moderator: false,  admin: false],
+          ] |> Enum.each(fn({user_role, cols}) ->
+            cols |> Enum.each(fn({role, is_allowed}) ->
+                it "#{if is_allowed, do: "allows", else: "does not allow"} #{role} to delete #{user_role} (#{locale})", permission: true, allow: is_allowed, role: user_role, locale: locale do
+                  user = build(unquote(user_role))
+                  author = build(:author)
 
-                %{access_token: access_token} = creator()
-                create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
+                  %{access_token: access_token} = creator()
+                  create_response = create_user(input: prepare_user(user), author: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-                %{access_token: access_token} = unquote(:"creator_#{role}")()
-                delete_response = delete_author(id: ~i(create_response.result.author.id), access_token: access_token, conn: shared.conn)
+                  %{access_token: access_token} = unquote(:"creator_#{role}")()
+                  delete_response = delete_author(id: ~i(create_response.data.createUser.author.id), access_token: access_token, conn: shared.conn, locale: unquote(locale))
 
-                if unquote(is_allowed) do
-                  assert ~i(delete_response.successful)
-                else
-                  refute ~i(delete_response.successful)
+                  if unquote(is_allowed) do
+                    expect ~i(delete_response.errors) |> to(be_nil())
+                  else
+                    expect ~i(delete_response.errors) |> not_to(be_empty())
+                    expect ~i(delete_response.errors[0].operation) |> to(eq("deleteAuthor"))
+                    expect ~i(delete_response.errors[0].entity) |> to(eq("author"))
+                    expect ~i(delete_response.errors[0].code) |> to(eq("permissions"))
+                    expect ~i(delete_response.errors[0].field) |> to(be_nil())
+                    expect ~i(delete_response.errors[0].message) |> to(eq(unquote(msg)))
+                  end
                 end
-              end
+            end)
           end)
         end)
       end

@@ -63,9 +63,9 @@ defmodule Arkenston.Subject.Author do
   @email_format Application.compile_env(:arkenston, [:authors, :format, :email])
 
   @doc false
-  @spec create_changeset(attrs :: map) :: Ecto.Changeset.t()
-  def create_changeset(attrs) do
-    attrs = create_translations(attrs)
+  @spec create_changeset(attrs :: map, context :: map) :: Ecto.Changeset.t()
+  def create_changeset(attrs, context \\ %{}) do
+    attrs = create_translations(attrs, context)
 
     %__MODULE__{}
     |> cast(attrs, [:name, :email, :translations, :note])
@@ -79,10 +79,10 @@ defmodule Arkenston.Subject.Author do
     |> unique_constraint(:email, name: :authors_data_email_index)
   end
 
-  @spec update_changeset(user :: t, attrs :: map) :: Ecto.Changeset.t()
+  @spec update_changeset(user :: t, attrs :: map, context :: map) :: Ecto.Changeset.t()
   @doc false
-  def update_changeset(user, attrs \\ %{}) do
-    attrs = update_translations(user, attrs)
+  def update_changeset(user, attrs \\ %{}, context \\ %{}) do
+    attrs = update_translations(user, attrs, context)
 
     user
     |> cast(attrs, [:name, :email, :translations, :note])
@@ -97,10 +97,10 @@ defmodule Arkenston.Subject.Author do
   end
 
   @doc false
-  @spec delete_changeset(user :: t, attrs :: map) :: Ecto.Changeset.t()
-  def delete_changeset(user, attrs \\ %{}) do
+  @spec delete_changeset(user :: t, attrs :: map, context :: map) :: Ecto.Changeset.t()
+  def delete_changeset(user, attrs \\ %{}, context \\ %{}) do
     user
-    |> update_changeset(attrs)
+    |> update_changeset(attrs, context)
     |> change(deleted: true)
   end
 

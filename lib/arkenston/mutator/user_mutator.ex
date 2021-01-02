@@ -20,7 +20,7 @@ defmodule Arkenston.Mutator.UserMutator do
                   ),
                 {:ok, user} <-
                   Subject.create_user(attrs |> Map.put(:author_id, author.id), context) do
-             {:ok, Subject.get_user(user.id)}
+             {:ok, Subject.get_user(user.id, context)}
            end
          end) do
       {:ok, result} ->
@@ -42,7 +42,7 @@ defmodule Arkenston.Mutator.UserMutator do
     case Repo.transational(fn ->
            case get_user(args, context) do
              {field, nil} ->
-               {:error, %AbsintheErrorPayload.ValidationMessage{field: field, code: :not_found}}
+               {:error, %Arkenston.Payload.ValidationMessage{field: field, code: :missing}}
 
              {_field, user} ->
                user = user |> Repo.preload(:author)
@@ -50,7 +50,7 @@ defmodule Arkenston.Mutator.UserMutator do
                with :ok <-
                       Permissions.check_permissions_for(:user, :update, context, user, attrs),
                     {:ok, _user} <- user |> Subject.update_user(attrs, context) do
-                 {:ok, Subject.get_user(user.id)}
+                 {:ok, Subject.get_user(user.id, context)}
                end
            end
          end) do
@@ -73,7 +73,7 @@ defmodule Arkenston.Mutator.UserMutator do
     case Repo.transational(fn ->
            case get_user(args, context) do
              {field, nil} ->
-               {:error, %AbsintheErrorPayload.ValidationMessage{field: field, code: :not_found}}
+               {:error, %Arkenston.Payload.ValidationMessage{field: field, code: :missing}}
 
              {_field, user} ->
                user = user |> Repo.preload(:author)
@@ -88,7 +88,7 @@ defmodule Arkenston.Mutator.UserMutator do
                       ),
                     {:ok, author} <- get_author(attrs),
                     {:ok, _user} <- user |> Subject.update_user(%{author_id: author.id}, context) do
-                 {:ok, Subject.get_user(user.id)}
+                 {:ok, Subject.get_user(user.id, context)}
                end
            end
          end) do
@@ -129,7 +129,7 @@ defmodule Arkenston.Mutator.UserMutator do
 
            case get_user(args, context) do
              {field, nil} ->
-               {:error, %AbsintheErrorPayload.ValidationMessage{field: field, code: :not_found}}
+               {:error, %Arkenston.Payload.ValidationMessage{field: field, code: :missing}}
 
              {_field, user} ->
                if with_author do
@@ -147,7 +147,7 @@ defmodule Arkenston.Mutator.UserMutator do
                         ),
                       {:ok, _user} <- user |> Subject.delete_user(attrs, context),
                       {:ok, _user} <- user.author |> Subject.delete_author(attrs, context) do
-                   {:ok, true}
+                   {:ok, nil}
                  else
                    error -> error
                  end
@@ -155,7 +155,7 @@ defmodule Arkenston.Mutator.UserMutator do
                  with :ok <-
                         Permissions.check_permissions_for(:user, :delete, context, user, attrs),
                       {:ok, _user} <- user |> Subject.delete_user(attrs, context) do
-                   {:ok, true}
+                   {:ok, nil}
                  else
                    error -> error
                  end
@@ -217,31 +217,34 @@ defmodule Arkenston.Mutator.UserMutator do
     end
   end
 
-  defp get_author_raw(attrs) do
-    {field, author} =
+  defp get_author_raw(entity, attrs) do
+    {entity, field, author} =
       case attrs do
         %{id: id} when not is_nil(id) ->
-          {:"author.id", Subject.get_author(id)}
+          {entity, :id, Subject.get_author(id)}
 
         %{name: name} when not is_nil(name) ->
-          {:"author.name", Subject.get_author_by(name: name)}
+          {entity, :name, Subject.get_author_by(name: name)}
 
         %{email: email} when not is_nil(email) ->
-          {:"author.email", Subject.get_author_by(email: email)}
+          {entity, :email, Subject.get_author_by(email: email)}
 
         _ ->
-          {nil, nil}
+          {:user, :author, nil}
       end
 
     if is_nil(author) do
-      {:error, %AbsintheErrorPayload.ValidationMessage{field: field, code: :not_found}}
+      {:error, %Arkenston.Payload.ValidationMessage{entity: entity, field: field, code: :missing}}
     else
       {:ok, author}
     end
   end
 
-  defp check_author_email(author) do
-    error = %AbsintheErrorPayload.ValidationMessage{field: :"author.email", code: :empty}
+  # existing author should have non-empty email address
+  # otherwise it is not possible to send confirmation email
+  # no need to check author name because it is a db constraint
+  defp check_author_email(entity, author) do
+    error = %Arkenston.Payload.ValidationMessage{entity: entity, field: :email, code: :required}
 
     case author do
       %{email: nil} ->
@@ -260,9 +263,9 @@ defmodule Arkenston.Mutator.UserMutator do
   end
 
   defp get_author(attrs) do
-    case get_author_raw(attrs) do
+    case get_author_raw(:author, attrs) do
       {:ok, author} ->
-        case check_author_email(author) do
+        case check_author_email(:author, author) do
           :ok -> {:ok, author}
           error -> error
         end
@@ -273,15 +276,15 @@ defmodule Arkenston.Mutator.UserMutator do
   end
 
   defp get_or_create_author(attrs, context) do
-    case get_author_raw(attrs) do
+    case get_author_raw(:user, attrs) do
       {:ok, author} ->
-        case check_author_email(author) do
+        case check_author_email(:user, author) do
           :ok -> {:ok, author}
           error -> error
         end
 
       {:error, _} ->
-        case check_author_email(attrs) do
+        case check_author_email(:user, attrs) do
           :ok -> Subject.create_author(attrs, context)
           error -> error
         end

@@ -3,8 +3,9 @@ defmodule ArkenstonWeb.Schema.Types.Object.UserAccessToken do
 
   object :user_access_token do
     interface :with_access_token
-    import_fields :with_access_token
+    interface :with_user
 
-    field :user, non_null(:user)
+    import_fields :with_access_token
+    import_fields :with_user
   end
 end

@@ -34,34 +34,36 @@ defmodule Arkenston.Mutator.UserTokenMutator do
            Guardian.exchange(refresh_token, "refresh", "access") do
       {:ok, %{refresh_token: refresh_token, access_token: access_token, user: user}}
     else
-      {:error, error} -> {:error, %AbsintheErrorPayload.ValidationMessage{code: error}}
+      {:error, error} -> {:error, %Arkenston.Payload.ValidationMessage{code: error}}
     end
   end
 
-  @type exchange_result :: %{access_token: String.t(), user: User.t()}
-  @spec exchange(args :: refresh_token, info :: map) :: {:error, any} | {:ok, exchange_result}
-  def exchange(args, info \\ %{})
+  @type exchange_token_result :: %{access_token: String.t(), user: User.t()}
+  @spec exchange_token(args :: refresh_token, info :: map) ::
+          {:error, any} | {:ok, exchange_token_result}
+  def exchange_token(args, info \\ %{})
 
-  def exchange(%{refresh_token: refresh_token}, _info) do
+  def exchange_token(%{refresh_token: refresh_token}, _info) do
     with {:ok, claims} <- Guardian.decode_and_verify(refresh_token, %{"typ" => "refresh"}),
          {:ok, user} <- Guardian.resource_from_claims(claims),
          {:ok, _old_stuff, {access_token, _new_claims}} <-
            Guardian.exchange(refresh_token, "refresh", "access") do
       {:ok, %{access_token: access_token, user: user}}
     else
-      {:error, %ArgumentError{message: message}} ->
-        {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: message}}
+      {:error, %ArgumentError{message: "argument error:" <> _msg}} ->
+        {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid}}
 
       {:error, "typ"} ->
-        {:error,
-         %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: :token_type_invalid}}
+        {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid_type}}
+
+      {:error, :token_not_found} ->
+        {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :revoked}}
 
       {:error, :token_expired} ->
-        {:error,
-         %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: :token_expired}}
+        {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :expired}}
 
       {:error, error} ->
-        {:error, %AbsintheErrorPayload.ValidationMessage{code: error}}
+        {:error, %Arkenston.Payload.ValidationMessage{code: error}}
     end
   end
 
@@ -71,21 +73,22 @@ defmodule Arkenston.Mutator.UserTokenMutator do
   def logout(%{refresh_token: token}, _info) do
     with {:ok, _claims} <- Guardian.decode_and_verify(token, %{"typ" => "refresh"}),
          {:ok, _claims} <- Guardian.revoke(token) do
-      {:ok, true}
+      {:ok, nil}
     else
-      {:error, %ArgumentError{message: message}} ->
-        {:error, %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: message}}
+      {:error, %ArgumentError{message: "argument error:" <> _msg}} ->
+        {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid}}
 
       {:error, "typ"} ->
-        {:error,
-         %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: :token_type_invalid}}
+        {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid_type}}
+
+      {:error, :token_not_found} ->
+        {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :revoked}}
 
       {:error, :token_expired} ->
-        {:error,
-         %AbsintheErrorPayload.ValidationMessage{field: :refresh_token, code: :token_expired}}
+        {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :expired}}
 
       {:error, error} ->
-        {:error, %AbsintheErrorPayload.ValidationMessage{code: error}}
+        {:error, %Arkenston.Payload.ValidationMessage{code: error}}
     end
   end
 

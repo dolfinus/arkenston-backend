@@ -12,10 +12,10 @@ defmodule ArkenstonWeb.Schema.Types.Custom.Locale do
   @spec decode(Absinthe.Blueprint.Input.String.t()) :: {:ok, String.t()} | :error
   @spec decode(Absinthe.Blueprint.Input.Null.t()) :: {:ok, String.t()}
   defp decode(%Absinthe.Blueprint.Input.String{value: value}) do
-    value = value |> String.to_existing_atom()
+    value = value |> to_string()
 
-    if I18n.locales() |> Enum.member?(value) do
-      {:ok, value |> to_string()}
+    if I18n.all_locales() |> Enum.member?(value) do
+      {:ok, value}
     else
       :error
     end
@@ -24,7 +24,7 @@ defmodule ArkenstonWeb.Schema.Types.Custom.Locale do
   end
 
   defp decode(%Absinthe.Blueprint.Input.Null{}) do
-    {:ok, I18n.locale()}
+    {:ok, I18n.default_locale()}
   end
 
   defp decode(_) do

@@ -10,7 +10,6 @@ defmodule ArkenstonWeb.Schema.Types do
       import_types ArkenstonWeb.Schema.Types.Interface
       import_types ArkenstonWeb.Schema.Types.Node
       import_types ArkenstonWeb.Schema.Types.Object
-      import_types ArkenstonWeb.Schema.Types.Payload
 
       import_types ArkenstonWeb.Schema.Query.User
       import_types ArkenstonWeb.Schema.Query.Author

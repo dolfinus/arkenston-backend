@@ -13,7 +13,7 @@ defmodule Arkenston.Mutator.AuthorMutator do
     case Repo.transational(fn ->
            with :ok <- Permissions.check_permissions_for(:author, :create, context, attrs),
                 {:ok, author} <- Subject.create_author(attrs, context) do
-             {:ok, Subject.get_author(author.id)}
+             {:ok, Subject.get_author(author.id, context)}
            end
          end) do
       {:ok, result} ->
@@ -35,13 +35,13 @@ defmodule Arkenston.Mutator.AuthorMutator do
     case Repo.transational(fn ->
            case get_author(args, context) do
              {field, nil} ->
-               {:error, %AbsintheErrorPayload.ValidationMessage{field: field, code: :not_found}}
+               {:error, %Arkenston.Payload.ValidationMessage{field: field, code: :missing}}
 
              {_field, author} ->
                with :ok <-
                       Permissions.check_permissions_for(:author, :update, context, author, attrs),
                     {:ok, _author} <- author |> Subject.update_author(attrs, context) do
-                 {:ok, Subject.get_author(author.id)}
+                 {:ok, Subject.get_author(author.id, context)}
                end
            end
          end) do
@@ -57,7 +57,7 @@ defmodule Arkenston.Mutator.AuthorMutator do
   end
 
   @spec delete(parent :: any, args :: map, info :: map) ::
-          {:ok, Author.t() | Ecto.Changeset.t()} | {:error, any}
+          {:ok, nil} | {:error, any}
   def delete(parent \\ nil, args, info \\ %{context: %{anonymous: true}})
 
   def delete(_parent, args, %{context: context}) do
@@ -73,13 +73,13 @@ defmodule Arkenston.Mutator.AuthorMutator do
     case Repo.transational(fn ->
            case get_author(args, context) do
              {field, nil} ->
-               {:error, %AbsintheErrorPayload.ValidationMessage{field: field, code: :not_found}}
+               {:error, %Arkenston.Payload.ValidationMessage{field: field, code: :missing}}
 
              {_field, author} ->
                with :ok <-
                       Permissions.check_permissions_for(:author, :delete, context, author, args),
                     {:ok, _author} <- author |> Subject.delete_author(attrs, context) do
-                 {:ok, true}
+                 {:ok, nil}
                end
            end
          end) do
@@ -103,7 +103,7 @@ defmodule Arkenston.Mutator.AuthorMutator do
         {:name, Subject.get_author_by(name: name)}
 
       %{email: email} when not is_nil(email) ->
-        {:name, Subject.get_author_by(email: email)}
+        {:email, Subject.get_author_by(email: email)}
 
       _ ->
         case context do

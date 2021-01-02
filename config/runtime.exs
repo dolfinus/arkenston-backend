@@ -83,7 +83,9 @@ config :linguist, Linguist.Cldr,
   locales: locales,
   force_locale_download: Mix.env() == "prod"
 
-config :arkenston, Arkenston.I18n, locale: default_locale
+config :arkenston, Arkenston.I18n,
+  default_locale: default_locale,
+  locales: locales
 
 if Mix.env() == "prod" do
   secret_key_base =

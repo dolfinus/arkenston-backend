@@ -10,16 +10,21 @@ defmodule GraphqlHelper do
       import unquote(current)
     end
   end
+  def make_query(conn, query, token \\ nil, locale \\ nil)
 
-  def make_query(conn, query) do
-    conn
-    |> post("/api/graphql", query)
-    |> json_response(200)
-  end
+  def make_query(conn, query, token, locale) do
+    conn = if is_nil(token) do
+      conn
+    else
+      conn |> put_req_header("authorization", "Bearer #{token}")
+    end
+    conn = if is_nil(locale) do
+      conn
+    else
+      conn |> put_req_header("accept-language", "#{locale}")
+    end
 
-  def make_query(conn, query, token) do
     conn
-    |> put_req_header("authorization", "Bearer #{token}")
     |> post("/api/graphql", query)
     |> json_response(200)
   end

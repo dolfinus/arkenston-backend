@@ -1,17 +1,17 @@
 defmodule ArkenstonWeb.Schema.Mutation.Author do
   use Absinthe.Schema.Notation
-  import AbsintheErrorPayload.Payload
+  import Arkenston.Middleware.HandleErrors
 
   alias Arkenston.Mutator.AuthorMutator
 
   object :author_mutations do
-    field :create_author, :author_payload do
+    field :create_author, :author do
       arg :input, non_null(:create_author_input)
       resolve &AuthorMutator.create/3
       middleware &build_payload/2
     end
 
-    field :update_author, :author_payload do
+    field :update_author, :author do
       arg :id, :uuid4
       arg :name, :string
       arg :email, :string
@@ -20,7 +20,7 @@ defmodule ArkenstonWeb.Schema.Mutation.Author do
       middleware &build_payload/2
     end
 
-    field :delete_author, :boolean_payload do
+    field :delete_author, :author do
       arg :id, :uuid4
       arg :name, :string
       arg :email, :string

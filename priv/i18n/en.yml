@@ -1,18 +1,32 @@
+
+entity:
+  user_author: user-author binding
+field:
+  author: &name
+    name:
+      nominative: "%{entity} name"
+      instrumental: name
+    email:
+      nominative: "%{entity} email"
+      instrumental: email
+  user: *name
 error:
-  auth:
-    token:
-      invalid: Auth token is invalid
-      expired: Auth token was expired
-    method:
-      prohibited: Auth method is not allowed
-  record:
-    missing: '%{record} not found'
-    invalid: '%{record} not valid'
-    translations:
-      missing: You should specify as least one translation
-      invalid: Invalid translation
-  policy:
-    prohibited: 'Insufficiend privileges to %{query} %{class}'
+  missing: Cannot find %{entity}
+  credentials: Incorrect login credentials
+  permissions: Not enough permissions to %{operation}
+  invalid_type: "%{entity} type is not valid"
+  expired: "%{entity} is expired"
+  revoked: "%{entity} has been revoked"
+  field:
+    missing: "Cannot find %{entity} with specified %{field.instrumental}"
+    invalid: "%{field} value %{value} is not valid"
+    unique: "%{entity} with the same %{field.instrumental} %{value} is already exist"
+    permissions: Not enough permissions to %{operation} with %{field.instrumental} %{value}
+    min:
+      one: "%{field} should be at least 1 character long"
+      other: "%{field} should be at least %{count} characters long"
+    format: "%{field} %{value} has invalid format"
+    required: "%{field} cannot be empty"
 default:
   authors:
     admin:

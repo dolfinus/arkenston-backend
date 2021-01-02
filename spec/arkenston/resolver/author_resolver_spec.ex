@@ -29,7 +29,7 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           inserted_authors = authors |> Enum.map(fn (author) ->
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createAuthor)
           end)
 
           inserted_authors = (inserted_authors ++ [creator.author]) |> Enum.map(&handle_author/1)
@@ -47,7 +47,7 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           inserted_authors = authors |> Enum.map(fn (author) ->
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createAuthor)
           end)
 
           inserted_author_id = ~i(inserted_authors[0].id)
@@ -67,7 +67,7 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           inserted_authors = authors |> Enum.map(fn (author) ->
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createAuthor)
           end)
 
           inserted_author = ~i(inserted_authors[0]) |> handle_author()
@@ -86,7 +86,7 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           inserted_authors = authors |> Enum.map(fn (author) ->
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createAuthor)
           end)
 
           inserted_author = ~i(inserted_authors[0]) |> handle_author()
@@ -105,7 +105,7 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           inserted_authors = authors |> Enum.map(fn (author) ->
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createAuthor)
           end)
 
           inserted_author_id = ~i(inserted_authors[0].id)
@@ -127,7 +127,7 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           inserted_authors = authors |> Enum.map(fn (author) ->
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createAuthor)
           end)
 
           inserted_author_id = ~i(inserted_authors[0].id)
@@ -151,7 +151,7 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           inserted_authors = authors |> Enum.map(fn (author) ->
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createAuthor)
           end)
 
           inserted_author_id = ~i(inserted_authors[0].id)
@@ -171,7 +171,7 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           inserted_authors = authors |> Enum.map(fn (author) ->
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createAuthor)
           end)
 
           inserted_author = ~i(inserted_authors[0]) |> handle_author()
@@ -190,7 +190,7 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           inserted_authors = authors |> Enum.map(fn (author) ->
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createAuthor)
           end)
 
           inserted_author = ~i(inserted_authors[0]) |> handle_author()
@@ -209,9 +209,9 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           inserted_authors = users |> Enum.map(fn (user) ->
             author = build(:author)
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
-            create_user(input: prepare_user(user), author: %{id: ~i(create_response.result.id)}, access_token: access_token, conn: shared.conn)
+            create_user(input: prepare_user(user), author: %{id: ~i(create_response.data.createAuthor.id)}, access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createAuthor)
           end)
 
           user = ~i(users[0])
@@ -240,7 +240,7 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           inserted_authors = authors |> Enum.map(fn (author) ->
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createAuthor)
           end)
 
           inserted_author_id = ~i(inserted_authors[0].id)
@@ -261,7 +261,7 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           inserted_authors = authors |> Enum.map(fn (author) ->
             create_response = create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
 
-            ~i(create_response.result)
+            ~i(create_response.data.createAuthor)
           end)
 
           inserted_author_id = ~i(inserted_authors[0].id)

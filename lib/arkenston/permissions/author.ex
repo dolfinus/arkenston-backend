@@ -68,14 +68,7 @@ defmodule Arkenston.Permissions.Author do
           context :: Context.t(),
           old_entity :: any,
           new_entity :: any
-        ) :: :ok | {:error, %AbsintheErrorPayload.ValidationMessage{}}
-  def check_permissions_for(
-        operation,
-        context \\ %{anonymous: true},
-        old_entity \\ nil,
-        new_entity \\ nil
-      )
-
+        ) :: :ok | {:error, %Arkenston.Payload.ValidationMessage{}}
   def check_permissions_for(:create, context, _, _) do
     actual_permissions = Permissions.permissions_for(context)
     create_permissions = [:create_author]
@@ -83,7 +76,7 @@ defmodule Arkenston.Permissions.Author do
     if Guardian.any_permissions?(actual_permissions, %{author: create_permissions}) do
       :ok
     else
-      {:error, %AbsintheErrorPayload.ValidationMessage{code: :not_enough_permissions}}
+      {:error, %Arkenston.Payload.ValidationMessage{code: :permissions}}
     end
   end
 
@@ -106,7 +99,7 @@ defmodule Arkenston.Permissions.Author do
     if Guardian.any_permissions?(actual_permissions, %{author: update_author_permissions}) do
       :ok
     else
-      {:error, %AbsintheErrorPayload.ValidationMessage{code: :not_enough_permissions}}
+      {:error, %Arkenston.Payload.ValidationMessage{code: :permissions}}
     end
   end
 
@@ -129,7 +122,7 @@ defmodule Arkenston.Permissions.Author do
     if Guardian.any_permissions?(actual_permissions, %{author: delete_author_permissions}) do
       :ok
     else
-      {:error, %AbsintheErrorPayload.ValidationMessage{code: :not_enough_permissions}}
+      {:error, %Arkenston.Payload.ValidationMessage{code: :permissions}}
     end
   end
 

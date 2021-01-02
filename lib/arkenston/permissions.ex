@@ -46,11 +46,11 @@ defmodule Arkenston.Permissions do
           context :: Context.t(),
           old_entity :: any,
           new_entity :: any
-        ) :: :ok | {:error, %AbsintheErrorPayload.ValidationMessage{}}
+        ) :: :ok | {:error, %Arkenston.Payload.ValidationMessage{}}
   def check_permissions_for(
         type,
         operation,
-        context \\ %{anonymous: true},
+        context,
         old_entity \\ nil,
         new_entity \\ nil
       ) do
