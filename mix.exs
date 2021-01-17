@@ -63,7 +63,7 @@ defmodule Arkenston.MixProject do
       {:postgrex, "~> 0.15"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.1"},
-      {:absinthe, "~> 1.5"},
+      {:absinthe, "~> 1.6", override: true},
       {:absinthe_plug, "~> 1.5"},
       {:absinthe_error_payload, "~> 1.1"},
       {:absinthe_relay, "~> 1.5"},

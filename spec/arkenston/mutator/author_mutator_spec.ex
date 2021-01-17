@@ -21,15 +21,15 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
   end
 
   let :translation_with_default_locale do
-    %{locale: I18n.default_locale(), first_name: first_name(), last_name: last_name(), middle_name: first_name()}
+    %{locale: I18n.default_locale() |> String.upcase(), first_name: first_name(), last_name: last_name(), middle_name: first_name()}
   end
 
   let :translation_with_custom_locale do
-    %{locale: "ru", first_name: first_name(), last_name: last_name(), middle_name: first_name()}
+    %{locale: "RU", first_name: first_name(), last_name: last_name(), middle_name: first_name()}
   end
 
   let :translation_with_unknown_locale do
-    %{locale: characters(2) |> to_string(), first_name: first_name(), last_name: last_name(), middle_name: first_name()}
+    %{locale: characters(2) |> to_string() |> String.upcase(), first_name: first_name(), last_name: last_name(), middle_name: first_name()}
   end
 
   let :creator_user do
@@ -300,7 +300,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           translations = ~i(create_response.data.createAuthor.translations)
 
-          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == I18n.default_locale() end) |> Enum.at(0)
+          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) |> String.downcase() == I18n.default_locale() end) |> Enum.at(0)
 
           expect ~i(default_translation.first_name)  |> to(eq(translation().first_name))
           expect ~i(default_translation.last_name)   |> to(eq(translation().last_name))
@@ -777,7 +777,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           translations = ~i(update_response.data.updateAuthor.translations)
 
-          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == I18n.default_locale() end) |> Enum.at(0)
+          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) |> String.downcase() == I18n.default_locale() end) |> Enum.at(0)
 
           expect ~i(default_translation.first_name)  |> not_to(eq(author.first_name))
           expect ~i(default_translation.last_name)   |> not_to(eq(author.last_name))
