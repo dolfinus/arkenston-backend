@@ -75,7 +75,7 @@ defmodule Arkenston.MixProject do
       {:argon2_elixir, "~> 2.3"},
       {:pbkdf2_elixir, "~> 1.2"},
       {:inflex, "~> 2.0"},
-      {:linguist, "~> 0.3"},
+      {:linguist, git: "https://github.com/dolfinus/linguist.git", branch: "master"},
       {:ex_cldr, "~> 2.13", override: true},
       {:guardian, "~> 2.1"},
       {:guardian_phoenix, "~> 2.0"},

@@ -76,7 +76,8 @@ config :ex_cldr,
   default_backend: Linguist.Cldr
 
 config :linguist,
-  pluralization_key: :count
+  pluralization_key: :count,
+  cldr: Linguist.Cldr
 
 config :linguist, Linguist.Cldr,
   default_locale: default_locale,
