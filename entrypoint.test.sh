@@ -5,7 +5,7 @@ set -e
 ./wait_for_postgres.sh;
 
 if [ ! -z "$TRAVIS" ]; then
-  mix coverage --pro $*;
+  mix coverage --pro $@;
 else
   case "$*" in
     *-h*)
@@ -17,7 +17,7 @@ else
       exit 0;
       ;;
     *)
-      mix test "$*";
+      mix test "$@";
       ;;
   esac
 fi

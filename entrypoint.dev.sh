@@ -6,4 +6,4 @@ set -e
 mix ecto.setup
 
 mkdir -p ./_build && chown arkenston:arkenston -R ./_build
-mix phx.server $*
+mix phx.server "$@"
