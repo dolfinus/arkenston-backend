@@ -2,7 +2,7 @@ _build
 deps
 .env*
 !.env.sample
-!.env.travis
+!.env.ci
 .bash*
 coverage
 cover

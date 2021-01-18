@@ -4,7 +4,7 @@ set -e
 
 ./wait_for_postgres.sh;
 
-if [ ! -z "$TRAVIS" ]; then
+if [ ! -z "$CI" ]; then
   mix coverage --pro $@;
 else
   case "$*" in
@@ -22,7 +22,7 @@ else
   esac
 fi
 
-if [ ! -z "$TRAVIS" ]; then
+if [ ! -z "$CI" ]; then
   mix quality.ci;
 else
   mix quality;

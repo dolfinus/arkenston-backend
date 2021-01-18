@@ -1,0 +1,86 @@
+name: Tests
+
+on: push
+
+jobs:
+  tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Get cached docker images
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+        with:
+          key: docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-hash-{hash}-git-${{ github.sha }}
+          restore-keys: |
+            docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-hash-{hash}-git-${{ github.sha }}
+            docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-hash-{hash}
+            docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+            docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}
+            docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}
+            docker-${{ runner.os }}-base
+
+      - name: Create dializer plts path
+        run: 'mkdir ${{ github.workspace }}/priv/plts || true'
+
+      - name: Get cached dializer plts
+        uses: actions/cache@v2
+        with:
+          path: priv/plts
+          key: plts-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-git-${{ github.sha }}
+          restore-keys: |
+            plts-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-git-${{ github.sha }}
+            plts-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+            plts-${{ runner.os }}-mix-
+
+      - name: Fix dializer plts owner
+        run: 'sudo chown 2000:2000 -R ${{ github.workspace }}/priv/plts'
+
+      - name: Login to DockerHub
+        run: docker login -u  ${{ secrets.DOCKERHUB_USERNAME }} -p "${{ secrets.DOCKERHUB_TOKEN }}"
+
+      - name: Load docker images from cache
+        run: 'docker load -i docker_images/images.tar || true'
+
+      - name: Build base image
+        run: docker build -t dolfinus/arkenston-backend:base --compress -f ${{ github.workspace }}/Dockerfile.base ${{ github.workspace }}
+
+      - name: Build testing image
+        run: docker build -t dolfinus/arkenston-backend:test --compress -f ${{ github.workspace }}/Dockerfile.test ${{ github.workspace }}
+
+      - name: Copy .env files
+        run: 'cp ${{ github.workspace }}/.env.ci ${{ github.workspace }}/.env.test'
+
+      - name: Create coverage reports path
+        run: 'mkdir ${{ github.workspace }}/cover || true; sudo chown 2000:2000 -R ${{ github.workspace }}/cover'
+
+      - name: Create graphql schema path
+        run: 'mkdir ${{ github.workspace }}/graphql || true; sudo chown 2000:2000 -R ${{ github.workspace }}/graphql'
+
+      - name: Run tests
+        env:
+          CI: true
+        run: 'docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from backend_test'
+
+      - name: Push coverage results
+        uses: codecov/codecov-action@v1
+        with:
+          directory: ./cover
+          flags: unittests
+          fail_ci_if_error: true
+
+      - name: Push build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: graphql-schema
+          path: graphql/*
+
+      - name: Logout from DockerHub
+        run: docker logout
