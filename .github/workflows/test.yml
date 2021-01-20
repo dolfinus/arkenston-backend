@@ -18,10 +18,8 @@ jobs:
         uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
         with:
-          key: docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-hash-{hash}-git-${{ github.sha }}
+          key: docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
           restore-keys: |
-            docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-hash-{hash}-git-${{ github.sha }}
-            docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-hash-{hash}
             docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
             docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}
             docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}
