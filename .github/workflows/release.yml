@@ -19,7 +19,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Run tests
           ref: ${{ github.ref }}
-          timeoutSeconds: 2400
+          timeoutSeconds: 3600
 
       - name: Fail the Build
         uses: cutenode/action-always-fail@v1

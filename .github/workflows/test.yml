@@ -32,9 +32,8 @@ jobs:
         uses: actions/cache@v2
         with:
           path: priv/plts
-          key: plts-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-git-${{ github.sha }}
+          key: plts-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
           restore-keys: |
-            plts-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-git-${{ github.sha }}
             plts-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
             plts-${{ runner.os }}-mix-
 
