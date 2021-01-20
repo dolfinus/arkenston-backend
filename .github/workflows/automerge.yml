@@ -32,11 +32,8 @@ jobs:
           ref: ${{ github.pull_request.head.sha || github.sha }}
           timeoutSeconds: 3600
 
-      - name: Fail the Build
-        uses: cutenode/action-always-fail@v1
-        if: steps.wait-for-tests.outputs.conclusion != 'success'
-
-      - name: automerge
+      - name: Automerge
+        if: steps.wait-for-tests.outputs.conclusion == 'success'
         uses: "pascalgn/automerge-action@v0.13.0"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
