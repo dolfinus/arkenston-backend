@@ -37,5 +37,5 @@ jobs:
           MERGE_REMOVE_LABELS: "automerge"
           MERGE_METHOD: rebase
           MERGE_FORKS: false
-          MERGE_RETRIES: "6"
+          MERGE_RETRIES: "5"
           MERGE_RETRY_SLEEP: "10000"
