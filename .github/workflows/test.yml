@@ -49,9 +49,6 @@ jobs:
       - name: Login to DockerHub
         run: docker login -u  ${{ secrets.DOCKERHUB_USERNAME }} -p "${{ secrets.DOCKERHUB_TOKEN }}"
 
-      - name: Load docker images from cache
-        run: 'docker load -i docker_images/images.tar || true'
-
       - name: Build base image
         run: docker build -t dolfinus/arkenston-backend:base --compress -f ${{ github.workspace }}/Dockerfile.base ${{ github.workspace }}
 
