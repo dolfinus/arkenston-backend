@@ -25,6 +25,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Run tests
           ref: ${{ github.head_ref || github.ref }}
+          intervalSeconds: 30
           timeoutSeconds: 3600
 
       - name: Automerge
