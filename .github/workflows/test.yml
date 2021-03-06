@@ -2,8 +2,6 @@ name: Tests
 
 on:
   push:
-    branches:
-    - '**'
   pull_request:
     branches:
     - master
@@ -11,7 +9,7 @@ on:
 jobs:
   tests:
     name: Run tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
       - name: Checkout code
@@ -29,7 +27,6 @@ jobs:
             docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
             docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}
             docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}
-            docker-${{ runner.os }}-base
 
       - name: Create dializer plts path
         run: 'mkdir ${{ github.workspace }}/priv/plts || true'
@@ -41,7 +38,6 @@ jobs:
           key: plts-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
           restore-keys: |
             plts-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
-            plts-${{ runner.os }}-mix-
 
       - name: Fix dializer plts owner
         run: 'sudo chown 2000:2000 -R ${{ github.workspace }}/priv/plts'
