@@ -1,16 +1,15 @@
 defmodule ArkenstonWeb.Schema.Helpers.Revision do
-  use ArkenstonWeb.Schema.Helpers.Pagination
-  use ArkenstonWeb.Schema.Helpers.Association
-
   defmacro __using__(_opts) do
     current = __MODULE__
 
     quote do
+      use ArkenstonWeb.Schema.Helpers.Pagination
+      use ArkenstonWeb.Schema.Helpers.Association
       import unquote(current)
     end
   end
 
-  defmacro audited_object(obj, do: block) when is_atom(obj) do
+  defmacro audited(obj, do: block) when is_atom(obj) do
     orig_name = obj |> Atom.to_string()
     revision_name = "#{orig_name}_revision" |> String.to_atom()
 
@@ -33,7 +32,7 @@ defmodule ArkenstonWeb.Schema.Helpers.Revision do
         end
 
         connection field :revisions, node_type: unquote(revision_name) do
-          paginated(:revisions)
+          paginated :revisions
         end
       end
 

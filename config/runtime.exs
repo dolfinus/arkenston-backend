@@ -65,7 +65,7 @@ config :arkenston, ArkenstonWeb.Endpoint,
       |> String.replace(backend_host, "127.0.0.1")
     ],
     allow_credentials: true,
-    max_age: 86400,
+    max_age: 86_400,
     allow_methods: ["POST", "OPTIONS", "HEAD"],
     allow_headers: ["Content-Type"],
     log: [rejected: :error]

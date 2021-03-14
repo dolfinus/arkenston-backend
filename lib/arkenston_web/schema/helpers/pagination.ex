@@ -1,6 +1,5 @@
 defmodule ArkenstonWeb.Schema.Helpers.Pagination do
   alias Arkenston.Helper.QueryHelper
-  use ArkenstonWeb.Schema.Helpers.Association
 
   @default_page_size Application.compile_env(:arkenston, [ArkenstonWeb.Endpoint, :page_size])
 
@@ -8,6 +7,8 @@ defmodule ArkenstonWeb.Schema.Helpers.Pagination do
     current = __MODULE__
 
     quote do
+      use Absinthe.Relay.Schema.Notation, :modern
+      use ArkenstonWeb.Schema.Helpers.Association
       import unquote(current)
     end
   end

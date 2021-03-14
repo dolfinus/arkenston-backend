@@ -197,7 +197,7 @@ defmodule Arkenston.Middleware.HandleErrors do
       |> Keyword.put(:operation, operation)
       |> Keyword.put(:entity, entity)
 
-    translation = translate(code, locale, new_opts)
+    translation = translate_errors(code, locale, new_opts)
 
     message =
       case translation do
@@ -217,7 +217,7 @@ defmodule Arkenston.Middleware.HandleErrors do
     }
   end
 
-  def translate(code, locale, opts) do
+  def translate_errors(code, locale, opts) do
     field = opts |> Keyword.get(:field)
 
     case field do

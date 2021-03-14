@@ -2,7 +2,6 @@ ESpec.start
 
 ESpec.configure fn(config) ->
   config.before fn(tags) ->
-    use Phoenix.ConnTest
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Arkenston.Repo)
 
     unless tags[:async] do

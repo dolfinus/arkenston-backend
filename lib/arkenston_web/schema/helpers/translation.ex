@@ -1,6 +1,4 @@
 defmodule ArkenstonWeb.Schema.Helpers.Translation do
-  use ArkenstonWeb.Schema.Helpers.Revision
-
   alias Arkenston.I18n
   alias Arkenston.Helper.TranslationHelper
 
@@ -8,11 +6,12 @@ defmodule ArkenstonWeb.Schema.Helpers.Translation do
     current = __MODULE__
 
     quote do
+      use ArkenstonWeb.Schema.Helpers.Revision
       import unquote(current)
     end
   end
 
-  defmacro translate(field, args \\ []) do
+  defmacro translated(field, args \\ []) do
     quote do
       field unquote(field), non_null(:string), unquote_splicing(args) do
         arg :locale, :locale, default_value: nil
@@ -25,24 +24,24 @@ defmodule ArkenstonWeb.Schema.Helpers.Translation do
     end
   end
 
-  defmacro audited_translated_object(object, do: block, else: translate, after: after_block) do
+  defmacro audited_translated(object, do: block, else: translation, after: after_block) do
     translation_type = :"#{object}_translation"
     translation_input_type = :"#{object}_translation_input"
 
     quote do
       object unquote(translation_type) do
         field :locale, non_null(:locale)
-        unquote(translate)
+        unquote(translation)
       end
 
       input_object unquote(translation_input_type) do
         field :locale, non_null(:locale)
-        unquote(translate)
+        unquote(translation)
       end
 
-      audited_object unquote(object) do
+      audited unquote(object) do
         unquote(block)
-        unquote(translate)
+        unquote(translation)
 
         field :translations, non_null(list_of(non_null(unquote(translation_type)))) do
           resolve fn parent, _args, _context ->

@@ -1,12 +1,8 @@
 defmodule ArkenstonWeb.Schema.Types.Object.Author do
   use Absinthe.Schema.Notation
-  use Absinthe.Relay.Schema.Notation, :modern
-  use ArkenstonWeb.Schema.Helpers.Association
   use ArkenstonWeb.Schema.Helpers.Translation
 
-  # translation fields
-  # resolvers
-  audited_translated_object :author do
+  audited_translated :author do
     field :name, non_null(:string)
     field :email, :string
     field :first_name, non_null(:string)
@@ -18,9 +14,9 @@ defmodule ArkenstonWeb.Schema.Types.Object.Author do
     field :middle_name, non_null(:string)
     field :last_name, non_null(:string)
   after
-    connect_with(:user)
-    translate(:first_name)
-    translate(:middle_name)
-    translate(:last_name)
+    connect_with :user
+    translated :first_name
+    translated :middle_name
+    translated :last_name
   end
 end

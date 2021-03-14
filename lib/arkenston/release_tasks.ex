@@ -50,7 +50,7 @@ defmodule Arkenston.ReleaseTasks do
   defp create_storage_for(repo) do
     app = Keyword.get(repo.config(), :otp_app)
     IO.puts("Creating storage for #{app}...")
-    repo.__adapter__.storage_up(repo.config)
+    repo.__adapter__().storage_up(repo.config())
   end
 
   defp run_migrations do

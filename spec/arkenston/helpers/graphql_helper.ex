@@ -1,12 +1,14 @@
 defmodule GraphqlHelper do
-  use Phoenix.ConnTest
+  import Plug.Conn
+  import Phoenix.ConnTest
   import Indifferent.Sigils
   @endpoint ArkenstonWeb.Endpoint
 
   defmacro __using__(_opts) do
     current = __MODULE__
     quote do
-      use Phoenix.ConnTest
+      import Plug.Conn
+      import Phoenix.ConnTest
       import unquote(current)
     end
   end
