@@ -26,7 +26,7 @@ defmodule Arkenston.MixProject do
         test_task: "espec"
       ],
       dialyzer: [
-        plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+        plt_core_path: "priv/plts",
         ignore_warnings: ".dialyzer_ignore.exs"
       ]
     ]
