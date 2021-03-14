@@ -28,24 +28,21 @@ defmodule Arkenston.I18n do
 
   @cases [:nominative, :genitive, :dative, :instrumental, :infinitive]
 
-  def translate(path), do: translate(path, nil, [])
+  def translate(path, locale \\ nil, bindings \\ []) do
+    locale = locale || default_locale()
 
-  def translate(path, locale), do: translate(path, locale, [])
+    case bindings do
+      [] ->
+        Memoize.Cache.get_or_run({__MODULE__, :translate, [path, locale]}, fn ->
+          do_translate(path, locale, [])
+        end)
 
-  def translate(path, nil, bindings), do: translate(path, default_locale(), bindings)
-
-  def translate(path, locale, []) do
-    Memoize.Cache.get_or_run({__MODULE__, :translate, [path, locale]}, fn ->
-      do_translate(path, locale, [])
-    end)
-  end
-
-  def translate(path, locale, bindings) do
-    do_translate(path, locale, bindings)
+      _ ->
+        do_translate(path, locale, bindings)
+    end
   end
 
   defp do_translate(path, locale, bindings) do
-    locale = locale || default_locale()
     bindings = handle_bindings(bindings, locale)
 
     options = [
