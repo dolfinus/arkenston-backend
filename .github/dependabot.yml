@@ -5,11 +5,10 @@ updates:
     schedule:
       interval: "daily"
     ignore:
-      - dependency-name: "ex_cldr" # TODO: https://github.com/change/linguist/pull/33
+      - dependency-name: "ex_cldr"
     labels:
       - "mix"
       - "dependencies"
-      - "automerge"
 
   - package-ecosystem: "docker"
     directory: "/"
@@ -18,4 +17,3 @@ updates:
     labels:
       - "docker"
       - "dependencies"
-      - "automerge"

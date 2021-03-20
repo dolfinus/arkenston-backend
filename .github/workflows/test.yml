@@ -9,19 +9,19 @@ on:
 jobs:
   check_duplicate_runs:
     name: Check for duplicate runs
-    # continue-on-error: true # Uncomment once integration is finished
+    continue-on-error: true
     runs-on: ubuntu-latest
     outputs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
       - id: skip_check
         uses: fkirc/skip-duplicate-actions@master
-        if: github.event_name == 'pull_request'
         with:
           concurrent_skipping: always
           cancel_others: true
           skip_after_successful_duplicate: true
           paths_ignore: '["**/README.md", "**/LICENSE"]'
+          do_not_skip: '["pull_request"]'
 
   tests:
     name: Run tests
@@ -40,11 +40,11 @@ jobs:
         uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
         with:
-          key: docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          key: docker-${{ runner.os }}-base-${{ hashFiles('**/Dockerfile.base') }}-test-${{ hashFiles('**/Dockerfile.test') }}-mix-${{ hashFiles('**/mix.lock') }}
           restore-keys: |
-            docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
-            docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}-test-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.test')) }}
-            docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}
+            docker-${{ runner.os }}-base-${{ hashFiles('**/Dockerfile.base') }}-test-${{ hashFiles('**/Dockerfile.test') }}-mix-${{ hashFiles('**/mix.lock') }}
+            docker-${{ runner.os }}-base-${{ hashFiles('**/Dockerfile.base') }}-test-${{ hashFiles('**/Dockerfile.test') }}
+            docker-${{ runner.os }}-base-${{ hashFiles('**/Dockerfile.base') }}
 
       - name: Create dializer plts path
         run: 'mkdir -p ${{ github.workspace }}/priv/plts/test ${{ github.workspace }}/priv/plts/dev || true'
@@ -53,9 +53,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: priv/plts
-          key: plts-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          key: plts-${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
           restore-keys: |
-            plts-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+            plts-${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
 
       - name: Fix dializer plts owner
         run: 'sudo chown 2000:2000 -R ${{ github.workspace }}/priv/plts'
