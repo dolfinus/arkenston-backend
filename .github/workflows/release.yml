@@ -42,7 +42,12 @@ jobs:
             docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}
 
       - name: Login to DockerHub
-        run: docker login -u  ${{ secrets.DOCKERHUB_USERNAME }} -p "${{ secrets.DOCKERHUB_TOKEN }}"
+        uses: nick-invision/retry@v2
+        with:
+          timeout_seconds: 15
+          max_attempts: 3
+          retry_on: any
+          command: docker login -u  ${{ secrets.DOCKERHUB_USERNAME }} -p "${{ secrets.DOCKERHUB_TOKEN }}"
 
       - name: Build base image
         run: docker build -t dolfinus/arkenston-backend:base --compress -f ${{ github.workspace }}/Dockerfile.base ${{ github.workspace }}
