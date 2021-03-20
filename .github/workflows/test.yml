@@ -40,11 +40,12 @@ jobs:
         uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
         with:
-          key: docker-${{ runner.os }}-base-${{ hashFiles('**/Dockerfile.base') }}-test-${{ hashFiles('**/Dockerfile.test') }}-mix-${{ hashFiles('**/mix.lock') }}
+          key: docker-${{ runner.os }}-base-${{ hashFiles('**/Dockerfile.base') }}-test-${{ hashFiles('**/Dockerfile.test') }}-mix-${{ hashFiles('**/mix.lock') }}-git-${{ github.sha }}
           restore-keys: |
             docker-${{ runner.os }}-base-${{ hashFiles('**/Dockerfile.base') }}-test-${{ hashFiles('**/Dockerfile.test') }}-mix-${{ hashFiles('**/mix.lock') }}
-            docker-${{ runner.os }}-base-${{ hashFiles('**/Dockerfile.base') }}-test-${{ hashFiles('**/Dockerfile.test') }}
-            docker-${{ runner.os }}-base-${{ hashFiles('**/Dockerfile.base') }}
+            docker-${{ runner.os }}-base-${{ hashFiles('**/Dockerfile.base') }}-test-${{ hashFiles('**/Dockerfile.test') }}-
+            docker-${{ runner.os }}-base-${{ hashFiles('**/Dockerfile.base') }}-
+            docker-${{ runner.os }}-base-
 
       - name: Create dializer plts path
         run: 'mkdir -p ${{ github.workspace }}/priv/plts/test ${{ github.workspace }}/priv/plts/dev || true'
@@ -52,10 +53,14 @@ jobs:
       - name: Get cached dializer plts
         uses: actions/cache@v2
         with:
-          path: priv/plts
-          key: plts-${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          path: |
+            priv/plts
+            priv/plts/test
+            priv/plts/dev
+          key: plts-${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}-git-${{ github.sha }}
           restore-keys: |
             plts-${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+            plts-${{ runner.os }}-
 
       - name: Fix dializer plts owner
         run: 'sudo chown 2000:2000 -R ${{ github.workspace }}/priv/plts'
