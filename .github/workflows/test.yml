@@ -7,9 +7,27 @@ on:
     - master
 
 jobs:
+  check_duplicate_runs:
+    name: Check for duplicate runs
+    # continue-on-error: true # Uncomment once integration is finished
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@master
+        if: github.event_name == 'pull_request'
+        with:
+          concurrent_skipping: always
+          cancel_others: true
+          skip_after_successful_duplicate: true
+          paths_ignore: '["**/README.md", "**/LICENSE"]'
+
   tests:
     name: Run tests
     runs-on: ubuntu-latest
+    needs: check_duplicate_runs
+    if: ${{ needs.check_duplicate_runs.outputs.should_skip != 'true' }}
 
     steps:
       - name: Checkout code
