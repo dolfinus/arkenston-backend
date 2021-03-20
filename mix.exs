@@ -27,6 +27,7 @@ defmodule Arkenston.MixProject do
       ],
       dialyzer: [
         plt_core_path: "priv/plts",
+        plt_local_path: "priv/plts/#{Mix.env()}",
         ignore_warnings: ".dialyzer_ignore.exs"
       ]
     ]

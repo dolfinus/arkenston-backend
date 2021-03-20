@@ -11,8 +11,8 @@ cover
 erlang-history
 .elixir*
 .sobelow
-/priv/plts/*.plt
-/priv/plts/*.plt.hash
+*.plt
+*.plt.hash
 graphql
 *.dmp
 *.dump
