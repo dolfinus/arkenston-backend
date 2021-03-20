@@ -4,8 +4,6 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    ignore:
-      - dependency-name: "ex_cldr"
     labels:
       - "mix"
       - "dependencies"
