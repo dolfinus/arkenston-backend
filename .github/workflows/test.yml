@@ -47,7 +47,7 @@ jobs:
             docker-${{ runner.os }}-base-${{ hashFiles(format('{0}{1}', github.workspace, '/Dockerfile.base')) }}
 
       - name: Create dializer plts path
-        run: 'mkdir ${{ github.workspace }}/priv/plts || true'
+        run: 'mkdir -p ${{ github.workspace }}/priv/plts/test ${{ github.workspace }}/priv/plts/dev || true'
 
       - name: Get cached dializer plts
         uses: actions/cache@v2
