@@ -42,7 +42,9 @@ config :arkenston, Arkenston.Repo,
     autogenerate: false,
     read_after_writes: true,
     default: {:fragment, "gen_random_uuid()"}
-  ]
+  ],
+  prepare: :named,
+  parameters: [plan_cache_mode: "force_custom_plan"]
 
 config :arkenston, ArkenstonWeb.Endpoint,
   page_size: 20,

@@ -10,7 +10,7 @@ defmodule Arkenston.I18n do
     case Regex.run(~r/.*(\w+)\.ya?ml$/iuU, path) do
       lang when not is_nil(lang) ->
         @external_resource path
-        MemorizedVocabulary.locale(Enum.at(lang, 1) |> String.to_atom(), path)
+        MemorizedVocabulary.locale(Enum.at(lang, 1), path)
     end
   end)
 
@@ -24,7 +24,7 @@ defmodule Arkenston.I18n do
     @default_locale |> to_string()
   end
 
-  def get_default_locale(%{locale: locale}) when not is_nil(locale), do: locale
+  def get_default_locale(%{locale: locale}) when not is_nil(locale), do: locale |> to_string()
 
   def get_default_locale(_), do: default_locale()
 

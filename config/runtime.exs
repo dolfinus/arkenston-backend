@@ -30,8 +30,7 @@ config :arkenston, Arkenston.Repo,
   username: db_user,
   password: db_password,
   database: db_name,
-  hostname: db_host,
-  pool_size: 10
+  hostname: db_host
 
 # Configures the endpoint
 config :arkenston, ArkenstonWeb.Endpoint,
