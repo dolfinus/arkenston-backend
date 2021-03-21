@@ -22,7 +22,7 @@ backend_port = System.get_env("BACKEND_PORT") || "3000" |> String.to_integer()
 backend_scheme = System.get_env("BACKEND_SCHEME") || "http"
 backend_path = System.get_env("BACKEND_PATH") || "/api"
 
-locales = ["en", "ru"]
+locales = [:en, :ru] |> Enum.map(&to_string/1)
 default_locale = System.get_env("BACKEND_LOCALE") || "en"
 
 # Configure your database
@@ -76,19 +76,16 @@ config :ex_cldr,
   default_backend: Linguist.Cldr
 
 config :linguist,
-  pluralization_key: :count,
   cldr: Linguist.Cldr
 
 config :linguist, Linguist.Cldr,
   default_locale: default_locale,
   locales: locales,
-  force_locale_download: Mix.env() == "prod"
+  force_locale_download: "#{Mix.env()}" == "prod"
 
-config :arkenston, Arkenston.I18n,
-  default_locale: default_locale,
-  locales: locales
+config :arkenston, Arkenston.I18n, default_locale: default_locale
 
-if Mix.env() == "prod" do
+if "#{Mix.env()}" == "prod" do
   secret_key_base =
     System.get_env("SECRET_KEY_BASE") ||
       raise """

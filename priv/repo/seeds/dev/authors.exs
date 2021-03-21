@@ -37,9 +37,9 @@ case action do
             {
               locale,
               %{
-                first_name: I18n.t!(locale |> to_string(), "default.authors.admin.first_name"),
-                middle_name: I18n.t!(locale |> to_string(), "default.authors.admin.middle_name"),
-                last_name: I18n.t!(locale |> to_string(), "default.authors.admin.last_name")
+                first_name: I18n.t!(locale, "default.authors.admin.first_name"),
+                middle_name: I18n.t!(locale, "default.authors.admin.middle_name"),
+                last_name: I18n.t!(locale, "default.authors.admin.last_name")
               }
             }
           end)
@@ -60,10 +60,9 @@ case action do
               {
                 locale,
                 %{
-                  first_name: I18n.t!(locale |> to_string(), "default.authors.admin.first_name"),
-                  middle_name:
-                    I18n.t!(locale |> to_string(), "default.authors.admin.middle_name"),
-                  last_name: I18n.t!(locale |> to_string(), "default.authors.admin.last_name")
+                  first_name: I18n.t!(locale, "default.authors.admin.first_name"),
+                  middle_name: I18n.t!(locale, "default.authors.admin.middle_name"),
+                  last_name: I18n.t!(locale, "default.authors.admin.last_name")
                 }
               }
             end)

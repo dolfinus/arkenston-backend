@@ -74,7 +74,7 @@ config :arkenston, Arkenston.Guardian,
   allowed_drift: 2000,
   # optional
   verify_issuer: true,
-  secret_key: %{"k" => Mix.env() |> Atom.to_string(), "kty" => "oct"},
+  secret_key: %{"k" => "#{Mix.env()}", "kty" => "oct"},
   serializer: Arkenston.Guardian,
   # append-only list, never change order of items
   all_permissions: [
@@ -134,7 +134,7 @@ config :guardian, Guardian.DB,
   # default: 60 minutes
   sweep_interval: 60
 
-config :linguist, pluralization_key: :count
+config :linguist, vocabulary_backend: :persistent_term
 
 # Git hooks
 config :git_hooks,

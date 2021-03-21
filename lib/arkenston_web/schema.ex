@@ -2,6 +2,8 @@ defmodule ArkenstonWeb.Schema do
   use Absinthe.Schema
   use ArkenstonWeb.Schema.Types
 
+  @schema_provider Absinthe.Schema.PersistentTerm
+
   use Absinthe.Relay.Schema,
     flavor: :modern,
     global_id_translator: ArkenstonWeb.Schema.Helpers.IDTranslator

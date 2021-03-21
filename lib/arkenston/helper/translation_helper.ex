@@ -67,13 +67,13 @@ defmodule Arkenston.Helper.TranslationHelper do
   def translation_locales(object) do
     keys = translation_container(object) |> Map.keys()
 
-    all_locales =
-      (keys ++ I18n.all_locales())
+    locales =
+      (keys ++ I18n.locales())
       |> Enum.map(&to_string/1)
       |> Enum.map(&String.to_existing_atom/1)
       |> Enum.uniq()
 
-    all_locales
+    locales
   end
 
   defp shrink_translation(translation) do

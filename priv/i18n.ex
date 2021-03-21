@@ -1,18 +1,24 @@
 defmodule Arkenston.I18n do
   use Memoize
-  use Linguist.Vocabulary
+  alias Linguist.MemorizedVocabulary
 
   @default_locale Application.get_env(:arkenston, Arkenston.I18n)[:default_locale]
-  @all_locales Application.get_env(:arkenston, Arkenston.I18n)[:locales]
 
   locale_files = Path.wildcard([__DIR__, "i18n", "*.{yml,yaml}"] |> Enum.join("/"))
 
   Enum.each(locale_files, fn path ->
     case Regex.run(~r/.*(\w+)\.ya?ml$/iuU, path) do
       lang when not is_nil(lang) ->
-        locale(Enum.at(lang, 1) |> String.to_atom(), path)
+        @external_resource path
+        MemorizedVocabulary.locale(Enum.at(lang, 1) |> String.to_atom(), path)
     end
   end)
+
+  defdelegate t(locale, path), to: MemorizedVocabulary
+  defdelegate t!(locale, path), to: MemorizedVocabulary
+  defdelegate t(locale, path, bindings), to: MemorizedVocabulary
+  defdelegate t!(locale, path, bindings), to: MemorizedVocabulary
+  defdelegate locales(), to: MemorizedVocabulary
 
   def default_locale() do
     @default_locale |> to_string()
@@ -21,10 +27,6 @@ defmodule Arkenston.I18n do
   def get_default_locale(%{locale: locale}) when not is_nil(locale), do: locale
 
   def get_default_locale(_), do: default_locale()
-
-  def all_locales() do
-    @all_locales |> Enum.map(&to_string/1)
-  end
 
   @cases [:nominative, :genitive, :dative, :instrumental, :infinitive]
 

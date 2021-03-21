@@ -55,5 +55,5 @@ defmodule Arkenston.Context do
   end
 
   @spec supported_locale?(String.t()) :: boolean
-  defp supported_locale?(locale), do: Enum.member?(I18n.all_locales(), locale)
+  defp supported_locale?(locale), do: Enum.member?(I18n.locales(), locale)
 end
