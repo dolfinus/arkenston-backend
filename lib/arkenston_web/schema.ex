@@ -2,7 +2,8 @@ defmodule ArkenstonWeb.Schema do
   use Absinthe.Schema
   use ArkenstonWeb.Schema.Types
 
-  @schema_provider Absinthe.Schema.PersistentTerm
+  # uncomment after solving https://github.com/absinthe-graphql/absinthe/issues/1054
+  # @schema_provider Absinthe.Schema.PersistentTerm
 
   use Absinthe.Relay.Schema,
     flavor: :modern,
