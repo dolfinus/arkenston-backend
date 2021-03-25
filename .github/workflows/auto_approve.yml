@@ -11,4 +11,4 @@ jobs:
     - uses: hmarr/auto-approve-action@v2
       if: github.event.pull_request.user.login == 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'dependencies')
       with:
-        github-token: "${{ secrets.GITHUB_TOKEN }}"
+        github-token: "${{ secrets.DEPENDABOT_TOKEN }}"
