@@ -23,7 +23,7 @@ jobs:
   automerge:
     name: Automatically merge pull requests
     runs-on: ubuntu-latest
-    if: github.event.pull_request.user.login == 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'dependencies') && !contains(github.event.pull_request.labels.*.name, 'work in progress')
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
       
     steps:
       - name: Wait for tests
@@ -41,6 +41,7 @@ jobs:
         uses: "pascalgn/automerge-action@v0.13.0"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          MERGE_LABELS: 'dependencies,!wip,!work in progress'
           MERGE_METHOD: rebase
           MERGE_FORKS: false
           MERGE_RETRIES: "5"
