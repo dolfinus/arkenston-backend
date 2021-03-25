@@ -1,0 +1,33 @@
+       
+name: Automerge
+
+on:
+  pull_request_target:
+    types: [labeled]
+
+jobs:
+  automerge:
+    name: Automatically merge pull requests
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'dependencies') && !contains(github.event.pull_request.labels.*.name, 'work in progress')'
+      
+    steps:
+      - name: Wait for tests
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        id: wait-for-tests
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Run tests
+          ref: ${{ github.head_ref || github.ref }}
+          intervalSeconds: 60
+          timeoutSeconds: 3600
+
+      - name: Merge PR
+        if: steps.wait-for-tests.outputs.conclusion == 'success'
+        uses: "pascalgn/automerge-action@v0.13.0"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          MERGE_METHOD: rebase
+          MERGE_FORKS: false
+          MERGE_RETRIES: "5"
+          MERGE_RETRY_SLEEP: "10000"
