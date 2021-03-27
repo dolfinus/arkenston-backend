@@ -17,7 +17,7 @@ defmodule ArkenstonWeb.Schema.Helpers.Translation do
         arg :locale, :locale, default_value: nil
 
         resolve fn parent, args, %{context: context} ->
-          locale = args |> Map.get(:locale, I18n.get_default_locale(context))
+          locale = args |> Map.get(:locale) || I18n.get_default_locale(context)
           {:ok, TranslationHelper.translate_field(parent, unquote(field), locale)}
         end
       end

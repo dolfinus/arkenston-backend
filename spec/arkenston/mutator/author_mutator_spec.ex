@@ -300,7 +300,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           translations = ~i(create_response.data.createAuthor.translations)
 
-          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) |> String.downcase() == I18n.default_locale() end) |> Enum.at(0)
+          default_translation = translations |> Enum.find(fn item -> ~i(item.locale) |> String.downcase() == I18n.default_locale() end)
 
           expect ~i(default_translation.first_name)  |> to(eq(translation().first_name))
           expect ~i(default_translation.last_name)   |> to(eq(translation().last_name))
@@ -323,8 +323,8 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           translations = ~i(create_response.data.createAuthor.translations)
 
-          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == default.locale end) |> Enum.at(0)
-          custom_translation  = translations |> Enum.filter(fn item -> ~i(item.locale) == custom.locale  end) |> Enum.at(0)
+          default_translation = translations |> Enum.find(fn item -> ~i(item.locale) == default.locale end)
+          custom_translation  = translations |> Enum.find(fn item -> ~i(item.locale) == custom.locale  end)
 
           expect ~i(default_translation.first_name)  |> to(eq(default.first_name))
           expect ~i(default_translation.last_name)   |> to(eq(default.last_name))
@@ -777,7 +777,7 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           translations = ~i(update_response.data.updateAuthor.translations)
 
-          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) |> String.downcase() == I18n.default_locale() end) |> Enum.at(0)
+          default_translation = translations |> Enum.find(fn item -> ~i(item.locale) |> String.downcase() == I18n.default_locale() end)
 
           expect ~i(default_translation.first_name)  |> not_to(eq(author.first_name))
           expect ~i(default_translation.last_name)   |> not_to(eq(author.last_name))
@@ -805,8 +805,8 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           translations = ~i(update_response.data.updateAuthor.translations)
 
-          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == default.locale end) |> Enum.at(0)
-          custom_translation  = translations |> Enum.filter(fn item -> ~i(item.locale) == custom.locale  end) |> Enum.at(0)
+          default_translation = translations |> Enum.find(fn item -> ~i(item.locale) == default.locale end)
+          custom_translation  = translations |> Enum.find(fn item -> ~i(item.locale) == custom.locale  end)
 
           expect ~i(default_translation.first_name)  |> to(eq(default.first_name))
           expect ~i(default_translation.last_name)   |> to(eq(default.last_name))
@@ -834,13 +834,13 @@ defmodule Arkenston.Mutator.AuthorMutatorSpec do
 
           translations = ~i(update_response.data.updateAuthor.translations)
 
-          default_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == default.locale end) |> Enum.at(0)
+          default_translation = translations |> Enum.find(fn item -> ~i(item.locale) == default.locale end)
 
           expect ~i(default_translation.first_name)  |> to(eq(default.first_name))
           expect ~i(default_translation.last_name)   |> to(eq(default.last_name))
           expect ~i(default_translation.middle_name) |> to(eq(default.middle_name))
 
-          custom_translation = translations |> Enum.filter(fn item -> ~i(item.locale) == custom.locale  end) |> Enum.at(0)
+          custom_translation = translations |> Enum.find(fn item -> ~i(item.locale) == custom.locale  end)
           refute custom_translation
         end
 

@@ -2,9 +2,11 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
   import Arkenston.Factories.MainFactory
   alias Arkenston.Subject
   alias Arkenston.Repo
+  alias Arkenston.I18n
   import SubjectHelper
   use GraphqlHelper
   use ESpec, async: true
+  import Faker.Person.En, only: [first_name: 0, last_name: 0]
   import Indifferent.Sigils
 
   let :creator do
@@ -17,6 +19,14 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
     result = result |> Repo.preload(:author)
 
     %{user: result, id: result.id, access_token: auth(user, author, shared.conn)}
+  end
+
+  let :translation_with_default_locale do
+    %{locale: I18n.default_locale() |> String.upcase(), first_name: first_name(), last_name: last_name(), middle_name: first_name()}
+  end
+
+  let :translation_with_custom_locale do
+    %{locale: "RU", first_name: first_name(), last_name: last_name(), middle_name: first_name()}
   end
 
   context "resolver", module: :resolver, query: true do
@@ -140,6 +150,64 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           all_authors = depaginate(~i(get_all_response.data.authors)) |> Enum.map(&handle_author/1)
 
           expect all_authors |> to(have inserted_author)
+        end
+
+        it "without locale returns translations for default locale" do
+          %{access_token: access_token} = creator()
+
+          authors = Enum.map(1..3, fn _ ->
+            default = translation_with_default_locale()
+            custom  = translation_with_custom_locale()
+
+            build(:author, translations: [default, custom])
+                     |> Map.drop([:first_name, :last_name, :middle_name])
+          end)
+
+          authors |> Enum.each(fn (author) ->
+            create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+          end)
+
+          get_all_response = get_authors(access_token: access_token, conn: shared.conn)
+          all_authors = depaginate(~i(get_all_response.data.authors))
+
+          authors |> Enum.each(fn author ->
+            [default, _] = author.translations
+
+            inserted_author = all_authors |> Enum.find(fn item -> ~i(item.name) == author.name end)
+
+            expect ~i(inserted_author.first_name)  |> to(eq(default.first_name))
+            expect ~i(inserted_author.last_name)   |> to(eq(default.last_name))
+            expect ~i(inserted_author.middle_name) |> to(eq(default.middle_name))
+          end)
+        end
+
+        it "with locale returns translations for custom locale" do
+          %{access_token: access_token} = creator()
+
+          authors = Enum.map(1..3, fn _ ->
+            default = translation_with_default_locale()
+            custom  = translation_with_custom_locale()
+
+            build(:author, translations: [default, custom])
+                     |> Map.drop([:first_name, :last_name, :middle_name])
+          end)
+
+          authors |> Enum.each(fn (author) ->
+            create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+          end)
+
+          get_all_response = get_authors(access_token: access_token, conn: shared.conn, locale: :ru)
+          all_authors = depaginate(~i(get_all_response.data.authors))
+
+          authors |> Enum.each(fn author ->
+            [_, custom] = author.translations
+
+            inserted_author = all_authors |> Enum.find(fn item -> ~i(item.name) == author.name end)
+
+            expect ~i(inserted_author.first_name)  |> to(eq(custom.first_name))
+            expect ~i(inserted_author.last_name)   |> to(eq(custom.last_name))
+            expect ~i(inserted_author.middle_name) |> to(eq(custom.middle_name))
+          end)
         end
       end
 
@@ -274,6 +342,58 @@ defmodule Arkenston.Resolver.AuthorResolverSpec do
           one_author = ~i(get_one_response.data.author) |> handle_author()
 
           expect one_author |> to(eq(inserted_author))
+        end
+
+        it "without locale returns translations for default locale" do
+          %{access_token: access_token} = creator()
+
+          authors = Enum.map(1..3, fn _ ->
+            default = translation_with_default_locale()
+            custom  = translation_with_custom_locale()
+
+            build(:author, translations: [default, custom])
+                     |> Map.drop([:first_name, :last_name, :middle_name])
+          end)
+
+          author = authors |> List.first()
+          [default, _] = author.translations
+
+          authors |> Enum.each(fn (author) ->
+            create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+          end)
+
+          get_one_response = get_author(name: author.name, access_token: access_token, conn: shared.conn)
+          one_author = ~i(get_one_response.data.author)
+
+          expect ~i(one_author.first_name)  |> to(eq(default.first_name))
+          expect ~i(one_author.last_name)   |> to(eq(default.last_name))
+          expect ~i(one_author.middle_name) |> to(eq(default.middle_name))
+        end
+
+        it "with locale returns translations for custom locale" do
+          %{access_token: access_token} = creator()
+
+          authors = Enum.map(1..3, fn _ ->
+            default = translation_with_default_locale()
+            custom  = translation_with_custom_locale()
+
+            build(:author, translations: [default, custom])
+                     |> Map.drop([:first_name, :last_name, :middle_name])
+          end)
+
+          author = authors |> List.first()
+          [_, custom] = author.translations
+
+          authors |> Enum.each(fn (author) ->
+            create_author(input: prepare_author(author), access_token: access_token, conn: shared.conn)
+          end)
+
+          get_one_response = get_author(name: author.name, access_token: access_token, conn: shared.conn, locale: :ru)
+          one_author = ~i(get_one_response.data.author)
+
+          expect ~i(one_author.first_name)  |> to(eq(custom.first_name))
+          expect ~i(one_author.last_name)   |> to(eq(custom.last_name))
+          expect ~i(one_author.middle_name) |> to(eq(custom.middle_name))
         end
       end
     end
