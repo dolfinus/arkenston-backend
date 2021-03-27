@@ -41,7 +41,6 @@ defmodule ArkenstonWeb.Schema.Helpers.Translation do
 
       audited unquote(object) do
         unquote(block)
-        unquote(translation)
 
         field :translations, non_null(list_of(non_null(unquote(translation_type)))) do
           resolve fn parent, _args, _context ->
