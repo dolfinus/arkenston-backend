@@ -5,7 +5,5 @@
 # setting reviewers on PRs manually, but this file should
 # offer a reasonable automatic best-guess
 
-/mix.* @dependabot @dependabot[bot] @dolfinus
-
 # catch-all rule (this only gets matched if no rules below match)
 * @dolfinus
