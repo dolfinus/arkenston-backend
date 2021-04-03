@@ -1,11 +1,84 @@
-defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
+defmodule Arkenston.Repo.Migrations.CreateAuditFunction do
   use Ecto.Migration
-  @id_name Application.get_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:name]
+  @id_name Application.get_env(:arkenston, Arkenston.Repo)[:primary_key][:name]
 
   def up do
     execute "CREATE EXTENSION IF NOT EXISTS \"pgcrypto\";"
 
-    execute "CREATE OR REPLACE FUNCTION generate_uuid(entity_name VARCHAR(4000)) RETURNS UUID AS $func$
+    execute "
+    CREATE OR REPLACE FUNCTION generate_uuid6(p_node bigint) RETURNS UUID AS $func$
+    DECLARE
+      i        integer;
+      v_rnd    float8;
+      v_byte   bit(8);
+      v_bytes  bytea;
+      v_uuid   varchar;
+
+      v_time timestamp with time zone:= null;
+      v_secs bigint := null;
+      v_msec bigint := null;
+      v_timestamp bigint := null;
+      v_timestamp_hex varchar := null;
+      v_variant varchar;
+      v_node varchar;
+
+      c_node_max bigint := (2^48)::bigint; -- 6 bytes
+      c_greg bigint :=  -12219292800; -- Gragorian epoch: '1582-10-15 00:00:00'
+    BEGIN
+
+      -- Get time and random values
+      v_time := clock_timestamp();
+      v_rnd := random();
+
+      -- Extract seconds and microseconds
+      v_secs := EXTRACT(EPOCH FROM v_time);
+      v_msec := mod(EXTRACT(MICROSECONDS FROM v_time)::numeric, 10^6::numeric); -- MOD() to remove seconds
+
+      -- Calculate the timestamp
+      v_timestamp := (((v_secs - c_greg) * 10^6) + v_msec) * 10;
+
+      -- Generate timestamp hexadecimal (and set version number)
+      v_timestamp_hex := lpad(to_hex(v_timestamp), 16, '0');
+      v_timestamp_hex := substr(v_timestamp_hex, 2, 12) || '6' || substr(v_timestamp_hex, 14, 3);
+
+      -- Generate a random hexadecimal
+      v_uuid := md5(v_time::text || v_rnd::text);
+
+      -- Concat timestemp hex with random hex
+      v_uuid := v_timestamp_hex || substr(v_uuid, 1, 16);
+
+      -- Insert the node identifier
+      if p_node is not null then
+
+        v_node := to_hex(p_node % c_node_max);
+        v_node := lpad(v_node, 12, '0');
+        v_uuid := overlay(v_uuid placing v_node from 21);
+
+      end if;
+
+      -- Set variant number
+      v_bytes := decode(substring(v_uuid, 17, 2), 'hex');
+      v_byte := get_byte(v_bytes, 0)::bit(8);
+      v_byte := v_byte & x'3f';
+      v_byte := v_byte | x'80';
+      v_bytes := set_byte(v_bytes, 0, v_byte::integer);
+      v_variant := encode(v_bytes, 'hex')::varchar;
+      v_uuid := overlay(v_uuid placing v_variant from 17);
+
+      -- Set multicast bit
+      v_bytes := decode(substring(v_uuid, 21, 2), 'hex');
+      v_byte := get_byte(v_bytes, 0)::bit(8);
+      v_byte := v_byte | x'01';
+      v_bytes := set_byte(v_bytes, 0, v_byte::integer);
+      v_variant := encode(v_bytes, 'hex')::varchar;
+      v_uuid := overlay(v_uuid placing v_variant from 21);
+
+      return v_uuid::uuid;
+    END;
+    $func$ LANGUAGE plpgsql"
+
+    execute "
+    CREATE OR REPLACE FUNCTION generate_uuid6(entity_name VARCHAR(4000)) RETURNS UUID AS $func$
     DECLARE
       domain varchar(12);
       tmp    varchar(36);
@@ -19,7 +92,8 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
     END;
     $func$ LANGUAGE plpgsql"
 
-    execute "CREATE OR REPLACE FUNCTION process_audit() RETURNS TRIGGER AS $audit$
+    execute "
+      CREATE OR REPLACE FUNCTION process_audit() RETURNS TRIGGER AS $audit$
       DECLARE
         view_name               text := TG_TABLE_NAME;
         data_table_name         text := TG_TABLE_NAME || '_data';
@@ -46,7 +120,7 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
         END IF;
 
         IF (TG_OP = 'INSERT') THEN
-          NEW.#{@id_name} := generate_uuid(entity_name);
+          NEW.#{@id_name} := generate_uuid6(entity_name);
         END IF;
 
         IF current_setting('arkenston.current_user', 't') IS NOT NULL AND current_setting('arkenston.current_user', 't') != '' THEN
@@ -111,7 +185,7 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
             RETURNING #{@id_name}
             ',
             audit_table_name,
-            generate_uuid(revision_name),
+            generate_uuid6(revision_name),
             new_version,
             orig_table_key,
             array_to_string(all_orig_table_columns, ',\n'),
@@ -136,7 +210,7 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
             RETURNING #{@id_name}
             ',
             audit_table_name,
-            generate_uuid(revision_name),
+            generate_uuid6(revision_name),
             new_version,
             orig_table_key,
             array_to_string(all_orig_table_columns, ',\n'),
@@ -256,6 +330,6 @@ defmodule Arkenston.Repo.Migrations.CreateUsersAudit do
 
   def down do
     execute "DROP FUNCTION process_audit()"
-    execute "DROP FUNCTION generate_uuid()"
+    execute "DROP FUNCTION generate_uuid6()"
   end
 end

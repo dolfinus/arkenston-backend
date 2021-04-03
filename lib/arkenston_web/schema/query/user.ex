@@ -7,7 +7,7 @@ defmodule ArkenstonWeb.Schema.Query.User do
 
   object :user_queries do
     connection field :users, node_type: :user do
-      arg :id, :uuid4
+      arg :id, :uuid6
       arg :name, :string
       arg :email, :string
       arg :role, :user_role
@@ -16,7 +16,7 @@ defmodule ArkenstonWeb.Schema.Query.User do
     end
 
     field :user, :user do
-      arg :id, :uuid4
+      arg :id, :uuid6
       arg :name, :string
       arg :email, :string
       arg :role, :user_role

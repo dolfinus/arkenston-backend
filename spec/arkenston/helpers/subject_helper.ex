@@ -53,7 +53,7 @@ defmodule SubjectHelper do
 
   def get_authors_query() do
     """
-    query ($id: UUID4, $name: String, $email: String, $deleted: Boolean, $first: PageSize, $last: PageSize, $after: String, $before: String){
+    query ($id: UUID6, $name: String, $email: String, $deleted: Boolean, $first: PageSize, $last: PageSize, $after: String, $before: String){
       authors(id: $id, name: $name, email: $email, deleted: $deleted, first: $first, last: $last, after: $after, before: $before) {
         pageInfo {
           hasNextPage
@@ -95,7 +95,7 @@ defmodule SubjectHelper do
 
   def get_users_query() do
     """
-    query ($id: UUID4, $name: String, $email: String, $role: UserRole, $deleted: Boolean, $first: PageSize, $last: PageSize, $after: String, $before: String){
+    query ($id: UUID6, $name: String, $email: String, $role: UserRole, $deleted: Boolean, $first: PageSize, $last: PageSize, $after: String, $before: String){
       users(id: $id, name: $name, email: $email, role: $role, deleted: $deleted, first: $first, last: $last, after: $after, before: $before) {
         pageInfo {
           hasNextPage
@@ -132,7 +132,7 @@ defmodule SubjectHelper do
 
   def get_author_query() do
     """
-    query ($id: UUID4, $name: String, $email: String, $deleted: Boolean){
+    query ($id: UUID6, $name: String, $email: String, $deleted: Boolean){
       author(id: $id, name: $name, email: $email, deleted: $deleted) {
         id
         name
@@ -163,7 +163,7 @@ defmodule SubjectHelper do
 
   def get_user_query() do
     """
-    query ($id: UUID4, $name: String, $email: String, $role: UserRole, $deleted: Boolean){
+    query ($id: UUID6, $name: String, $email: String, $role: UserRole, $deleted: Boolean){
       user(id: $id, name: $name, email: $email, role: $role, deleted: $deleted) {
         id
         author(deleted: $deleted) {
@@ -248,7 +248,7 @@ defmodule SubjectHelper do
 
   def update_author_mutation() do
     """
-    mutation ($id: UUID4, $name: String, $email: String, $input: UpdateAuthorInput!){
+    mutation ($id: UUID6, $name: String, $email: String, $input: UpdateAuthorInput!){
       updateAuthor(id: $id, name: $name, email: $email, input: $input) {
         id
         name
@@ -279,7 +279,7 @@ defmodule SubjectHelper do
 
   def update_user_mutation() do
     """
-    mutation ($id: UUID4, $name: String, $email: String, $input: UpdateUserInput!){
+    mutation ($id: UUID6, $name: String, $email: String, $input: UpdateUserInput!){
       updateUser(id: $id, name: $name, email: $email, input: $input) {
         id
         name
@@ -307,7 +307,7 @@ defmodule SubjectHelper do
 
   def change_user_author_mutation() do
     """
-    mutation ($id: UUID4, $name: String, $email: String, $author: ChangeUserAuthorInput!){
+    mutation ($id: UUID6, $name: String, $email: String, $author: ChangeUserAuthorInput!){
       changeUserAuthor(id: $id, name: $name, email: $email, author: $author) {
         id
         name
@@ -335,7 +335,7 @@ defmodule SubjectHelper do
 
   def delete_author_mutation() do
     """
-    mutation ($id: UUID4, $name: String, $email: String, $input: DeleteAuthorInput){
+    mutation ($id: UUID6, $name: String, $email: String, $input: DeleteAuthorInput){
       deleteAuthor(id: $id, name: $name, email: $email, input: $input) {
         id
       }
@@ -345,7 +345,7 @@ defmodule SubjectHelper do
 
   def delete_user_mutation() do
     """
-    mutation ($id: UUID4, $name: String, $email: String, $input: DeleteUserInput){
+    mutation ($id: UUID6, $name: String, $email: String, $input: DeleteUserInput){
       deleteUser(id: $id, name: $name, email: $email, input: $input) {
         id
       }

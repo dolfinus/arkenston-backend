@@ -12,7 +12,7 @@ defmodule ArkenstonWeb.Schema.Mutation.Author do
     end
 
     field :update_author, :author do
-      arg :id, :uuid4
+      arg :id, :uuid6
       arg :name, :string
       arg :email, :string
       arg :input, non_null(:update_author_input)
@@ -21,7 +21,7 @@ defmodule ArkenstonWeb.Schema.Mutation.Author do
     end
 
     field :delete_author, :author do
-      arg :id, :uuid4
+      arg :id, :uuid6
       arg :name, :string
       arg :email, :string
       arg :input, :delete_author_input

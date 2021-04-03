@@ -36,13 +36,12 @@ config :arkenston,
 config :arkenston, Arkenston.Repo,
   pool_size: 10,
   migration_timestamps: [type: :utc_datetime],
-  migration_primary_key: [
+  primary_key: [
     name: :id,
-    type: :binary_id,
-    autogenerate: false,
-    read_after_writes: true,
-    default: {:fragment, "gen_random_uuid()"}
+    type: :uuid,
+    ecto_type: Arkenston.Types.UUID6
   ],
+  migration_primary_key: false,
   prepare: :named,
   parameters: [plan_cache_mode: "force_custom_plan"]
 

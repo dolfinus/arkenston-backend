@@ -2,7 +2,7 @@ defmodule ArkenstonWeb.Schema.Types.Input.User do
   use Absinthe.Schema.Notation
 
   input_object :create_user_author_input do
-    field :id, :uuid4
+    field :id, :uuid6
     field :name, :string
     field :email, :string
     field :first_name, :string
@@ -12,7 +12,7 @@ defmodule ArkenstonWeb.Schema.Types.Input.User do
   end
 
   input_object :change_user_author_input do
-    field :id, :uuid4
+    field :id, :uuid6
     field :name, :string
     field :email, :string
   end

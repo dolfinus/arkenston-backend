@@ -13,7 +13,7 @@ defmodule ArkenstonWeb.Schema.Mutation.User do
     end
 
     field :update_user, :user do
-      arg :id, :uuid4
+      arg :id, :uuid6
       arg :name, :string
       arg :email, :string
       arg :input, non_null(:update_user_input)
@@ -22,7 +22,7 @@ defmodule ArkenstonWeb.Schema.Mutation.User do
     end
 
     field :change_user_author, :user do
-      arg :id, :uuid4
+      arg :id, :uuid6
       arg :name, :string
       arg :email, :string
       arg :author, non_null(:change_user_author_input)
@@ -31,7 +31,7 @@ defmodule ArkenstonWeb.Schema.Mutation.User do
     end
 
     field :delete_user, :user do
-      arg :id, :uuid4
+      arg :id, :uuid6
       arg :name, :string
       arg :email, :string
       arg :input, :delete_user_input

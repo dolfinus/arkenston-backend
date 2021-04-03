@@ -7,7 +7,7 @@ defmodule ArkenstonWeb.Schema.Query.Author do
 
   object :author_queries do
     connection field :authors, node_type: :author do
-      arg :id, :uuid4
+      arg :id, :uuid6
       arg :name, :string
       arg :email, :string
       arg :deleted, :boolean
@@ -15,7 +15,7 @@ defmodule ArkenstonWeb.Schema.Query.Author do
     end
 
     field :author, :author do
-      arg :id, :uuid4
+      arg :id, :uuid6
       arg :name, :string
       arg :email, :string
       arg :deleted, :boolean

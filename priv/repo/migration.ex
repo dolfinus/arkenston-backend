@@ -2,8 +2,8 @@ defmodule Arkenston.Repo.Migration do
   use Ecto.Migration
   import Inflex
 
-  @id_name Application.get_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:name]
-  @id_type Application.get_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:type]
+  @id_name Application.get_env(:arkenston, Arkenston.Repo)[:primary_key][:name]
+  @id_type Application.get_env(:arkenston, Arkenston.Repo)[:primary_key][:type]
 
   @created_by String.to_atom("created_by_#{@id_name}")
   @updated_by String.to_atom("updated_by_#{@id_name}")
@@ -116,6 +116,11 @@ defmodule Arkenston.Repo.Migration do
 
     quote do
       create table(unquote(data_table)) do
+        add unquote(@id_name), unquote(@id_type),
+          primary_key: true,
+          null: false,
+          default: {:fragment, "generate_uuid6('#{unquote(data_table)}')"}
+
         unquote(block)
 
         add unquote(@created_by), references(unquote(@users_data_table), type: unquote(@id_type)),
@@ -130,6 +135,11 @@ defmodule Arkenston.Repo.Migration do
       flush()
 
       create table(unquote(audit_table)) do
+        add unquote(@id_name), unquote(@id_type),
+          primary_key: true,
+          null: false,
+          default: {:fragment, "generate_uuid6('#{unquote(audit_table)}')"}
+
         unquote(block)
 
         add unquote(orig_primary_key), references(unquote(data_table), type: unquote(@id_type)),

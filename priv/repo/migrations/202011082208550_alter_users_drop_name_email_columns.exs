@@ -2,7 +2,7 @@ defmodule Arkenston.Repo.Migrations.AlterUsersDropNameEmailColumns do
   use Ecto.Migration
   import Arkenston.Repo.Migration
 
-  @id_type Application.get_env(:arkenston, Arkenston.Repo)[:migration_primary_key][:type]
+  @id_type Application.get_env(:arkenston, Arkenston.Repo)[:primary_key][:type]
 
   def change do
     alter_audit_table :users do

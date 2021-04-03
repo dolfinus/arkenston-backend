@@ -18,7 +18,7 @@ defmodule Arkenston.Helper.UUID do
   end
 
   defp random_uuid do
-    UUID.uuid4()
+    UUID.uuid6()
   end
 
   defp random_uuid_truncated do
