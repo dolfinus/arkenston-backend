@@ -11,22 +11,7 @@ defmodule ArkenstonWeb.Schema.Helpers.Association do
 
   defmacro assoc(name, args \\ []) do
     quote do
-      fn parent, opts, resolution ->
-        defaults = unquote(args) |> Keyword.get(:defaults, %{})
-        args = unquote(args) |> Keyword.drop([:defaults])
-
-        case parent |> Map.get(unquote(name)) do
-          %Ecto.Association.NotLoaded{} ->
-            dataloader(
-              Arkenston.Repo,
-              unquote(name),
-              args ++ [use_parent: true, args: %{context: resolution.context}]
-            ).(parent, defaults |> Map.merge(opts), resolution)
-
-          loaded ->
-            {:ok, loaded}
-        end
-      end
+      dataloader(Arkenston.Repo, unquote(name), [use_parent: true] ++ unquote(args))
     end
   end
 
@@ -124,7 +109,7 @@ defmodule ArkenstonWeb.Schema.Helpers.Association do
                          unquote(field),
                          unquote(target_field),
                          unquote(type),
-                         unquote(args) ++ [defaults: %{deleted: nil}] do
+                         [deleted: nil] ++ unquote(args) do
         unquote(block)
       end
     end
