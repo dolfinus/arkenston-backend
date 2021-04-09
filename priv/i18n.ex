@@ -4,15 +4,23 @@ defmodule Arkenston.I18n do
 
   @default_locale Application.get_env(:arkenston, Arkenston.I18n)[:default_locale]
 
-  locale_files = Path.wildcard([__DIR__, "i18n", "*.{yml,yaml}"] |> Enum.join("/"))
+  @locale_files Path.wildcard([__DIR__, "i18n", "*.{yml,yaml}"] |> Enum.join("/"))
 
-  Enum.each(locale_files, fn path ->
-    case Regex.run(~r/.*(\w+)\.ya?ml$/iuU, path) do
-      lang when not is_nil(lang) ->
-        @external_resource path
-        MemorizedVocabulary.locale(Enum.at(lang, 1), path)
-    end
-  end)
+  @locale_tuples Enum.map(@locale_files, fn path ->
+                   case Regex.run(~r/.*(\w+)\.ya?ml$/iuU, path) do
+                     lang when not is_nil(lang) ->
+                       @external_resource path
+                       {Enum.at(lang, 1), path}
+                   end
+                 end)
+
+  @on_load :__on_load__
+  def __on_load__() do
+    @locale_tuples
+    |> Enum.each(fn {locale, path} ->
+      MemorizedVocabulary.locale(locale, path)
+    end)
+  end
 
   defdelegate t(locale, path), to: MemorizedVocabulary
   defdelegate t!(locale, path), to: MemorizedVocabulary
