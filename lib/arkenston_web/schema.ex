@@ -23,25 +23,16 @@ defmodule ArkenstonWeb.Schema do
     import_fields :author_mutations
   end
 
-  def dataloader(ctx) do
+  def dataloader do
     Dataloader.new()
-    |> Dataloader.add_source(Repo, Repo.data(ctx))
+    |> Dataloader.add_source(Repo, Repo.data())
   end
 
   def context(ctx) do
-    Map.put(ctx, :loader, dataloader(ctx))
+    Map.put(ctx, :loader, dataloader())
   end
 
   def plugins do
     [Absinthe.Middleware.Dataloader] ++ Absinthe.Plugin.defaults()
-  end
-
-  def middleware(middleware, _field, %Absinthe.Type.Object{identifier: identifier})
-      when identifier in [:query, :subscription, :mutation] do
-    [Arkenston.Middleware.HandleFields] ++ middleware
-  end
-
-  def middleware(middleware, _field, _object) do
-    middleware
   end
 end

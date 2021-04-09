@@ -20,7 +20,7 @@ defmodule Arkenston.Mutator.UserMutator do
                   ),
                 {:ok, user} <-
                   Subject.create_user(attrs |> Map.put(:author_id, author.id), context) do
-             {:ok, Subject.get_user(user.id, context)}
+             {:ok, Subject.get_user(user.id)}
            end
          end) do
       {:ok, result} ->
@@ -50,7 +50,7 @@ defmodule Arkenston.Mutator.UserMutator do
                with :ok <-
                       Permissions.check_permissions_for(:user, :update, context, user, attrs),
                     {:ok, _user} <- user |> Subject.update_user(attrs, context) do
-                 {:ok, Subject.get_user(user.id, context)}
+                 {:ok, Subject.get_user(user.id)}
                end
            end
          end) do
@@ -88,7 +88,7 @@ defmodule Arkenston.Mutator.UserMutator do
                       ),
                     {:ok, author} <- get_author(attrs),
                     {:ok, _user} <- user |> Subject.update_user(%{author_id: author.id}, context) do
-                 {:ok, Subject.get_user(user.id, context)}
+                 {:ok, Subject.get_user(user.id)}
                end
            end
          end) do

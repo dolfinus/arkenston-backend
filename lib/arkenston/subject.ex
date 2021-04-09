@@ -69,15 +69,12 @@ defmodule Arkenston.Subject do
 
   """
 
-  @spec list_users(
-          opts :: QueryHelper.query_opts() | list[keyword],
-          context :: QueryHelper.context()
-        ) :: [User.t()]
-  def list_users(opts \\ %{}, context \\ %{}) do
+  @spec list_users(opts :: QueryHelper.query_opts() | list[keyword]) :: [User.t()]
+  def list_users(opts \\ %{}) do
     {query, opts} = filter_user_by_author(User, opts)
 
     query
-    |> QueryHelper.generate_query(opts, context)
+    |> QueryHelper.generate_query(opts)
     |> Repo.all()
   end
 
@@ -91,15 +88,12 @@ defmodule Arkenston.Subject do
 
   """
 
-  @spec list_authors(
-          opts :: QueryHelper.query_opts() | list[keyword],
-          context :: QueryHelper.context()
-        ) :: [Author.t()]
-  def list_authors(opts \\ %{}, context \\ %{}) do
+  @spec list_authors(opts :: QueryHelper.query_opts() | list[keyword]) :: [Author.t()]
+  def list_authors(opts \\ %{}) do
     {query, opts} = filter_author(Author, opts)
 
     query
-    |> QueryHelper.generate_query(opts, context)
+    |> QueryHelper.generate_query(opts)
     |> Repo.all()
   end
 
@@ -115,15 +109,12 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_user_by(
-          opts :: QueryHelper.query_opts() | list[keyword],
-          context :: QueryHelper.context()
-        ) :: User.t() | nil
-  def get_user_by(opts, context \\ %{}) do
+  @spec get_user_by(opts :: QueryHelper.query_opts() | list[keyword]) :: User.t() | nil
+  def get_user_by(opts) do
     {query, opts} = filter_user_by_author(User, opts)
 
     query
-    |> QueryHelper.generate_query(opts, context)
+    |> QueryHelper.generate_query(opts)
     |> QueryHelper.first()
     |> Repo.one()
   end
@@ -140,15 +131,12 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_author_by(
-          opts :: QueryHelper.query_opts() | list[keyword],
-          context :: QueryHelper.context()
-        ) :: Author.t() | nil
-  def get_author_by(opts, context \\ %{}) do
+  @spec get_author_by(opts :: QueryHelper.query_opts() | list[keyword]) :: Author.t() | nil
+  def get_author_by(opts) do
     {query, opts} = filter_author(Author, opts)
 
     query
-    |> QueryHelper.generate_query(opts, context)
+    |> QueryHelper.generate_query(opts)
     |> QueryHelper.first()
     |> Repo.one()
   end
@@ -165,8 +153,8 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_user(id :: User.id(), context :: QueryHelper.context()) :: User.t() | nil
-  def get_user(id, context \\ %{}), do: get_user_by(%{id: id}, context)
+  @spec get_user(id :: User.id()) :: User.t() | nil
+  def get_user(id), do: get_user_by(%{id: id})
 
   @doc """
   Gets a single author by id.
@@ -180,8 +168,8 @@ defmodule Arkenston.Subject do
       nil
 
   """
-  @spec get_author(id :: Author.id(), context :: QueryHelper.context()) :: Author.t() | nil
-  def get_author(id, context \\ %{}), do: get_author_by(%{id: id}, context)
+  @spec get_author(id :: Author.id()) :: Author.t() | nil
+  def get_author(id), do: get_author_by(%{id: id})
 
   @doc """
   Creates a user.

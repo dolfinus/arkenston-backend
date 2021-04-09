@@ -1,12 +1,10 @@
 defmodule Arkenston.Helper.QueryHelper do
   import Ecto.Query, warn: false
 
-  alias Arkenston.Helper.FieldsHelper
   alias Absinthe.Relay.Connection
 
   @type query :: Ecto.Query.t()
   @type queryable :: Ecto.Queryable.t() | module
-  @type context :: map
   @type limit :: pos_integer
   @type offset :: pos_integer
   @type first :: pos_integer
@@ -23,8 +21,7 @@ defmodule Arkenston.Helper.QueryHelper do
           optional(:last) => last,
           optional(:count) => count
         }
-  @type fields_opt :: %{fields: FieldsHelper.fields()}
-  @type query_opts :: filter_opt | deleted_opt | order_opt | pagination_opt | fields_opt
+  @type query_opts :: filter_opt | deleted_opt | order_opt | pagination_opt
 
   @default_page_size Application.compile_env(:arkenston, [ArkenstonWeb.Endpoint, :page_size])
   @max_page_size Application.compile_env(:arkenston, [ArkenstonWeb.Endpoint, :max_page_size])
@@ -269,36 +266,20 @@ defmodule Arkenston.Helper.QueryHelper do
         order_by: [desc: column]
 
   """
-  @spec generate_query(query :: queryable, opts :: query_opts | list, context :: context) ::
+  @spec generate_query(query :: queryable, opts :: query_opts | list) ::
           queryable
-  def generate_query(query, opts \\ %{}, context \\ %{})
+  def generate_query(query, opts \\ %{})
 
-  def generate_query(query, opts, context) when is_list(opts) do
-    generate_query(query, opts |> Enum.into(%{}), context)
+  def generate_query(query, opts) when is_list(opts) do
+    generate_query(query, opts |> Enum.into(%{}))
   end
 
-  def generate_query(query, %{context: ctx} = opts, _context) when is_map(ctx) do
-    generate_query(query, opts |> Map.drop([:context]), ctx)
-  end
-
-  def generate_query(query, opts, context) do
-    opts =
-      case opts do
-        %{fields: fields} ->
-          fields_map = fields |> Enum.into(%{})
-          opts |> Map.drop([:fields]) |> Map.merge(fields_map)
-
-        _ ->
-          opts
-      end
-
+  def generate_query(query, opts) do
     filter_opts = Map.drop(opts, @reserved_field_names)
-    fields = query |> FieldsHelper.prepare_fields(context)
 
     query
     |> handle_order(opts)
     |> handle_pagination(opts)
     |> handle_filter(filter_opts)
-    |> FieldsHelper.return_fields(fields)
   end
 end

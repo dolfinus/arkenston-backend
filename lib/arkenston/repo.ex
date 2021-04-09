@@ -12,11 +12,10 @@ defmodule Arkenston.Repo do
   @type changeset :: Ecto.Changeset.t()
   @type operation :: atom
 
-  @spec data(ctx :: map) :: Dataloader.Ecto.t()
-  def data(context) do
+  @spec data() :: Dataloader.Ecto.t()
+  def data do
     Dataloader.Ecto.new(__MODULE__,
-      query: &QueryHelper.generate_query/2,
-      default_params: %{context: context}
+      query: &QueryHelper.generate_query/2
     )
   end
 

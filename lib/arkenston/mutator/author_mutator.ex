@@ -13,7 +13,7 @@ defmodule Arkenston.Mutator.AuthorMutator do
     case Repo.transational(fn ->
            with :ok <- Permissions.check_permissions_for(:author, :create, context, attrs),
                 {:ok, author} <- Subject.create_author(attrs, context) do
-             {:ok, Subject.get_author(author.id, context)}
+             {:ok, Subject.get_author(author.id)}
            end
          end) do
       {:ok, result} ->
@@ -41,7 +41,7 @@ defmodule Arkenston.Mutator.AuthorMutator do
                with :ok <-
                       Permissions.check_permissions_for(:author, :update, context, author, attrs),
                     {:ok, _author} <- author |> Subject.update_author(attrs, context) do
-                 {:ok, Subject.get_author(author.id, context)}
+                 {:ok, Subject.get_author(author.id)}
                end
            end
          end) do
