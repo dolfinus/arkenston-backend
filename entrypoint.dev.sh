@@ -6,4 +6,4 @@ set -e
 mix ecto.setup
 
 mkdir -p ./_build && chown arkenston:arkenston -R ./_build
-mix phx.server "$@"
+elixir --sname arkenston@localhost -S mix phx.server "$@"
