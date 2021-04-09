@@ -24,7 +24,7 @@ defmodule ArkenstonWeb.Schema.Helpers.Translation do
     end
   end
 
-  defmacro audited_translated(object, do: block, else: translation, after: after_block) do
+  defmacro audited_translated(object, do: block, after: after_block, else: translation) do
     translation_type = :"#{object}_translation"
     translation_input_type = :"#{object}_translation_input"
 

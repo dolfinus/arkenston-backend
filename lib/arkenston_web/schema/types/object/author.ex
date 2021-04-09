@@ -9,14 +9,14 @@ defmodule ArkenstonWeb.Schema.Types.Object.Author do
     field :middle_name, non_null(:string)
     field :last_name, non_null(:string)
     field :deleted, non_null(:boolean)
-  else
-    field :first_name, non_null(:string)
-    field :middle_name, non_null(:string)
-    field :last_name, non_null(:string)
   after
     connect_with :user
     translated :first_name
     translated :middle_name
     translated :last_name
+  else
+    field :first_name, non_null(:string)
+    field :middle_name, non_null(:string)
+    field :last_name, non_null(:string)
   end
 end

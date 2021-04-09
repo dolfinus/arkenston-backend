@@ -17,19 +17,15 @@ defmodule Arkenston.Permissions do
     }
   end
 
-  def permissions_for(:anonymous) do
-    %{
-      user: UserPermissions.permissions_for(:anonymous),
-      author: AuthorPermissions.permissions_for(:anonymous)
-    }
-  end
-
   def permissions_for(%{anonymous: false, current_user: %User{} = user}) do
     permissions_for(user)
   end
 
-  def permissions_for(%{anonymous: true}) do
-    permissions_for(:anonymous)
+  def permissions_for(_) do
+    %{
+      user: UserPermissions.permissions_for(:anonymous),
+      author: AuthorPermissions.permissions_for(:anonymous)
+    }
   end
 
   @spec all_permissions() :: permissions_map

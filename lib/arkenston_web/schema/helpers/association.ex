@@ -15,7 +15,9 @@ defmodule ArkenstonWeb.Schema.Helpers.Association do
     end
   end
 
-  defmacro connect_with_audited(name, args \\ [])
+  defmacro connect_with_audited(name) do
+    do_connect_with_audited(name, name, name, [], do: [])
+  end
 
   defmacro connect_with_audited(name, args) when is_list(args) do
     non_null = args |> Keyword.get(:non_null, false)
@@ -53,7 +55,9 @@ defmodule ArkenstonWeb.Schema.Helpers.Association do
     end
   end
 
-  defmacro connect_with(name, args \\ [])
+  defmacro connect_with(name) do
+    do_connect_with(name, name, name, [], do: [])
+  end
 
   defmacro connect_with(name, args) when is_list(args) do
     non_null = args |> Keyword.get(:non_null, false)
