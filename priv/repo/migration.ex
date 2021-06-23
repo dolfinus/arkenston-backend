@@ -102,9 +102,7 @@ defmodule Arkenston.Repo.Migration do
 
     execute "CREATE TRIGGER #{view_name}_audit
       INSTEAD OF INSERT OR UPDATE OR DELETE ON #{view_name}
-        FOR EACH ROW EXECUTE PROCEDURE process_audit('#{orig_primary_key}','#{entity_type}',#{
-              columns_quoted
-            },'note')"
+        FOR EACH ROW EXECUTE PROCEDURE process_audit('#{orig_primary_key}','#{entity_type}',#{columns_quoted},'note')"
   end
 
   def drop_audit_view(view_name) do
