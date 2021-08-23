@@ -17,9 +17,10 @@ jobs:
       - id: skip_check
         uses: fkirc/skip-duplicate-actions@master
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           concurrent_skipping: always
           cancel_others: true
-          skip_after_successful_duplicate: true
+          skip_after_successful_duplicate: false
           paths_ignore: '["**/README.md", "**/LICENSE"]'
           do_not_skip: '["pull_request"]'
 
