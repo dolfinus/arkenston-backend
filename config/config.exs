@@ -139,7 +139,7 @@ config :linguist, vocabulary_backend: :persistent_term
 
 # Git hooks
 config :git_hooks,
-  auto_install: true,
+  auto_install: false,
   verbose: true,
   hooks: [
     pre_commit: [
