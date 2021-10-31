@@ -90,5 +90,5 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./graphql/schema.json
-            ./graphql/schema.graphql
+            graphql/schema.json
+            graphql/schema.graphql
