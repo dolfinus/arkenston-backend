@@ -17,8 +17,9 @@ jobs:
         id: wait-for-tests
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: Run tests
-          ref: ${{ github.ref }}
+          checkName: Run tests (pull_request)
+          ref: ${{ github.head_ref || github.ref }}
+          intervalSeconds: 60
           timeoutSeconds: 3600
 
       - name: Fail the Build
