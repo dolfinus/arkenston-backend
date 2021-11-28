@@ -20,7 +20,7 @@ jobs:
         uses: fkirc/skip-duplicate-actions@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          concurrent_skipping: same_content_newer
+          concurrent_skipping: same_content
           cancel_others: true
           skip_after_successful_duplicate: false
           paths_ignore: '["**/README.md", "**/LICENSE"]'
