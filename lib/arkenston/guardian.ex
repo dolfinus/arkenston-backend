@@ -16,7 +16,7 @@ defmodule Arkenston.Guardian do
 
   def subject_for_token(_, _), do: {:error, :unhandled_resource_type}
 
-  @spec resource_from_claims(claims :: map) :: {:ok, %User{}} | {:error, atom}
+  @spec resource_from_claims(claims :: map) :: {:ok, User.t()} | {:error, atom}
   def resource_from_claims(%{"sub" => "User:" <> id}) do
     case Subject.get_user(id) do
       %User{} = user ->

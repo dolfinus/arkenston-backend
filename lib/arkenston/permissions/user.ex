@@ -89,7 +89,7 @@ defmodule Arkenston.Permissions.User do
           context :: Context.t(),
           old_entity :: any,
           new_entity :: any
-        ) :: :ok | {:error, %Arkenston.Payload.ValidationMessage{}}
+        ) :: :ok | {:error, Arkenston.Payload.ValidationMessage.t()}
   def check_permissions_for(:create, context, user, _) do
     actual_permissions = Permissions.permissions_for(context)
     current_user = Permissions.get_current_user(context)
