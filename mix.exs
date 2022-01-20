@@ -74,7 +74,7 @@ defmodule Arkenston.MixProject do
       {:p1_utils, "~> 1.0"},
       {:trans, "~> 2.2"},
       {:ecto_enum, "~> 1.4"},
-      {:argon2_elixir, "~> 2.3"},
+      {:argon2_elixir, "~> 3.0"},
       {:pbkdf2_elixir, "~> 2.0"},
       {:inflex, "~> 2.0"},
       {:linguist, git: "https://github.com/dolfinus/linguist.git", branch: "master"},
