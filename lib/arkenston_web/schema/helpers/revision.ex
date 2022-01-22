@@ -41,7 +41,6 @@ defmodule ArkenstonWeb.Schema.Helpers.Revision do
       node object unquote(revision_name) do
         interface :revision
         import_fields :revision
-        import_fields :node
 
         unquote(block)
 
