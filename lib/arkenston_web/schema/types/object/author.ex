@@ -5,9 +5,6 @@ defmodule ArkenstonWeb.Schema.Types.Object.Author do
   audited_translated :author do
     field :name, non_null(:string)
     field :email, :string
-    field :first_name, non_null(:string)
-    field :middle_name, non_null(:string)
-    field :last_name, non_null(:string)
     field :deleted, non_null(:boolean)
   after
     connect_with :user
