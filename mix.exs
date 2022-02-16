@@ -93,7 +93,7 @@ defmodule Arkenston.MixProject do
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.8", only: [:dev, :test], runtime: false},
-      {:git_hooks, "~> 0.6.0", only: [:test, :dev], runtime: false}
+      {:git_hooks, "~> 0.7.0", only: [:test, :dev], runtime: false}
     ]
   end
 
