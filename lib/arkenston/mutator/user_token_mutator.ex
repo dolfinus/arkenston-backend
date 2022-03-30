@@ -53,7 +53,7 @@ defmodule Arkenston.Mutator.UserTokenMutator do
       {:error, "typ"} ->
         {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid_type}}
 
-      {:error, :invalid_token"} ->
+      {:error, :invalid_token} ->
         {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid}}
 
       {:error, :token_not_found} ->
@@ -78,7 +78,7 @@ defmodule Arkenston.Mutator.UserTokenMutator do
       {:error, "typ"} ->
         {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid_type}}
 
-      {:error, :invalid_token"} ->
+      {:error, :invalid_token} ->
         {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid}}
 
       {:error, :token_not_found} ->
