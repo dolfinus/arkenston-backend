@@ -75,11 +75,11 @@ defmodule Arkenston.Mutator.UserTokenMutator do
          {:ok, _claims} <- Guardian.revoke(token) do
       {:ok, nil}
     else
-      {:error, %ArgumentError{message: "argument error:" <> _msg}} ->
-        {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid}}
-
       {:error, "typ"} ->
         {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid_type}}
+
+      {:error, :invalid_token"} ->
+        {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid}}
 
       {:error, :token_not_found} ->
         {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :revoked}}
