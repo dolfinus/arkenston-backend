@@ -50,11 +50,11 @@ defmodule Arkenston.Mutator.UserTokenMutator do
            Guardian.exchange(refresh_token, "refresh", "access") do
       {:ok, %{access_token: access_token, user: user}}
     else
-      {:error, %ArgumentError{message: "argument error:" <> _msg}} ->
-        {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid}}
-
       {:error, "typ"} ->
         {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid_type}}
+
+      {:error, :invalid_token"} ->
+        {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :invalid}}
 
       {:error, :token_not_found} ->
         {:error, %Arkenston.Payload.ValidationMessage{field: :refresh_token, code: :revoked}}
