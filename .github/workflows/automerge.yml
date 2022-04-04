@@ -7,14 +7,12 @@ jobs:
   automerge:
     name: Enable pull request automerge
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     if: github.event.pull_request.user.login == 'dependabot[bot]'
 
     steps:
     - uses: alexwilson/enable-github-automerge-action@1.0.0
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.PERSONAL_TOKEN }}
         merge-method: REBASE
 
   autoapprove:
