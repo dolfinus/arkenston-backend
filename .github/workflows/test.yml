@@ -34,10 +34,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v3.x
+        uses: rlespinasse/github-slug-action@v4.x
 
       - name: Get cached docker images
         uses: satackey/action-docker-layer-caching@v0.0.11
@@ -54,7 +54,7 @@ jobs:
         run: 'mkdir -p ${{ github.workspace }}/priv/plts/test ${{ github.workspace }}/priv/plts/dev || true'
 
       - name: Get cached dializer plts
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             priv/plts
@@ -89,14 +89,14 @@ jobs:
         run: 'docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from backend_test'
 
       - name: Push coverage results
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           directory: ./cover
           flags: unittests
           fail_ci_if_error: true
 
       - name: Push build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: graphql-schema
           path: graphql/*
