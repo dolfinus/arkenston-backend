@@ -18,7 +18,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Run tests
-          ref: ${{ github.head_ref || github.ref }}
+          ref: ${{ github.sha }}
           intervalSeconds: 60
           timeoutSeconds: 3600
 
