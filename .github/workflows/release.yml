@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Wait for tests
-        uses: fountainhead/action-wait-for-check@v1.0.0
+        uses: fountainhead/action-wait-for-check@v1.1.0
         id: wait-for-tests
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
