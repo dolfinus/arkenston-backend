@@ -1,4 +1,4 @@
-defmodule ArkenstonWeb.ErrorView do  
+defmodule ArkenstonWeb.ErrorJSON do
   def render("500.json", _assigns) do
     %{
       errors: [
