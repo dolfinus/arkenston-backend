@@ -6,7 +6,6 @@ defmodule ArkenstonWeb do
   This can be used in your application as:
 
       use ArkenstonWeb, :controller
-      use ArkenstonWeb, :view
 
   The definitions below will be executed for every view,
   controller, etc, so keep them short and clean, focused
@@ -22,16 +21,6 @@ defmodule ArkenstonWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
-    end
-  end
-
-  def view do
-    quote do
-      use Phoenix.View,
-        root: "lib/arkenston_web/templates",
-        namespace: ArkenstonWeb
-
-      alias ArkenstonWeb.Router.Helpers, as: Routes
     end
   end
 
