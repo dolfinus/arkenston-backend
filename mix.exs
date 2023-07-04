@@ -85,7 +85,7 @@ defmodule Arkenston.MixProject do
       {:indifferent, "~> 0.9"},
       {:elixir_uuid, "~> 1.6", hex: :uuid_utils},
       {:memoize, "~> 1.3"},
-      {:corsica, "~> 1.1"},
+      {:corsica, "~> 2.0"},
       {:faker, "~> 0.13", only: :test},
       {:ex_machina, "~> 2.4", only: :test},
       {:espec, "~> 1.8", only: :test},
