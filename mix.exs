@@ -72,7 +72,7 @@ defmodule Arkenston.MixProject do
       {:dataloader, "~> 2.0"},
       {:distillery, "~> 2.1", only: :prod},
       {:p1_utils, "~> 1.0"},
-      {:trans, "~> 2.2"},
+      {:trans, "~> 3.0"},
       {:ecto_enum, "~> 1.4"},
       {:argon2_elixir, "~> 3.0"},
       {:pbkdf2_elixir, "~> 2.0"},
