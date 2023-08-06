@@ -8,7 +8,7 @@ defmodule Arkenston.Subject.Author do
 
   alias Arkenston.Subject.User
 
-  use Trans, translates: [:first_name, :middle_name, :last_name], default_locale: :en
+  use Trans, translates: [:first_name, :middle_name, :last_name], default_locale: "EN"
 
   @type lang :: atom :: String.t()
 
