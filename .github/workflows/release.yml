@@ -27,7 +27,7 @@ jobs:
         if: steps.wait-for-tests.outputs.conclusion != 'success'
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
