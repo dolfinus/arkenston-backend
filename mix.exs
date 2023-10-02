@@ -81,7 +81,7 @@ defmodule Arkenston.MixProject do
       {:ex_cldr, "~> 2.19"},
       {:guardian, "~> 2.1"},
       {:guardian_phoenix, "~> 2.0"},
-      {:guardian_db, "~> 2.0"},
+      {:guardian_db, "~> 3.0"},
       {:indifferent, "~> 0.9"},
       {:elixir_uuid, "~> 1.6", hex: :uuid_utils},
       {:memoize, "~> 1.3"},
