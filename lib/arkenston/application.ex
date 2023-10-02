@@ -14,7 +14,7 @@ defmodule Arkenston.Application do
       ArkenstonWeb.Endpoint,
       # Starts a worker by calling: Arkenston.Worker.start_link(arg)
       # {Arkenston.Worker, arg},
-      {Guardian.DB.Token.SweeperServer, []}
+      {Guardian.DB.Sweeper, []}
       # Start the Absinthe schema when the application starts
       # uncomment after solving https://github.com/absinthe-graphql/absinthe/issues/1054
       # {Absinthe.Schema, ArkenstonWeb.Schema}
