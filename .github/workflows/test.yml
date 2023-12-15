@@ -82,7 +82,7 @@ jobs:
           fail_ci_if_error: true
 
       - name: Push build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: graphql-schema
           path: graphql/*
