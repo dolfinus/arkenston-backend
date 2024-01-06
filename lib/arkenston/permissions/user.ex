@@ -151,7 +151,7 @@ defmodule Arkenston.Permissions.User do
       end
 
     update_user_permissions =
-      unless is_self(context, old_user) do
+      unless self?(context, old_user) do
         if is_role_changing do
           [
             "update_#{new_role}" |> String.to_existing_atom()
@@ -185,7 +185,7 @@ defmodule Arkenston.Permissions.User do
 
     change_password_permissions =
       if is_password_changing do
-        if is_self(context, old_user) do
+        if self?(context, old_user) do
           [:change_self_password]
         else
           if is_role_changing do
@@ -226,7 +226,7 @@ defmodule Arkenston.Permissions.User do
     actual_permissions = Permissions.permissions_for(context)
 
     {change_author_permissions, field, options} =
-      unless is_self(context, user) do
+      unless self?(context, user) do
         {[
            "change_#{user.role}_author" |> String.to_existing_atom()
          ], :role, [role: {:enum, user.role}]}
@@ -246,7 +246,7 @@ defmodule Arkenston.Permissions.User do
     actual_permissions = Permissions.permissions_for(context)
 
     {delete_user_permissions, field, options} =
-      if is_self(context, user) do
+      if self?(context, user) do
         {[:delete_self], nil, []}
       else
         {[
@@ -262,7 +262,7 @@ defmodule Arkenston.Permissions.User do
     end
   end
 
-  defp is_self(context, user) do
+  defp self?(context, user) do
     case Permissions.get_current_user(context) do
       nil ->
         false

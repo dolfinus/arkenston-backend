@@ -89,7 +89,7 @@ defmodule Arkenston.Permissions.Author do
         is_nil(author.user) ->
           [:update_unassigned_author]
 
-        is_self(context, author) ->
+        self?(context, author) ->
           [:update_self]
 
         true ->
@@ -112,7 +112,7 @@ defmodule Arkenston.Permissions.Author do
         is_nil(author.user) ->
           [:delete_unassigned_author]
 
-        is_self(context, author) ->
+        self?(context, author) ->
           [:delete_self]
 
         true ->
@@ -126,7 +126,7 @@ defmodule Arkenston.Permissions.Author do
     end
   end
 
-  defp is_self(context, author) do
+  defp self?(context, author) do
     case Permissions.get_current_user(context) do
       nil ->
         false
