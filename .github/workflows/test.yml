@@ -40,7 +40,7 @@ jobs:
         run: 'mkdir -p ${{ github.workspace }}/priv/plts/test ${{ github.workspace }}/priv/plts/dev || true'
 
       - name: Get cached dializer plts
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             priv/plts
