@@ -75,7 +75,7 @@ jobs:
         run: 'docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from backend_test'
 
       - name: Push coverage results
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           directory: ./cover
           flags: unittests
