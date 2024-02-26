@@ -1,5 +1,4 @@
 version: 2
-enabled: false
 updates:
   - package-ecosystem: mix
     directory: /
